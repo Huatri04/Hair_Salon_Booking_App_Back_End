@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
+import com.hairsalonbookingapp.hairsalon.exception.AccountBlockedException;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.model.*;
@@ -10,6 +11,7 @@ import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -50,6 +52,7 @@ public class AuthenticationService implements UserDetailsService{
             account.setScore(0);
             account.setCreatAt(new Date());
             account.setStatus(true);
+            account.setDeleted(false);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = customerRepository.save(account); //lưu xuống database
@@ -74,8 +77,12 @@ public class AuthenticationService implements UserDetailsService{
 
             //=> tài khoản có tồn tại
             AccountForCustomer account = (AccountForCustomer) authentication.getPrincipal();
-            return modelMapper.map(account, AccountResponseForCustomer.class);
-        } catch (Exception e) {
+            if(account.isDeleted()){
+                throw new AccountBlockedException("Your account is blocked!");
+            } else {
+                return modelMapper.map(account, AccountResponseForCustomer.class);
+            }
+        } catch (BadCredentialsException e) {
             throw new AccountNotFoundException("Username or password invalid!");
         }
 
@@ -112,8 +119,12 @@ public class AuthenticationService implements UserDetailsService{
 
             //=> tài khoản có tồn tại
             AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
-            return modelMapper.map(account, AccountResponseForEmployee.class);
-        } catch (Exception e) {
+            if(account.isDeleted()){
+                throw new AccountBlockedException("Your account is blocked!");
+            } else {
+                return modelMapper.map(account, AccountResponseForEmployee.class);
+            }
+        } catch (BadCredentialsException e) { //lỗi này xuất hiện khi xác thực thất bại
             throw new AccountNotFoundException("Username or password invalid!");
         }
 
