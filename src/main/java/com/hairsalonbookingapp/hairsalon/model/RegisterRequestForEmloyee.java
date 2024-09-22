@@ -1,24 +1,16 @@
-package com.hairsalonbookingapp.hairsalon.entity;
+package com.hairsalonbookingapp.hairsalon.model;
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
-import jakarta.validation.constraints.*;
-import lombok.Getter;
-import lombok.Setter;
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.Size;
+import lombok.Data;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
 
-import java.io.Serializable;
-import java.util.Collection;
-import java.util.Date;
-import java.util.List;
-
-@Getter
-@Setter
-@Entity
-public class AccountForEmployee implements UserDetails {
+@Data
+public class RegisterRequestForEmloyee {
     @Id
     @Column(unique = true, nullable = false)
     private String id;
@@ -39,15 +31,6 @@ public class AccountForEmployee implements UserDetails {
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid!")
     @NotBlank(message = "phone number must not blank!", groups = CreatedBy.class)
     private String phoneNumber;
-
-    private double experience;
-
-    private double baseSalary;
-
-    private double serviceMoney;
-
-    private Date createdAt;
-
     @NotBlank(message = "Password can not blank!", groups = CreatedBy.class)
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
@@ -55,40 +38,4 @@ public class AccountForEmployee implements UserDetails {
     @NotBlank(message = "role must not blank!", groups = CreatedBy.class)
     @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "role invalid")
     private String role;
-
-
-    private String Status;
-
-    boolean isDeleted = false;
-
-
-    @Override
-    public Collection<? extends GrantedAuthority> getAuthorities() {
-        return null;
-    }
-
-    @Override
-    public String getUsername() {
-        return this.username; // cho ng dung dang nhap vao bang cai gi co the cho phone neu muon ng dung dang nhap bang phone
-    }
-
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
-    }
-
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
-    }
 }

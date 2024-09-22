@@ -2,12 +2,22 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
+import com.hairsalonbookingapp.hairsalon.model.AccountForCustomerResponse;
+import com.hairsalonbookingapp.hairsalon.model.AccountForEmployeeResponse;
+import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForCustomer;
+import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForEmloyee;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.data.annotation.CreatedBy;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import org.springframework.validation.annotation.Validated;
+import org.modelmapper.ModelMapper;
 
 import java.util.Date;
 import java.util.List;
@@ -15,18 +25,22 @@ import java.util.Optional;
 
 @Service
 @Transactional
-public class AuthenticationService {
+public class AuthenticationService implements UserDetailsService {
     @Autowired
     AccountForCustomerRepository accountForCustomerRepository;
 
 
-
+    @Validated(CreatedBy.class)// phan vao nhom created
     // logic dang ki tk cho guest
-    public AccountForCustomer register(AccountForCustomer account){
+    public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer){
+        AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
         try {
+            String originPassword = account.getPassword();
+            account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = accountForCustomerRepository.save(account);
             newAccount.setCreatAt(account.getCreatAt());
-            return newAccount;
+
+            return modelMapper.map(newAccount, AccountForCustomerResponse.class);
         } catch (Exception e) {
             if(e.getMessage().contains(account.getEmail())){
                 throw new Duplicate("duplicate email!");
@@ -76,7 +90,6 @@ public class AuthenticationService {
 
     // logic update profile cho employee
     public AccountForEmployee updatedAccount(AccountForEmployee account, String id){
-
         try {
             AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
             if(oldAccount == null){
@@ -85,18 +98,28 @@ public class AuthenticationService {
                 //account ton tai
                 if(account.getEmail() != null){
                     oldAccount.setEmail(account.getEmail());
+                }else{
+                    oldAccount.setEmail(oldAccount.getEmail());
                 }
                 if(account.getPhoneNumber() != null){
                     oldAccount.setPhoneNumber(account.getPhoneNumber());
+                }else{
+                    oldAccount.setPhoneNumber(oldAccount.getPhoneNumber());
                 }
                 if(account.getPassword() != null){
                     oldAccount.setPassword(account.getPassword());
+                }else{
+                    oldAccount.setPassword(oldAccount.getPassword());
                 }
                 if(account.getName() != null){
                     oldAccount.setName(account.getName());
+                }else{
+                    oldAccount.setName(oldAccount.getName());
                 }
                 if(account.getImg() != null){
                     oldAccount.setImg(account.getImg());
+                }else{
+                    oldAccount.setImg(oldAccount.getImg());
                 }
                 return employeeRepository.save(oldAccount);
             }
@@ -114,9 +137,16 @@ public class AuthenticationService {
 
 
 
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ModelMapper modelMapper;
+
     // logic dang ki tk cho employee
-    public AccountForEmployee register(AccountForEmployee account) {
-        AccountForEmployee newAccount = null;
+    @Validated(CreatedBy.class)// phan vao nhom created
+    public AccountForEmployeeResponse register(RegisterRequestForEmloyee registerRequestForEmloyee) {
+        AccountForEmployee account = modelMapper.map(registerRequestForEmloyee, AccountForEmployee.class);
         try {
 //            account.setId(generateNewId());
 //            return employeeRepository.save(account);
@@ -124,8 +154,14 @@ public class AuthenticationService {
             // Tạo ID dựa trên vai trò
             String newId = generateIdBasedOnRole(account.getRole());
             account.setId(newId);
+            String originPassword = account.getPassword();
+            account.setPassword(passwordEncoder.encode(originPassword));
 
-            return employeeRepository.save(account);
+            AccountForEmployee newAccount = employeeRepository.save(account);
+
+
+            return modelMapper.map(newAccount, AccountForEmployeeResponse.class);
+
         } catch (DataIntegrityViolationException e) {
             if (e.getMessage().contains(account.getEmail())) {
                 throw new Duplicate("duplicate email!");
@@ -185,5 +221,8 @@ public class AuthenticationService {
     }
 
 
-
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return null;
+    }
 }
