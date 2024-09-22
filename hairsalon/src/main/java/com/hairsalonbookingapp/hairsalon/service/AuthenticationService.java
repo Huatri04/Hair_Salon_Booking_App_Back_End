@@ -37,10 +37,12 @@ public class AuthenticationService implements UserDetailsService{
     @Autowired
     AuthenticationManager authenticationManager;
 
+    //CHECK INPUT LÀ SĐT HAY NAME
     private boolean isPhoneNumber(String input) {
         // Logic để kiểm tra input có phải là số điện thoại
         return input.matches("(84|0[3|5|7|8|9])+([0-9]{8})\\b");
     }
+
 
     public AccountResponseForCustomer registerCustomer(RegisterRequestForCustomer registerRequestForCustomer){
         AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
@@ -62,6 +64,7 @@ public class AuthenticationService implements UserDetailsService{
         }
     }
 
+    //LOGIN CUSTOMER
     public AccountResponseForCustomer loginForCustomer(LoginRequestForCustomer loginRequestForCustomer){
         try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -99,6 +102,7 @@ public class AuthenticationService implements UserDetailsService{
         }
     }
 
+    //LOGIN EMPLOYEE
     public AccountResponseForEmployee loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
         try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
@@ -113,6 +117,45 @@ public class AuthenticationService implements UserDetailsService{
             throw new AccountNotFoundException("Username or password invalid!");
         }
 
+    }
+
+    //GET PROFILE CUSTOMER
+    public ProfileCustomer getProfileCustomer(LoginRequestForCustomer loginRequestForCustomer){
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginRequestForCustomer.getPhoneNumber(),
+                    loginRequestForCustomer.getPassword()
+            ));
+            //=> tài khoản có tồn tại
+            AccountForCustomer account = (AccountForCustomer) authentication.getPrincipal();
+            if(account.isDeleted()==false){
+                return modelMapper.map(account, ProfileCustomer.class);
+            } else {
+                throw new Exception("Account is blocked!");
+            }
+        } catch (Exception e) {
+            throw new AccountNotFoundException("Can not find profile!");
+        }
+    }
+
+    //GET PROFILE EMPLOYEE
+    public ProfileEmployee getProfileEmployee(LoginRequestForEmployee loginRequestForEmployee){
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginRequestForEmployee.getName(),
+                    loginRequestForEmployee.getPassword()
+            ));
+
+            //=> tài khoản có tồn tại
+            AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
+            if(account.isDeleted()==false){
+                return modelMapper.map(account, ProfileEmployee.class);
+            } else {
+                throw new Exception("Account is blocked!");
+            }
+        } catch (Exception e) {
+            throw new AccountNotFoundException("Can not find profile!");
+        }
     }
 
     @Override

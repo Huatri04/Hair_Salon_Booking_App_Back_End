@@ -42,4 +42,16 @@ public class AuthenticationAPI {
         //return ResponseEntity.ok("Hi");
     }
 
+    @PostMapping("/ProfileCustomer")
+    public ResponseEntity getProfileCustomer(@Valid @RequestBody LoginRequestForCustomer loginRequestForCustomer){
+        ProfileCustomer profileCustomer = authenticationService.getProfileCustomer(loginRequestForCustomer);
+        return ResponseEntity.ok(profileCustomer);
+    }
+
+    @PostMapping("/ProfileEmployee")
+    public ResponseEntity getProfileEmployee(@Valid @RequestBody LoginRequestForEmployee loginRequestForEmployee){
+        ProfileEmployee profileEmployee = authenticationService.getProfileEmployee(loginRequestForEmployee);
+        return ResponseEntity.ok(profileEmployee);
+    }
+
 }
