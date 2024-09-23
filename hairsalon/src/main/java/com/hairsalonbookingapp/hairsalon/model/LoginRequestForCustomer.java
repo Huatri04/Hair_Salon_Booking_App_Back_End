@@ -12,7 +12,7 @@ public class LoginRequestForCustomer {
     @NotBlank(message = "phone number must not blank!")
     String phoneNumber;
 
-    @NotBlank(message = "Password must not blank!")
-    @Size(min = 6, message = "Password must be more than 6 characters")
+    //@NotBlank(message = "Password must not blank!")
+    //@Size(min = 6, message = "Password must be more than 6 characters")
     String password;
 }

@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
@@ -8,9 +9,8 @@ import lombok.Data;
 public class LoginRequestForEmployee {
 
     @NotBlank(message = "Name must not blank!")
+    @Pattern(regexp = "^[^0-9]+$", message = "Name is invalid!")
     String name;
 
-    @NotBlank(message = "Password must not blank!")
-    @Size(min = 6, message = "Password must be more than 6 characters")
     String password;
 }

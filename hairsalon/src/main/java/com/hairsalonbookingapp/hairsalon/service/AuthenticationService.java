@@ -83,7 +83,7 @@ public class AuthenticationService implements UserDetailsService{
                 return modelMapper.map(account, AccountResponseForCustomer.class);
             }
         } catch (BadCredentialsException e) {
-            throw new AccountNotFoundException("Username or password invalid!");
+            throw new AccountNotFoundException("Phonenumber or password invalid!");
         }
 
     }
@@ -179,10 +179,19 @@ public class AuthenticationService implements UserDetailsService{
     }
 
     public UserDetails loadUserByPhoneNumber(String phoneNumber) throws UsernameNotFoundException {
-        return customerRepository.findAccountForCustomerByPhoneNumber(phoneNumber);
+        if(customerRepository.findAccountForCustomerByPhoneNumber(phoneNumber)!=null){
+            return customerRepository.findAccountForCustomerByPhoneNumber(phoneNumber);
+        } else {
+            throw new AccountNotFoundException("Phonenumber or password invalid!");
+        }
     }
 
     public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
-        return employeeRepository.findAccountForEmployeeByName(name);
+        if(employeeRepository.findAccountForEmployeeByName(name)!=null){
+            return employeeRepository.findAccountForEmployeeByName(name);
+        } else {
+            throw new AccountNotFoundException("Username or password invalid!");
+        }
+
     }
 }
