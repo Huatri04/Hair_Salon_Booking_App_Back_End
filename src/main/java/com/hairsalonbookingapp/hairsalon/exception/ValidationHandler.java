@@ -31,4 +31,10 @@ public class ValidationHandler {
     public ResponseEntity handleValidation(AccountNotFoundException exception){
         return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    public ResponseEntity handleValidation(Duplicate exception){
+        return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    public ResponseEntity handleValidation(UpdatedException exception){
+        return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
 }

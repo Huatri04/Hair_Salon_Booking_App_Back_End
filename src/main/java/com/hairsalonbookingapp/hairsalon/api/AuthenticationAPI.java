@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.model.AccountForCustomerResponse;
-import com.hairsalonbookingapp.hairsalon.model.AccountForEmployeeResponse;
-import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForCustomer;
-import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForEmloyee;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.AuthenticationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,15 +38,15 @@ public class AuthenticationAPI {
 
     // update profile cua customer
     @PutMapping("/profile/{id}")
-    public ResponseEntity updatedAccountCustomer(@Valid @RequestBody AccountForCustomer account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
-        AccountForCustomer oldAccount = authenticationService.updatedAccount(account, id);
+    public ResponseEntity updatedAccountCustomer(@Valid @RequestBody RequestEditProfileCustomer account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
+        EditProfileCustomerResponse oldAccount = authenticationService.updatedAccount(account, id);
         return ResponseEntity.ok(oldAccount);
     }
 
     //update profile cua employee
     @PutMapping("/profileEmployee/{id}")
-    public ResponseEntity updatedAccountEmployee(@Valid @RequestBody AccountForEmployee account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
-        AccountForEmployee oldAccount = authenticationService.updatedAccount(account, id);
+    public ResponseEntity updatedAccountEmployee(@Valid @RequestBody RequestEditProfileEmployee account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
+        EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccount(account, id);
         return ResponseEntity.ok(oldAccount);
     }
 }

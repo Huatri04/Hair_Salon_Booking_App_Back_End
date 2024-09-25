@@ -2,14 +2,16 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.AccountForCustomerResponse;
-import com.hairsalonbookingapp.hairsalon.model.AccountForEmployeeResponse;
-import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForCustomer;
-import com.hairsalonbookingapp.hairsalon.model.RegisterRequestForEmloyee;
+import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Valid;
+import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.annotation.CreatedBy;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -18,6 +20,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Date;
 import java.util.List;
@@ -54,32 +57,39 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     // update profile cho customer
-    public AccountForCustomer updatedAccount(AccountForCustomer account, String id){
-        AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(id);
-        try {
 
-            if(oldAccount == null){
-                throw new Duplicate("Account not found!");
-            }else{
-                //account ton tai
-                if(account.getEmail() != null){
+    public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer, String phone){
+        AccountForCustomer account = modelMapper.map(requestEditProfileCustomer, AccountForCustomer.class);
+        AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(phone);
+        if (oldAccount == null) {
+            throw new Duplicate("Account not found!");// cho dung luon
+        } else {
+
+            try{
+                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
                     oldAccount.setEmail(account.getEmail());
                 }
-                if(account.getPassword() != null){
-                    oldAccount.setPassword(account.getPassword());
+
+                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
+                String originPassword = account.getPassword();
+                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
                 }
-                if(account.getName() != null){
+
+                // Kiểm tra và cập nhật tên
+                if (account.getName() != null && !account.getName().isEmpty()) {
                     oldAccount.setName(account.getName());
                 }
-                return accountForCustomerRepository.save(oldAccount);
-            }
-        } catch (Exception e) {
-            if(e.getMessage().contains(oldAccount.getEmail())){
-                throw new Duplicate("duplicate email!");
-            } else if (e.getMessage().contains(oldAccount.getPhoneNumber())) {
-                throw new Duplicate("duplicate phone!");
-            } else if (e.getMessage().contains(oldAccount.getPassword())) {
-                throw new Duplicate("duplicate password!");
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                AccountForCustomer updatedAccount = accountForCustomerRepository.save(oldAccount);
+                return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
+            } catch (DataIntegrityViolationException e) {
+                if(e.getMessage().contains(account.getEmail())){
+                    throw new Duplicate("duplicate email!");
+                } else if (e.getMessage().contains(account.getPassword())) {
+                    throw new Duplicate("duplicate password!");
+                }
             }
         }
         return null;
@@ -89,51 +99,162 @@ public class AuthenticationService implements UserDetailsService {
     EmployeeRepository employeeRepository;
 
     // logic update profile cho employee
-    public AccountForEmployee updatedAccount(AccountForEmployee account, String id){
-        try {
+
+
+    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
+        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
             AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
-            if(oldAccount == null){
-                throw new Duplicate("Account not found!");
-            }else{
-                //account ton tai
-                if(account.getEmail() != null){
-                    oldAccount.setEmail(account.getEmail());
-                }else{
-                    oldAccount.setEmail(oldAccount.getEmail());
+            if (oldAccount == null) {
+                throw new Duplicate("Account not found!");// cho dung luon
+            } else {
+                try{
+                    if (account.getEmail() != null && !account.getEmail().isEmpty()) {
+                        oldAccount.setEmail(account.getEmail());
+                    }
+                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
+                    if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
+                        oldAccount.setPhoneNumber(account.getPhoneNumber());
+                    }
+                    // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
+                    String originPassword = account.getPassword();
+                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
+                    }
+                    // Kiểm tra và cập nhật tên
+                    if (account.getName() != null && !account.getName().isEmpty()) {
+                        oldAccount.setName(account.getName());
+                    }
+
+                    // Kiểm tra và cập nhật ảnh
+                    if (account.getImg() != null && !account.getImg().isEmpty()) {
+                        oldAccount.setImg(account.getImg());
+                    }
+
+                    // Lưu cập nhật vào cơ sở dữ liệu
+                    AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+                    return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
+                } catch (Exception e) {
+                    if(e.getMessage().contains(account.getEmail())){
+                        throw new Duplicate("duplicate email!");
+                    } else if (e.getMessage().contains(account.getPhoneNumber())) {
+                        throw new Duplicate("duplicate phone!");
+                    } else if (e.getMessage().contains(account.getPassword())) {
+                        throw new Duplicate("duplicate password!");
+                    }
                 }
-                if(account.getPhoneNumber() != null){
-                    oldAccount.setPhoneNumber(account.getPhoneNumber());
-                }else{
-                    oldAccount.setPhoneNumber(oldAccount.getPhoneNumber());
-                }
-                if(account.getPassword() != null){
-                    oldAccount.setPassword(account.getPassword());
-                }else{
-                    oldAccount.setPassword(oldAccount.getPassword());
-                }
-                if(account.getName() != null){
-                    oldAccount.setName(account.getName());
-                }else{
-                    oldAccount.setName(oldAccount.getName());
-                }
-                if(account.getImg() != null){
-                    oldAccount.setImg(account.getImg());
-                }else{
-                    oldAccount.setImg(oldAccount.getImg());
-                }
-                return employeeRepository.save(oldAccount);
             }
-        } catch (Exception e) {
-            if(e.getMessage().contains(account.getEmail())){
-                throw new Duplicate("duplicate email!");
-            } else if (e.getMessage().contains(account.getPhoneNumber())) {
-                throw new Duplicate("duplicate phone!");
-            } else if (e.getMessage().contains(account.getPassword())) {
-                throw new Duplicate("duplicate password!");
-            }
-        }
-        return null;
+            return null;
     }
+
+//    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
+//        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
+//            AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
+//            if (oldAccount == null) {
+//                throw new Duplicate("Account not found!");// cho dung luon
+//            } else {
+//                // Kiểm tra email hợp lệ
+//                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
+//                    if (!account.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
+//                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email invalid!");
+//                    }
+//                    oldAccount.setEmail(account.getEmail());
+//                }
+//
+//                // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
+//                if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
+//                    if (!account.getPhoneNumber().matches("^[0-9]{10}$")) {
+//                        throw new UpdatedException("phone number invalid!");
+//                    }
+//                    oldAccount.setPhoneNumber(account.getPhoneNumber());
+//                }
+//
+//                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
+//                String originPassword = account.getPassword();
+//                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+//                    if (account.getPassword().length() <= 6) {
+//                        throw new UpdatedException("Password must be at least 6 characters");
+//                    }
+//                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
+//                }
+//
+//                // Kiểm tra và cập nhật tên
+//                if (account.getName() != null && !account.getName().isEmpty()) {
+//                    oldAccount.setName(account.getName());
+//                }
+//
+//                // Kiểm tra và cập nhật ảnh
+//                if (account.getImg() != null && !account.getImg().isEmpty()) {
+//                    oldAccount.setImg(account.getImg());
+//                }
+//
+//                // Lưu cập nhật vào cơ sở dữ liệu
+//                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+//                return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
+//            }
+//    }
+
+//    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id){
+//        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
+//
+//            AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
+//            if(oldAccount == null){
+//                throw new Duplicate("Account not found!");
+//            }else{
+//                //account ton tai
+//                if(account.getEmail() != null){
+//                    try{
+//                        oldAccount.setEmail(account.getEmail());
+//                    } catch (Exception e) {
+//                        if(e.getMessage().contains(account.getEmail())){
+//                            throw new Duplicate("duplicate email!");
+//                        }
+//                    }
+//                }else{
+//                    oldAccount.setEmail(oldAccount.getEmail());
+//                }
+//                if(account.getPhoneNumber() != null){
+//                    try{
+//                        oldAccount.setPhoneNumber(account.getPhoneNumber());
+//                    } catch (Exception e) {
+//                        if(e.getMessage().contains(account.getPhoneNumber())){
+//                            throw new Duplicate("duplicate phone number!");
+//                        }
+//                    }
+//                }else{
+//                    oldAccount.setPhoneNumber(oldAccount.getPhoneNumber());
+//                }
+//                if(account.getPassword() != null){
+//                    try{
+//                        oldAccount.setPassword(account.getPassword());
+//                    } catch (Exception e) {
+//                        if(e.getMessage().contains(account.getPassword())){
+//                            throw new Duplicate("duplicate pasword!");
+//                        }
+//                    }
+//                }else{
+//                    oldAccount.setPassword(oldAccount.getPassword());
+//                }
+//                if(account.getName() != null){
+//                    try{
+//                        oldAccount.setName(account.getName());
+//                    } catch (Exception e) {
+//                        if(e.getMessage().contains(account.getName())){
+//                            throw new Duplicate("duplicate name!");
+//                        }
+//                    }
+//                }else{
+//                    oldAccount.setName(oldAccount.getName());
+//                }
+//                if(account.getImg() != null){
+//                    oldAccount.setImg(account.getImg());
+//                }else{
+//                    oldAccount.setImg(oldAccount.getImg());
+//                }
+//
+//                AccountForEmployee oldAccount1 = employeeRepository.save(oldAccount);
+//                return modelMapper.map(oldAccount1, EditProfileEmployeeResponse.class);
+//            }
+//    }
 
 
 
