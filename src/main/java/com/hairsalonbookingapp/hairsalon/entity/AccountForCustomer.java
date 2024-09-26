@@ -9,11 +9,12 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
+
 
 @Getter
 @Setter
 @Entity
+@Table(name = "AccountForCustomer")
 public class AccountForCustomer implements UserDetails {
     @Email(message = "Email invalid!")
     @NotBlank(message = "email must not blank!")
@@ -37,6 +38,12 @@ public class AccountForCustomer implements UserDetails {
     @NotBlank(message = "Password can not blank!")
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
+
+    private String feedbackId;
+
+    private String discountCodeId;
+
+    private String appointmentId;
 
     private boolean Status;
 

@@ -5,13 +5,9 @@ import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
 import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
-import jakarta.validation.ConstraintViolationException;
-import jakarta.validation.Valid;
-import org.apache.coyote.BadRequestException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.annotation.CreatedBy;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,10 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
-import org.springframework.web.server.ResponseStatusException;
 
-import java.util.Date;
-import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -86,9 +79,9 @@ public class AuthenticationService implements UserDetailsService {
                 return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
             } catch (DataIntegrityViolationException e) {
                 if(e.getMessage().contains(account.getEmail())){
-                    throw new Duplicate("duplicate email!");
+                    throw new UpdatedException("duplicate email!");
                 } else if (e.getMessage().contains(account.getPassword())) {
-                    throw new Duplicate("duplicate password!");
+                    throw new UpdatedException("duplicate password!");
                 }
             }
         }
@@ -135,11 +128,11 @@ public class AuthenticationService implements UserDetailsService {
                     return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
                 } catch (Exception e) {
                     if(e.getMessage().contains(account.getEmail())){
-                        throw new Duplicate("duplicate email!");
+                        throw new UpdatedException("duplicate email!");
                     } else if (e.getMessage().contains(account.getPhoneNumber())) {
-                        throw new Duplicate("duplicate phone!");
+                        throw new UpdatedException("duplicate phone!");
                     } else if (e.getMessage().contains(account.getPassword())) {
-                        throw new Duplicate("duplicate password!");
+                        throw new UpdatedException("duplicate password!");
                     }
                 }
             }
@@ -275,8 +268,8 @@ public class AuthenticationService implements UserDetailsService {
             // Tạo ID dựa trên vai trò
             String newId = generateIdBasedOnRole(account.getRole());
             account.setId(newId);
-            String originPassword = account.getPassword();
-            account.setPassword(passwordEncoder.encode(originPassword));
+//            String originPassword = account.getPassword();
+//            account.setPassword(passwordEncoder.encode(originPassword));
 
             AccountForEmployee newAccount = employeeRepository.save(account);
 

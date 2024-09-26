@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,6 +19,7 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
+@Table(name = "AccountForEmployee")
 public class AccountForEmployee implements UserDetails {
     @Id
     @Column(unique = true, nullable = false)
@@ -45,6 +47,14 @@ public class AccountForEmployee implements UserDetails {
     private double baseSalary;
 
     private double serviceMoney;
+
+    private String transactionId;
+
+    private String leaveRequestId;
+
+    private String softwareSupportApplicationId;
+
+    private String salaryMonthId;
 
     private Date createdAt;
 
