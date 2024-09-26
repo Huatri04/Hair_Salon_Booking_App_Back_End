@@ -15,4 +15,5 @@ public class AccountResponseForEmployee {
     String email;
     String phoneNumber;
     String role;
+    String token;
 }

@@ -12,4 +12,5 @@ public class AccountResponseForCustomer {
     String email;
     String name;
     String phoneNumber;
+    String token;
 }
