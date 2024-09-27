@@ -14,6 +14,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -39,8 +40,11 @@ public class AuthenticationService implements UserDetailsService{
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    TokenService tokenService;
+
     //CHECK INPUT LÀ SĐT HAY NAME
-    private boolean isPhoneNumber(String input) {
+    public boolean isPhoneNumber(String input) {
         // Logic để kiểm tra input có phải là số điện thoại
         return input.matches("(84|0[3|5|7|8|9])+([0-9]{8})\\b");
     }
@@ -52,7 +56,7 @@ public class AuthenticationService implements UserDetailsService{
             account.setScore(0);
             account.setCreatAt(new Date());
             account.setStatus(true);
-            account.setDeleted(true);
+            account.setDeleted(false);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = customerRepository.save(account); //lưu xuống database
@@ -80,7 +84,9 @@ public class AuthenticationService implements UserDetailsService{
             if(account.isDeleted()){
                 throw new AccountBlockedException("Your account is blocked!");
             } else {
-                return modelMapper.map(account, AccountResponseForCustomer.class);
+                AccountResponseForCustomer accountResponseForCustomer = modelMapper.map(account, AccountResponseForCustomer.class);
+                accountResponseForCustomer.setToken(tokenService.generateTokenCustomer(account));
+                return accountResponseForCustomer;
             }
         } catch (BadCredentialsException e) {
             throw new AccountNotFoundException("Phonenumber or password invalid!");
@@ -91,11 +97,10 @@ public class AuthenticationService implements UserDetailsService{
     public AccountResponseForEmployee registerEmployee(RegisterRequestForEmployee registerRequestForEmployee){
         AccountForEmployee account = modelMapper.map(registerRequestForEmployee, AccountForEmployee.class);
         try{
-            account.setId("2");
+            account.setId("1");
             account.setBaseSalary(2);
             account.setCreatedAt(new Date());
             account.setStatus(true);
-            account.setDeleted(true);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForEmployee newAccount = employeeRepository.save(account); //lưu xuống database
@@ -123,7 +128,9 @@ public class AuthenticationService implements UserDetailsService{
             if(account.isDeleted()){
                 throw new AccountBlockedException("Your account is blocked!");
             } else {
-                return modelMapper.map(account, AccountResponseForEmployee.class);
+                AccountResponseForEmployee accountResponseForEmployee = modelMapper.map(account, AccountResponseForEmployee.class);
+                accountResponseForEmployee.setToken(tokenService.generateTokenEmployee(account));
+                return accountResponseForEmployee;
             }
         } catch (BadCredentialsException e) { //lỗi này xuất hiện khi xác thực thất bại
             throw new AccountNotFoundException("Username or password invalid!");
@@ -132,8 +139,10 @@ public class AuthenticationService implements UserDetailsService{
     }
 
     //GET PROFILE CUSTOMER
-    public ProfileCustomer getProfileCustomer(LoginRequestForCustomer loginRequestForCustomer){
-        try{
+    public ProfileCustomer getProfileCustomer(){
+        AccountForCustomer accountForCustomer = getCurrentAccountForCustomer();
+        return modelMapper.map(accountForCustomer, ProfileCustomer.class);
+        /*try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequestForCustomer.getPhoneNumber(),
                     loginRequestForCustomer.getPassword()
@@ -147,12 +156,14 @@ public class AuthenticationService implements UserDetailsService{
             }
         } catch (Exception e) {
             throw new AccountNotFoundException("Can not find profile!");
-        }
+        }*/
     }
 
     //GET PROFILE EMPLOYEE
-    public ProfileEmployee getProfileEmployee(LoginRequestForEmployee loginRequestForEmployee){
-        try{
+    public ProfileEmployee getProfileEmployee(){
+        AccountForEmployee accountForEmployee = getCurrentAccountForEmployee();
+        return modelMapper.map(accountForEmployee, ProfileEmployee.class);
+        /*try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequestForEmployee.getName(),
                     loginRequestForEmployee.getPassword()
@@ -167,7 +178,7 @@ public class AuthenticationService implements UserDetailsService{
             }
         } catch (Exception e) {
             throw new AccountNotFoundException("Can not find profile!");
-        }
+        }*/
     }
 
     @Override
@@ -194,5 +205,15 @@ public class AuthenticationService implements UserDetailsService{
             throw new AccountNotFoundException("Username or password invalid!");
         }
 
+    }
+
+    public AccountForCustomer getCurrentAccountForCustomer(){
+        AccountForCustomer account = (AccountForCustomer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return customerRepository.findAccountForCustomerByPhoneNumber(account.getPhoneNumber());
+    }
+
+    public AccountForEmployee getCurrentAccountForEmployee(){
+        AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return employeeRepository.findAccountForEmployeeByName(account.getName());
     }
 }

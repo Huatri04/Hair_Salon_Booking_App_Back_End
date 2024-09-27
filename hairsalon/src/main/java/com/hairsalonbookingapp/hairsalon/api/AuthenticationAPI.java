@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.AuthenticationService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -9,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api")
+@SecurityRequirement(name = "api")
 public class AuthenticationAPI {
 
     @Autowired
@@ -42,15 +44,15 @@ public class AuthenticationAPI {
         //return ResponseEntity.ok("Hi");
     }
 
-    @PostMapping("/ProfileCustomer")
-    public ResponseEntity getProfileCustomer(@Valid @RequestBody LoginRequestForCustomer loginRequestForCustomer){
-        ProfileCustomer profileCustomer = authenticationService.getProfileCustomer(loginRequestForCustomer);
+    @GetMapping("/ProfileCustomer")
+    public ResponseEntity getProfileCustomer(){
+        ProfileCustomer profileCustomer = authenticationService.getProfileCustomer();
         return ResponseEntity.ok(profileCustomer);
     }
 
-    @PostMapping("/ProfileEmployee")
-    public ResponseEntity getProfileEmployee(@Valid @RequestBody LoginRequestForEmployee loginRequestForEmployee){
-        ProfileEmployee profileEmployee = authenticationService.getProfileEmployee(loginRequestForEmployee);
+    @GetMapping("/ProfileEmployee")
+    public ResponseEntity getProfileEmployee(){
+        ProfileEmployee profileEmployee = authenticationService.getProfileEmployee();
         return ResponseEntity.ok(profileEmployee);
     }
 
