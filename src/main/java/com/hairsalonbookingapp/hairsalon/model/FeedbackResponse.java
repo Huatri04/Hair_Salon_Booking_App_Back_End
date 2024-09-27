@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
 import jakarta.validation.constraints.Max;
@@ -11,9 +12,10 @@ public class FeedbackResponse {
 
     private String feedbackId;
 
-    private int start;
+    private int star;
 
     private String comment;
 
-    private String phoneNumberOfCustomer;
+    private AccountForCustomer customer;
+
 }

@@ -14,7 +14,6 @@ public class RequestDiscountCode {
 
     private double percentage;
 
-    private String discountProgramId;
 
     private  String appointmentId;
 

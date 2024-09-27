@@ -21,7 +21,5 @@ public class RequestDiscountprogram {
 
     private double percentage;
 
-    private String discountCodeId;
-
     private boolean isDeleted = false;
 }

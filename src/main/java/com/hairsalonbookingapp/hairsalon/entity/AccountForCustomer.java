@@ -6,8 +6,10 @@ import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -29,6 +31,8 @@ public class AccountForCustomer implements UserDetails {
     @Min(value = 0, message = "Score must at least 0")
     private long score;
 
+    private String role = "customer";
+
     @Id
     @Column(unique = true)
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid!")
@@ -45,16 +49,21 @@ public class AccountForCustomer implements UserDetails {
     @JsonIgnore
     private List<Feedback> feedbacks;
 
-    private String discountCodeId;
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<DiscountCode> discountCodes;
 
     private String appointmentId;
 
-    private boolean Status;
+    private boolean status;
 
     boolean isDeleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
+//        List<SimpleGrantedAuthority> authorities = new ArrayList<>();
+//        authorities.add(new SimpleGrantedAuthority(this.role));
+//        return authorities;
         return null;
     }
 

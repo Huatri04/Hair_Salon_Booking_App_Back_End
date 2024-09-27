@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
+import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
 import com.hairsalonbookingapp.hairsalon.model.*;
@@ -8,6 +9,11 @@ import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.annotation.CreatedBy;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -25,7 +31,21 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     AccountForCustomerRepository accountForCustomerRepository;
 
+    @Autowired
+    EmployeeRepository employeeRepository;
 
+
+    @Autowired
+    PasswordEncoder passwordEncoder;
+
+    @Autowired
+    ModelMapper modelMapper;
+
+    @Autowired
+    AuthenticationManager authenticationManager;
+
+    @Autowired
+    TokenService tokenService;
     @Validated(CreatedBy.class)// phan vao nhom created
     // logic dang ki tk cho guest
     public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer){
@@ -88,8 +108,7 @@ public class AuthenticationService implements UserDetailsService {
         return null;
     }
 
-    @Autowired
-    EmployeeRepository employeeRepository;
+
 
     // logic update profile cho employee
 
@@ -251,11 +270,7 @@ public class AuthenticationService implements UserDetailsService {
 
 
 
-    @Autowired
-    PasswordEncoder passwordEncoder;
 
-    @Autowired
-    ModelMapper modelMapper;
 
     // logic dang ki tk cho employee
     @Validated(CreatedBy.class)// phan vao nhom created
@@ -334,9 +349,98 @@ public class AuthenticationService implements UserDetailsService {
         return String.format("%s%06d", prefix, newIdNumber); // Tạo ID mới với format
     }
 
+    //CHECK INPUT LÀ SĐT HAY NAME
+    public boolean isPhoneNumber(String input) {
+        // Logic để kiểm tra input có phải là số điện thoại
+        return input.matches("(84|0[3|5|7|8|9])+([0-9]{8})\\b");
+    }
+
+
+
+
+    //LOGIN CUSTOMER
+    public AccountForCustomerResponse loginForCustomer(LoginRequestForCustomer loginRequestForCustomer){
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginRequestForCustomer.getPhoneNumber(),
+                    loginRequestForCustomer.getPassword()
+            ));
+
+            //=> tài khoản có tồn tại
+            AccountForCustomer account = (AccountForCustomer) authentication.getPrincipal();
+            if(account.isDeleted()){
+                throw new Duplicate("Your account is blocked!");
+            } else {
+                AccountForCustomerResponse accountResponseForCustomer = modelMapper.map(account, AccountForCustomerResponse.class);
+                accountResponseForCustomer.setToken(tokenService.generateTokenCustomer(account));
+                return accountResponseForCustomer;
+            }
+        } catch (BadCredentialsException e) {
+            throw new AccountNotFoundException("Phonenumber or password invalid!");
+        }
+
+    }
+
+
+    //LOGIN EMPLOYEE
+    public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
+        try{
+            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+                    loginRequestForEmployee.getUsername(),
+                    loginRequestForEmployee.getPassword()
+            ));
+
+            //=> tài khoản có tồn tại
+            AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
+            if(account.isDeleted()){
+                throw new Duplicate("Your account is blocked!");
+            } else {
+                AccountForEmployeeResponse accountResponseForEmployee = modelMapper.map(account, AccountForEmployeeResponse.class);
+                accountResponseForEmployee.setToken(tokenService.generateTokenEmployee(account));
+                return accountResponseForEmployee;
+            }
+        } catch (BadCredentialsException e) { //lỗi này xuất hiện khi xác thực thất bại
+            throw new AccountNotFoundException("Username or password invalid!");
+        }
+
+    }
+
 
     @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return null;
+    public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
+        if(isPhoneNumber(input)){
+            return loadUserByPhoneNumber(input);
+        } else {
+            return loadUserByName(input);
+        }
     }
+
+    public UserDetails loadUserByPhoneNumber(String phoneNumber) throws UsernameNotFoundException {
+        if(accountForCustomerRepository.findByPhoneNumber(phoneNumber)!=null){
+            return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
+        } else {
+            throw new AccountNotFoundException("Phonenumber or password invalid!");
+        }
+    }
+
+    public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
+        if(employeeRepository.findAccountForEmployeeByName(name)!=null){
+            return employeeRepository.findAccountForEmployeeByName(name);
+        } else {
+            throw new AccountNotFoundException("Username or password invalid!");
+        }
+
+    }
+
+    public AccountForCustomer getCurrentAccountForCustomer(){
+        AccountForCustomer account = (AccountForCustomer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return accountForCustomerRepository.findByPhoneNumber(account.getPhoneNumber());
+    }
+
+    public AccountForEmployee getCurrentAccountForEmployee(){
+        AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        return employeeRepository.findAccountForEmployeeByName(account.getName());
+    }
+
+
 }

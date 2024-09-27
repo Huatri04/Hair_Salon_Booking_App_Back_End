@@ -1,7 +1,10 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import jakarta.persistence.Column;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
@@ -14,9 +17,9 @@ public class RequestFeedback {
 
     @Min(value = 1, message = "start must at least 1")
     @Max(value = 5, message = "start must smaller than 5")
-    private int start;
+    private int star;
 
     private String comment;
 
-    private String phoneNumberOfCustomer;
+    private boolean isDeleted = false;
 }

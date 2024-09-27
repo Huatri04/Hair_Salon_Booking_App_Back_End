@@ -1,5 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
+import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import lombok.Data;
 
 @Data
@@ -10,7 +12,9 @@ public class DiscountCodeResponse {
 
     private double percentage;
 
-    private String discountProgramId;
+    private DiscountProgram discountProgram;
+
+    private AccountForCustomer customer;
 
     private  String appointmentId;
 }

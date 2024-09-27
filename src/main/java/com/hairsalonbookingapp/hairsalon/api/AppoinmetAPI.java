@@ -7,6 +7,7 @@ import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
 import com.hairsalonbookingapp.hairsalon.model.RequestAppointment;
 import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.service.AppontmentService;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +18,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/appoinment")
 @CrossOrigin("*")
+@SecurityRequirement(name = "api") // tao controller moi nho copy qua
 public class AppoinmetAPI {
     @Autowired
     AppontmentService appontmentService;

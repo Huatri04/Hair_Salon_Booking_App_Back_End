@@ -29,4 +29,6 @@ public class RegisterRequestForCustomer {
     @NotBlank(message = "Password can not blank!")
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
+
+    private String role = "customer";
 }

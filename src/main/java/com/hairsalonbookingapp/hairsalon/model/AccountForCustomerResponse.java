@@ -6,6 +6,8 @@ import lombok.Data;
 public class AccountForCustomerResponse {
     private String email;
     private String name;
-    private long score;
+
     private String phoneNumber;
+    private String token;
+    private long score;
 }

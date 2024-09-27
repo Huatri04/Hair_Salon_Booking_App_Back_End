@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
@@ -19,6 +20,9 @@ public class FeedbackService {
     FeedbackRepository feedbackRepository;
 
     @Autowired
+    AuthenticationService authenticationService;
+
+    @Autowired
     ModelMapper modelMapper;
     // create feedback
     public FeedbackResponse createFeedback(RequestFeedback requestFeedback){
@@ -26,13 +30,20 @@ public class FeedbackService {
         try{
             String newId = generateId();
             feedback.setFeedbackId(newId);
+            AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+            if(accountForCustomer == null){
+                throw new Duplicate("No current customer found.");
+            }
+            feedback.setCustomer(accountForCustomer);
             Feedback newFeedback = feedbackRepository.save(feedback);
             return modelMapper.map(newFeedback, FeedbackResponse.class);
         } catch (Exception e) {
-            if(e.getMessage().contains(feedback.getStart() + "")){
+            if(e.getMessage().contains(feedback.getStar() + "")){
                 throw new Duplicate("duplicate start! ");
             } else if (e.getMessage().contains(feedback.getFeedbackId())) {
                 throw new Duplicate("duplicate feedback id! ");
+            } else if (e.getMessage().contains(feedback.getCustomer() + "")) {
+                throw new Duplicate("duplicate Customer! ");
             }
         }
         return null;

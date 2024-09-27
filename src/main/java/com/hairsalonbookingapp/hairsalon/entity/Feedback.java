@@ -17,12 +17,12 @@ public class Feedback {
 
     @Min(value = 1, message = "start must at least 1")
     @Max(value = 5, message = "start must smaller than 5")
-    private int start;
+    private int star;
 
     private String comment;
 
     @ManyToOne
-    @JoinColumn(name = "phoneNumber") // day la foreign key
+    @JoinColumn(name = "phoneNumber", nullable = false) // day la foreign key
     private AccountForCustomer customer;
 
     private boolean isDeleted = false;

@@ -1,13 +1,12 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -24,11 +23,15 @@ public class DiscountProgram {
 
     private long Amount;
 
+    private String img;
+
     private String status;
 
     private double percentage;
 
-    private String discountCodeId;
+    @OneToMany(mappedBy = "discountProgram")
+    @JsonIgnore
+    private List<DiscountCode> discountCodes;
 
     private boolean isDeleted = false;
 }

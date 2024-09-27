@@ -29,12 +29,17 @@ public class ValidationHandler {
     @ExceptionHandler(DuplicateRequestException.class) //MethodArgumentNotValidException la loi khi ng dung nhap sai
     @ResponseStatus(HttpStatus.BAD_REQUEST) // dua ra ma loi cho FE biet BAD REQUEST la dau va nguoi dung nhap sai FE coi lai
     public ResponseEntity handleValidation(AccountNotFoundException exception){
-        return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+        return new ResponseEntity(exception.getMessage(), HttpStatus.UNAUTHORIZED);
     }
     public ResponseEntity handleValidation(Duplicate exception){
         return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
     public ResponseEntity handleValidation(UpdatedException exception){
+        return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+    @ExceptionHandler(Exception.class)
+    //@ResponseStatus(HttpStatus.BAD_REQUEST)// cái này báo cho front end biết mã lỗi status: INPUT đầu vào sai, front end check lại
+    public ResponseEntity handleGenericException(Exception exception){
         return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
 }

@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
+import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.model.DiscountCodeResponse;
@@ -21,6 +23,10 @@ public class DiscountCodeService {
     DiscountCodeRepository discountCodeRepository;
     @Autowired
     ModelMapper modelMapper;
+    @Autowired
+    DiscountProgramService discountProgramService;
+    @Autowired
+    AuthenticationService authenticationService;
 
     // create feedback
     public DiscountCodeResponse createDiscountCode(RequestDiscountCode requestDiscountCode){
@@ -28,6 +34,17 @@ public class DiscountCodeService {
         try{
             String newId = generateId();
             discountCode.setDiscountCodeId(newId);
+            DiscountProgram discountProgram = discountProgramService.getCurrentDiscountProgram();
+            if(discountProgram == null){
+                throw new Duplicate("No current customer found.");
+            }
+            discountCode.setDiscountProgram(discountProgram);
+
+            AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+            if(accountForCustomer == null){
+                throw new Duplicate("No current customer found.");
+            }
+            discountCode.setCustomer(accountForCustomer);
             DiscountCode newDiscountCode = discountCodeRepository.save(discountCode);
             return modelMapper.map(newDiscountCode, DiscountCodeResponse.class);
         } catch (Exception e) {

@@ -1,9 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -20,7 +17,13 @@ public class DiscountCode {
 
     private double percentage;
 
-    private String discountProgramId;
+    @ManyToOne
+    @JoinColumn(name = "discountProgramId", nullable = false) // day la foreign key
+    private DiscountProgram discountProgram;
+
+    @ManyToOne
+    @JoinColumn(name = "phoneNumber", nullable = false) // day la foreign key
+    private AccountForCustomer customer;
 
     private  String appointmentId;
 
