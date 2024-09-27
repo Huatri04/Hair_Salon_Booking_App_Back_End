@@ -1,9 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Getter;
@@ -24,7 +21,9 @@ public class Feedback {
 
     private String comment;
 
-    private String phoneNumberOfCustomer;
+    @ManyToOne
+    @JoinColumn(name = "phoneNumber") // day la foreign key
+    private AccountForCustomer customer;
 
     private boolean isDeleted = false;
 }

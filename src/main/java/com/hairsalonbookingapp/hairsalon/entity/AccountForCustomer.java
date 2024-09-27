@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
@@ -9,6 +10,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import java.util.Collection;
 import java.util.Date;
+import java.util.List;
 
 
 @Getter
@@ -39,7 +41,9 @@ public class AccountForCustomer implements UserDetails {
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
 
-    private String feedbackId;
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<Feedback> feedbacks;
 
     private String discountCodeId;
 

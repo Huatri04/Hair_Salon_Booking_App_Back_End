@@ -64,10 +64,10 @@ public class AuthenticationService implements UserDetailsService {
                 }
 
                 // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-                String originPassword = account.getPassword();
-                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
-                }
+//                String originPassword = account.getPassword();
+//                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+//                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
+//                }
 
                 // Kiểm tra và cập nhật tên
                 if (account.getName() != null && !account.getName().isEmpty()) {
