@@ -36,7 +36,7 @@ public class RegisterRequestForEmployee {
     @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "Role is invalid!")
     private String role;
 
-    @Pattern(regexp = "Normal|Expert|", message = "StylistLevel is invalid!")
+    @Pattern(regexp = "Normal|Expert|NotStylist", message = "StylistLevel is invalid!")
     private String stylistLevel; // [Stylist]
 
 }

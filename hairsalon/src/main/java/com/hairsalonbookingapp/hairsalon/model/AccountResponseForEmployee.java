@@ -21,7 +21,7 @@ public class AccountResponseForEmployee {
     Date createdAt;
     String role;
     String stylistLevel; // [Stylist]
-    String expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
     int KPI; // KPI của stylist // [Stylist]
     String token;
 }

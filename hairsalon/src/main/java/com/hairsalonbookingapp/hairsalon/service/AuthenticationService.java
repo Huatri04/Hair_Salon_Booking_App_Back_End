@@ -55,7 +55,7 @@ public class AuthenticationService implements UserDetailsService{
         try{
             account.setPoint(0);
             account.setCreatAt(new Date());
-            account.setDeleted(false);
+            account.setDeleted(true);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = customerRepository.save(account); //lưu xuống database
@@ -96,30 +96,45 @@ public class AuthenticationService implements UserDetailsService{
     public AccountResponseForEmployee registerEmployee(RegisterRequestForEmployee registerRequestForEmployee){
         AccountForEmployee account = modelMapper.map(registerRequestForEmployee, AccountForEmployee.class);
         try{
-            account.setId("1");
+            /*account.setId("1");
             account.setCreatedAt(new Date());
-            account.setBasicSalary(500000);
+            account.setBasicSalary("500000");
             account.setStatus("Workday");
-            //account.setDeleted(true);
+            account.setDeleted(false);
+            account.setExpertStylistBonus("NoBonus");
+            account.setKPI(0);
+            if(account.getDegrees().isEmpty()){
+                account.setDegrees("NoDegree");
+            }
             if(account.getRole().equals("Stylist")){
-                account.setBasicSalary(600000);
+                account.setBasicSalary("600000");
                 account.setKPI(60);
                 if(account.getStylistLevel().equals("Expert")){
-                    account.setBasicSalary(700000);
+                    account.setBasicSalary("700000");
                     account.setExpertStylistBonus("20%");
                 }
-            }
+            }*/
+            account.setId("2");
+            //account.setBasicSalary("100000");
+            account.setCreatedAt(new Date());
+            account.setExpertStylistBonus(20);
+            account.setStatus("Workday");
+            account.setBasicSalary(600000);
+            account.setKPI(50);
+            account.setDeleted(true);
+
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForEmployee newAccount = employeeRepository.save(account); //lưu xuống database
             return modelMapper.map(newAccount, AccountResponseForEmployee.class);
         } catch (Exception e) {
-            if (e.getMessage().contains(account.getUsername())) {
-                throw new DuplicateEntity("DuplicateEntity name!");
-            } else {
-                throw new DuplicateEntity("DuplicateEntity email!");
-            }
-
+            //if (e.getMessage().contains(account.getUsername())) {
+            //    throw new DuplicateEntity("DuplicateEntity name!");
+            //} else {
+            //    throw new DuplicateEntity("ERROR");
+            //}
+            System.out.println("Exception: " + e.getClass().getName());
+            return null;
         }
     }
 

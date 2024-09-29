@@ -26,7 +26,7 @@ import java.util.List;
 @Entity
 public class AccountForEmployee implements UserDetails {
     @Id
-    @Column(unique = true, nullable = false)
+    @Column(unique = true)
     private String id;
 
     @NotBlank(message = "Name must not be blank!")
@@ -58,13 +58,13 @@ public class AccountForEmployee implements UserDetails {
     private String role;
 
     @NotBlank(message = "StylistLevel must not be blank!")
-    @Pattern(regexp = "Normal|Expert", message = "StylistLevel is invalid!")
+    @Pattern(regexp = "Normal|Expert|NotStylist", message = "StylistLevel is invalid!")
     private String stylistLevel; // [Stylist]
 
-    private String expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    private double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
 
-    @NotBlank(message = "Status must not be blank!")
-    @Pattern(regexp = "Workday|On leave", message = "Status is invalid!")
+    //@NotBlank(message = "Status must not be blank!")
+    //@Pattern(regexp = "Workday|On leave", message = "Status is invalid!")
     private String status;
 
     private int KPI; // KPI của stylist // [Stylist]

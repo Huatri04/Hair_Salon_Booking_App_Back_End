@@ -7,10 +7,10 @@ import org.springframework.data.repository.query.Param;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<AccountForEmployee, String> {
-    String findLastIdByRole(String role);
+    //String findLastIdByRole(String role);
 
     // Lấy account có id lớn nhất để tạo id mới
-    Optional<AccountForEmployee> findTopByOrderByIdDesc();
+    //Optional<AccountForEmployee> findTopByOrderByIdDesc();
 
     AccountForEmployee findAccountForEmployeeByUsername(String username);
 }
