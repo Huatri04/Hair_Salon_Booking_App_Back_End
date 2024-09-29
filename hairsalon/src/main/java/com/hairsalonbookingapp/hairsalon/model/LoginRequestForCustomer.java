@@ -8,8 +8,8 @@ import lombok.Data;
 @Data
 public class LoginRequestForCustomer {
 
-    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid!")
-    @NotBlank(message = "phone number must not blank!")
+    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Phone number is invalid!")
+    @NotBlank(message = "Phone number must not be blank!")
     String phoneNumber;
 
     //@NotBlank(message = "Password must not blank!")

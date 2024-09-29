@@ -12,12 +12,15 @@ import java.util.Date;
 @Data
 public class ProfileEmployee {
     String id;
-    String name;
+    String username;
     String img;
     String email;
     String phoneNumber;
-    double experience;
+    String degrees; // Bằng cấp // [Stylist]
+    double basicSalary;
     Date createdAt;
-    String password;
     String role;
+    String stylistLevel; // [Stylist]
+    String expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    int KPI; // KPI của stylist // [Stylist]
 }

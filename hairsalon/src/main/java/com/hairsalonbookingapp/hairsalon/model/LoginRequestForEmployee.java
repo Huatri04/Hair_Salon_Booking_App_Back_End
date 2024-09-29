@@ -8,9 +8,9 @@ import lombok.Data;
 @Data
 public class LoginRequestForEmployee {
 
-    @NotBlank(message = "Name must not blank!")
-    @Pattern(regexp = "^[^0-9]+$", message = "Name is invalid!")
-    String name;
+    @NotBlank(message = "Username must not be blank!")
+    @Pattern(regexp = "^[^0-9]+$", message = "Username is invalid!")
+    String Username;
 
     String password;
 }

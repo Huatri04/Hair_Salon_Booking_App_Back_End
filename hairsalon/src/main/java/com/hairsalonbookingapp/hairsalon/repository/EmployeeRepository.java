@@ -12,5 +12,5 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     // Lấy account có id lớn nhất để tạo id mới
     Optional<AccountForEmployee> findTopByOrderByIdDesc();
 
-    AccountForEmployee findAccountForEmployeeByName(String name);
+    AccountForEmployee findAccountForEmployeeByUsername(String username);
 }

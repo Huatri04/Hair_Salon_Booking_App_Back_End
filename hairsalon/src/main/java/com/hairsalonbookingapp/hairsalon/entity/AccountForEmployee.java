@@ -29,34 +29,45 @@ public class AccountForEmployee implements UserDetails {
     @Column(unique = true, nullable = false)
     private String id;
 
-    @NotBlank(message = "Name must not blank!") //ko cho de trong, neu de trong se hien messsage "Name can not blank!"
-    private String name;
+    @NotBlank(message = "Name must not be blank!")
+    @Column(unique = true)
+    private String username;
 
     private String img;
 
-    @Pattern(regexp = "^[\\w.-]+@[\\w-]+\\.[\\w]{2,}$", message = "email is invalid!")
-    @NotBlank(message = "email must not blank!")
+    @Pattern(regexp = "^[\\w.-]+@[\\w-]+\\.[\\w]{2,}$", message = "Email is invalid!")
+    @NotBlank(message = "Email must not be blank!")
     private String email;
 
-    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid!")
-    @NotBlank(message = "phone number must not blank!")
+    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Phone number is invalid!")
+    @NotBlank(message = "Phone number must not be blank!")
     private String phoneNumber;
 
-    private double experience;
+    private String degrees; // Bằng cấp // [Stylist]
 
-    private double baseSalary;
+    private double basicSalary;
 
     private Date createdAt;
 
-    @NotBlank(message = "Password must not blank!")
+    @NotBlank(message = "Password must not be blank!")
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
 
-    @NotBlank(message = "role must not blank!")
-    @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "role invalid")
+    @NotBlank(message = "Role must not be blank!")
+    @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "Role is invalid!")
     private String role;
 
-    private boolean Status;
+    @NotBlank(message = "StylistLevel must not be blank!")
+    @Pattern(regexp = "Normal|Expert", message = "StylistLevel is invalid!")
+    private String stylistLevel; // [Stylist]
+
+    private String expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+
+    @NotBlank(message = "Status must not be blank!")
+    @Pattern(regexp = "Workday|On leave", message = "Status is invalid!")
+    private String status;
+
+    private int KPI; // KPI của stylist // [Stylist]
 
     boolean isDeleted = false;
 
@@ -67,7 +78,7 @@ public class AccountForEmployee implements UserDetails {
 
     @Override
     public String getUsername() {
-        return this.name;
+        return this.username;
     }
 
     @Override

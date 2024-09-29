@@ -47,7 +47,7 @@ public class TokenService {
     //tạo ra token cho employee
     public String generateTokenEmployee(AccountForEmployee accountForEmployee){
         String token = Jwts.builder()
-                .subject(accountForEmployee.getName()+ "")
+                .subject(accountForEmployee.getUsername()+ "")
                 .issuedAt(new Date(System.currentTimeMillis())) // 10:30
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSigninKey())
@@ -83,7 +83,7 @@ public class TokenService {
         if(authenticationService.isPhoneNumber(name)){
             return null;
         } else {
-            return employeeRepository.findAccountForEmployeeByName(name);
+            return employeeRepository.findAccountForEmployeeByUsername(name);
         }
     }
 }

@@ -53,9 +53,8 @@ public class AuthenticationService implements UserDetailsService{
     public AccountResponseForCustomer registerCustomer(RegisterRequestForCustomer registerRequestForCustomer){
         AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
         try{
-            account.setScore(0);
+            account.setPoint(0);
             account.setCreatAt(new Date());
-            account.setStatus(true);
             account.setDeleted(false);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
@@ -98,15 +97,24 @@ public class AuthenticationService implements UserDetailsService{
         AccountForEmployee account = modelMapper.map(registerRequestForEmployee, AccountForEmployee.class);
         try{
             account.setId("1");
-            account.setBaseSalary(2);
             account.setCreatedAt(new Date());
-            account.setStatus(true);
+            account.setBasicSalary(500000);
+            account.setStatus("Workday");
+            //account.setDeleted(true);
+            if(account.getRole().equals("Stylist")){
+                account.setBasicSalary(600000);
+                account.setKPI(60);
+                if(account.getStylistLevel().equals("Expert")){
+                    account.setBasicSalary(700000);
+                    account.setExpertStylistBonus("20%");
+                }
+            }
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForEmployee newAccount = employeeRepository.save(account); //lưu xuống database
             return modelMapper.map(newAccount, AccountResponseForEmployee.class);
         } catch (Exception e) {
-            if (e.getMessage().contains(account.getName())) {
+            if (e.getMessage().contains(account.getUsername())) {
                 throw new DuplicateEntity("DuplicateEntity name!");
             } else {
                 throw new DuplicateEntity("DuplicateEntity email!");
@@ -119,7 +127,7 @@ public class AuthenticationService implements UserDetailsService{
     public AccountResponseForEmployee loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
         try{
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-                    loginRequestForEmployee.getName(),
+                    loginRequestForEmployee.getUsername(),
                     loginRequestForEmployee.getPassword()
             ));
 
@@ -198,9 +206,9 @@ public class AuthenticationService implements UserDetailsService{
         }
     }
 
-    public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
-        if(employeeRepository.findAccountForEmployeeByName(name)!=null){
-            return employeeRepository.findAccountForEmployeeByName(name);
+    public UserDetails loadUserByName(String username) throws UsernameNotFoundException {
+        if(employeeRepository.findAccountForEmployeeByUsername(username)!=null){
+            return employeeRepository.findAccountForEmployeeByUsername(username);
         } else {
             throw new AccountNotFoundException("Username or password invalid!");
         }
@@ -214,6 +222,6 @@ public class AuthenticationService implements UserDetailsService{
 
     public AccountForEmployee getCurrentAccountForEmployee(){
         AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return employeeRepository.findAccountForEmployeeByName(account.getName());
+        return employeeRepository.findAccountForEmployeeByUsername(account.getUsername());
     }
 }

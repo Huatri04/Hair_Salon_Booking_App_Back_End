@@ -7,13 +7,21 @@ import jakarta.validation.constraints.Pattern;
 import jakarta.validation.constraints.Size;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class AccountResponseForEmployee {
     String id;
-    String name;
+    String username;
     String img;
     String email;
     String phoneNumber;
+    String degrees; // Bằng cấp // [Stylist]
+    double basicSalary;
+    Date createdAt;
     String role;
+    String stylistLevel; // [Stylist]
+    String expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    int KPI; // KPI của stylist // [Stylist]
     String token;
 }
