@@ -24,6 +24,7 @@ import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
 
 import java.util.Date;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -440,6 +441,44 @@ public class AuthenticationService implements UserDetailsService {
             throw new AccountNotFoundException("Username or password invalid!");
         }
 
+    }
+
+    //delete Acc customer
+    public AccountForCustomerResponse deleteAccountForCustomer(String phoneNumber){
+        // tim toi id ma FE cung cap
+        AccountForCustomer accountForCustomerNeedDelete = accountForCustomerRepository.findByPhoneNumber(phoneNumber);
+        if(accountForCustomerNeedDelete == null){
+            throw new Duplicate("Account For Customer not found!"); // dung tai day
+        }
+
+        accountForCustomerNeedDelete.setDeleted(true);
+        AccountForCustomer deletedAccountForCustomer = accountForCustomerRepository.save(accountForCustomerNeedDelete);
+        return modelMapper.map(deletedAccountForCustomer, AccountForCustomerResponse.class);
+    }
+
+    //delete Acc employee
+    public AccountForEmployeeResponse deleteAccountForEmployee(String emlpoyeeId){
+        // tim toi id ma FE cung cap
+        AccountForEmployee accountForEmployeeNeedDelete = employeeRepository.findAccountForEmployeeByEmployeeId(emlpoyeeId);
+        if(accountForEmployeeNeedDelete == null){
+            throw new Duplicate("Account For Customer not found!"); // dung tai day
+        }
+
+        accountForEmployeeNeedDelete.setDeleted(true);
+        AccountForEmployee deletedAccountForEmployee = employeeRepository.save(accountForEmployeeNeedDelete);
+        return modelMapper.map(deletedAccountForEmployee, AccountForEmployeeResponse.class);
+    }
+
+    // show list of Account For Customer
+    public List<AccountForCustomer> getAllAccountForCustomer(){
+        List<AccountForCustomer> accountForCustomers = accountForCustomerRepository.findAccountForCustomersByIsDeletedFalse();
+        return accountForCustomers;
+    }
+
+    // show list of Account For Employee
+    public List<AccountForEmployee> getAllAccountForEmployee(){
+        List<AccountForEmployee> accountForEmployees = employeeRepository.findAccountForEmployeesByIsDeletedFalse();
+        return accountForEmployees;
     }
 
 

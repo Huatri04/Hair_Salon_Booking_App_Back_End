@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestSoftwareSupportApplication;
-import com.hairsalonbookingapp.hairsalon.model.SoftwareSupportApplicationResponse;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
 import com.hairsalonbookingapp.hairsalon.service.SoftwareSupportApplicationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -42,4 +39,17 @@ public class SoftwareSupportApplicationAPI {
         List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplication();
         return ResponseEntity.ok(softwareSupportApplications);
     }
+
+    @PutMapping("{id}")
+    public ResponseEntity updatedSoftwareSupportApplication(@Valid @RequestBody RequestUpdateSoftwareSupportApplication requestUpdateSoftwareSupportApplication, @PathVariable int id){ //@PathVariable de tim thang id tu FE
+        UpdateSoftwareSupportApplicationResponse oldSoftwareSupportApplication = softwareSupportApplicationService.updatedSoftwareSupportApplication(requestUpdateSoftwareSupportApplication, id);
+        return ResponseEntity.ok(oldSoftwareSupportApplication);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getSoftwareSupportApplicationInfo(@PathVariable int id){
+        SoftwareSupportApplicationResponse softwareSupportApplicationResponse = softwareSupportApplicationService.getInfoSoftwareSupportApplication(id);
+        return ResponseEntity.ok(softwareSupportApplicationResponse);
+    }
 }
+

@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.entity.SalaryMonth;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestSalaryMonth;
-import com.hairsalonbookingapp.hairsalon.model.SalaryMonthResponse;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
 import com.hairsalonbookingapp.hairsalon.service.SalaryMonthService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -41,5 +38,11 @@ public class SalaryMonthAPI {
     public ResponseEntity getAllSalaryMonth(){
         List<SalaryMonth> salaryMonths = salaryMonthService.getAllSalaryMonth();
         return ResponseEntity.ok(salaryMonths);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getSalaryMonthInfo(@PathVariable int id){
+        SalaryMonthResponse salaryMonthResponse = salaryMonthService.getInfoSalaryMonth(id);
+        return ResponseEntity.ok(salaryMonthResponse);
     }
 }

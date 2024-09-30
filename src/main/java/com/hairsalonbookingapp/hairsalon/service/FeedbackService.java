@@ -2,8 +2,10 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
+import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
+import com.hairsalonbookingapp.hairsalon.model.DiscountProgramInfoResponse;
 import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
 import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
@@ -87,6 +89,12 @@ public class FeedbackService {
     public List<Feedback> getAllFeedback(){
         List<Feedback> feedbacks = feedbackRepository.findFeedbacksByIsDeletedFalse();
         return feedbacks;
+    }
+
+    //GET PROFILE Feedback
+    public FeedbackResponse getInfoFeedback(int id){
+        Feedback feedback = feedbackRepository.findFeedbackByFeedbackId(id);
+        return modelMapper.map(feedback, FeedbackResponse.class);
     }
 
 }

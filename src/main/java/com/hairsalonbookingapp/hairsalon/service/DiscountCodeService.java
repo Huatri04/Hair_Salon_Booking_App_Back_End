@@ -5,10 +5,8 @@ import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.DiscountCodeResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestDiscountCode;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
+import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
@@ -102,5 +100,32 @@ public class DiscountCodeService {
     public List<DiscountCode> getAllDiscountCode(){
         List<DiscountCode> discountCodes = discountCodeRepository.findDiscountCodesByIsDeletedFalse();
         return discountCodes;
+    }
+
+    public UpdateDiscountCodeResponse updatedDiscountCode(RequestUpdateDiscountCode requestUpdateDiscountCode, String id) {
+        DiscountCode discountCode = modelMapper.map(requestUpdateDiscountCode, DiscountCode.class);
+//        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramByName(name);
+        DiscountCode oldDiscountCode = discountCodeRepository.findDiscountCodeByDiscountCodeId(id);
+        if (oldDiscountCode == null) {
+            throw new Duplicate("Discount program not found!");// cho dung luon
+        } else {
+            try{
+                if (oldDiscountCode.getCode() != null && !oldDiscountCode.getCode().isEmpty()) {
+                    oldDiscountCode.setCode(oldDiscountCode.getCode());
+                }
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                DiscountCode updatedDiscountCode = discountCodeRepository.save(oldDiscountCode);
+                return modelMapper.map(updatedDiscountCode, UpdateDiscountCodeResponse.class);
+            } catch (Exception e) {
+                throw new UpdatedException("Discount Program can not update!");
+            }
+        }
+    }
+
+    //GET PROFILE DiscountCode
+    public DiscountCodeInfResponse getInfoDiscountCode(String id){
+        DiscountCode discountCode = discountCodeRepository.findDiscountCodeByDiscountCodeId(id);
+        return modelMapper.map(discountCode, DiscountCodeInfResponse.class);
     }
 }

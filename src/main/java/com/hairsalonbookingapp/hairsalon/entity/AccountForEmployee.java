@@ -70,7 +70,6 @@ public class AccountForEmployee implements UserDetails {
     @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "role invalid")
     private String role;
 
-
     private String Status;
 
     private boolean isDeleted = false;

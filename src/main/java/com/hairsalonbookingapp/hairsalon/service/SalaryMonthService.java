@@ -1,14 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.entity.SalaryMonth;
+import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestSalaryMonth;
-import com.hairsalonbookingapp.hairsalon.model.SalaryMonthResponse;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SalaryMonthRepository;
@@ -83,9 +77,15 @@ public class SalaryMonthService {
         return modelMapper.map(deletedSalaryMonth, SalaryMonthResponse.class);
     }
 
-    // show list of feedback
+    // show list of SalaryMonth
     public List<SalaryMonth> getAllSalaryMonth(){
         List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
         return salaryMonths;
+    }
+
+    //GET PROFILE SalaryMonth
+    public SalaryMonthResponse getInfoSalaryMonth(int id){
+        SalaryMonth salaryMonth = salaryMonthRepository.findSalaryMonthBySalaryMonthId(id);
+        return modelMapper.map(salaryMonth, SalaryMonthResponse.class);
     }
 }

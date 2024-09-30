@@ -102,46 +102,52 @@ public class DiscountProgramService {
     public UpdateDiscountProgramResponse updatedDiscountProgram(RequestUpdateDiscountProgram requestUpdateDiscountProgram, int id) {
         DiscountProgram discountProgram = modelMapper.map(requestUpdateDiscountProgram, DiscountProgram.class);
 //        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramByName(name);
-        DiscountProgram oldAccountDiscountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
-        if (oldAccountDiscountProgram == null) {
+        DiscountProgram oldDiscountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
+        if (oldDiscountProgram == null) {
             throw new Duplicate("Discount program not found!");// cho dung luon
         } else {
             try{
                 if (discountProgram.getName() != null && !discountProgram.getName().isEmpty()) {
-                    oldAccountDiscountProgram.setName(discountProgram.getName());
+                    oldDiscountProgram.setName(discountProgram.getName());
                 }
 
                 if (discountProgram.getDescription() != null && !discountProgram.getDescription().isEmpty()) {
-                    oldAccountDiscountProgram.setDescription(discountProgram.getDescription());
+                    oldDiscountProgram.setDescription(discountProgram.getDescription());
                 }
 
                 if (discountProgram.getStartedDate() != null) {
-                    oldAccountDiscountProgram.setStartedDate(discountProgram.getStartedDate());
+                    oldDiscountProgram.setStartedDate(discountProgram.getStartedDate());
                 }
 
                 if (discountProgram.getEndedDate() != null) {
-                    oldAccountDiscountProgram.setEndedDate(discountProgram.getEndedDate());
+                    oldDiscountProgram.setEndedDate(discountProgram.getEndedDate());
                 }
 
                 if (discountProgram.getStatus() != null && !discountProgram.getStatus().isEmpty()) {
-                    oldAccountDiscountProgram.setStatus(discountProgram.getStatus());
+                    oldDiscountProgram.setStatus(discountProgram.getStatus());
                 }
 
                 if (discountProgram.getPercentage() != 0) {
-                    oldAccountDiscountProgram.setPercentage(discountProgram.getPercentage());
+                    oldDiscountProgram.setPercentage(discountProgram.getPercentage());
                 }
 
                 if (discountProgram.getAmount() != 0) {
-                    oldAccountDiscountProgram.setAmount(discountProgram.getAmount());
+                    oldDiscountProgram.setAmount(discountProgram.getAmount());
                 }
 
                 // Lưu cập nhật vào cơ sở dữ liệu
-                DiscountProgram updatedDiscountProgram = discountProgramRepository.save(oldAccountDiscountProgram);
+                DiscountProgram updatedDiscountProgram = discountProgramRepository.save(oldDiscountProgram);
                 return modelMapper.map(updatedDiscountProgram, UpdateDiscountProgramResponse.class);
             } catch (Exception e) {
                 throw new UpdatedException("Discount Program can not update!");
             }
         }
+    }
+
+    //GET PROFILE DiscountProgram
+    public DiscountProgramInfoResponse getInfoDiscountProgram(int id){
+        DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
+        return modelMapper.map(discountProgram, DiscountProgramInfoResponse.class);
     }
 
 }

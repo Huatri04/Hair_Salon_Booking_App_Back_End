@@ -61,7 +61,7 @@ public class AccountForCustomer implements UserDetails {
 
     private boolean status;
 
-    boolean isDeleted = false;
+    private boolean isDeleted = false;
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

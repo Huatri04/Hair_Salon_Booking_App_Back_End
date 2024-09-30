@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
+import com.hairsalonbookingapp.hairsalon.model.DiscountProgramInfoResponse;
 import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
 import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
@@ -39,4 +40,11 @@ public class FeedbackAPI {
         List<Feedback> feedbacks = feedbackService.getAllFeedback();
         return ResponseEntity.ok(feedbacks);
     }
+
+    @GetMapping("{id}")
+    public ResponseEntity getFeedbackInfo(@PathVariable int id){
+        FeedbackResponse feedbackResponse = feedbackService.getInfoFeedback(id);
+        return ResponseEntity.ok(feedbackResponse);
+    }
+
 }

@@ -1,14 +1,9 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestSoftwareSupportApplication;
-import com.hairsalonbookingapp.hairsalon.model.SoftwareSupportApplicationResponse;
+import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.SoftwareSupportApplicationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -91,7 +86,7 @@ public class SoftwareSupportApplicationService {
 //    }
 
 
-    //delete feedback
+    //delete SoftwareSupportApplication
     public SoftwareSupportApplicationResponse deleteSoftwareSupportApplication(int id){
         // tim toi id ma FE cung cap
         SoftwareSupportApplication softwareSupportApplicationNeedDelete = softwareSupportApplicationRepository.findSoftwareSupportApplicationBySoftwareSupportApplicationId(id);
@@ -104,9 +99,54 @@ public class SoftwareSupportApplicationService {
         return modelMapper.map(deletedSoftwareSupportApplication, SoftwareSupportApplicationResponse.class);
     }
 
-    // show list of feedback
+    public UpdateSoftwareSupportApplicationResponse updatedSoftwareSupportApplication(RequestUpdateSoftwareSupportApplication requestUpdateSoftwareSupportApplication, int id) {
+        SoftwareSupportApplication softwareSupportApplication = modelMapper.map(requestUpdateSoftwareSupportApplication, SoftwareSupportApplication.class);
+//        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramByName(name);
+        SoftwareSupportApplication oldSoftwareSupportApplication = softwareSupportApplicationRepository.findSoftwareSupportApplicationBySoftwareSupportApplicationId(id);
+        if (oldSoftwareSupportApplication == null) {
+            throw new Duplicate("Software Support Application not found!");// cho dung luon
+        } else {
+            try{
+                // Lấy thông tin tài khoản khách hàng hiện tại
+                AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+
+                // Lấy thông tin tài khoản nhân viên hiện tại
+                AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+
+                if (accountForCustomer != null) {
+                    softwareSupportApplication.setCustomer(accountForCustomer);
+                } else if (accountForEmployee != null) { // Chỉ nên kiểm tra một cái thôi
+                    softwareSupportApplication.setEmployee(accountForEmployee);
+                } else {
+                    throw new Duplicate("At least one of Customer or Employee must be set.");
+                }
+
+                if (softwareSupportApplication.getDescription() != null && !softwareSupportApplication.getDescription().isEmpty()) {
+                    oldSoftwareSupportApplication.setDescription(softwareSupportApplication.getDescription());
+                }
+
+                if (softwareSupportApplication.getImg() != null && !softwareSupportApplication.getImg().isEmpty()) {
+                    oldSoftwareSupportApplication.setImg(softwareSupportApplication.getImg());
+                }
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                SoftwareSupportApplication updatedSoftwareSupportApplication = softwareSupportApplicationRepository.save(oldSoftwareSupportApplication);
+                return modelMapper.map(updatedSoftwareSupportApplication, UpdateSoftwareSupportApplicationResponse.class);
+            } catch (Exception e) {
+                throw new UpdatedException("Software Support Application can not update!");
+            }
+        }
+    }
+
+    // show list of SoftwareSupportApplication
     public List<SoftwareSupportApplication> getAllSoftwareSupportApplication(){
         List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByIsDeletedFalse();
         return softwareSupportApplications;
+    }
+
+    //GET PROFILE SoftwareSupportApplication
+    public SoftwareSupportApplicationResponse getInfoSoftwareSupportApplication(int id){
+        SoftwareSupportApplication softwareSupportApplication = softwareSupportApplicationRepository.findSoftwareSupportApplicationBySoftwareSupportApplicationId(id);
+        return modelMapper.map(softwareSupportApplication, SoftwareSupportApplicationResponse.class);
     }
 }

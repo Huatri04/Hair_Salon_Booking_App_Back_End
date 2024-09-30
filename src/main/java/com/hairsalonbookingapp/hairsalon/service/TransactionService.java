@@ -1,14 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.entity.Transaction;
+import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestTransaction;
-import com.hairsalonbookingapp.hairsalon.model.TransactionResponse;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import com.hairsalonbookingapp.hairsalon.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
@@ -79,9 +73,15 @@ public class TransactionService {
         return modelMapper.map(deletedTransaction, TransactionResponse.class);
     }
 
-    // show list of feedback
+    // show list of Transaction
     public List<Transaction> getAllTransaction(){
         List<Transaction> transactions = transactionRepository.findTransactionsByIsDeletedFalse();
         return transactions;
+    }
+
+    //GET PROFILE SalaryMonth
+    public TransactionResponse getInfoTransaction(int id){
+        Transaction transaction = transactionRepository.findTransactionByTransactionId(id);
+        return modelMapper.map(transaction, TransactionResponse.class);
     }
 }

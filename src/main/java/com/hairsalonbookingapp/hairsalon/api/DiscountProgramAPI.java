@@ -44,4 +44,10 @@ public class DiscountProgramAPI {
         UpdateDiscountProgramResponse oldDiscountProgram = discountProgramService.updatedDiscountProgram(requestUpdateDiscountProgram, id);
         return ResponseEntity.ok(oldDiscountProgram);
     }
+
+    @GetMapping("{id}")
+    public ResponseEntity getDiscountProgramInfo(@PathVariable int id){
+        DiscountProgramInfoResponse discountProgram = discountProgramService.getInfoDiscountProgram(id);
+        return ResponseEntity.ok(discountProgram);
+    }
 }

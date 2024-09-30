@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.entity.Transaction;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
-import com.hairsalonbookingapp.hairsalon.model.RequestTransaction;
-import com.hairsalonbookingapp.hairsalon.model.TransactionResponse;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
 import com.hairsalonbookingapp.hairsalon.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -41,5 +38,11 @@ public class TransactionAPI {
     public ResponseEntity getAllTransaction(){
         List<Transaction> transactions = transactionService.getAllTransaction();
         return ResponseEntity.ok(transactions);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getTransactionInfo(@PathVariable int id){
+        TransactionResponse transactionResponse = transactionService.getInfoTransaction(id);
+        return ResponseEntity.ok(transactionResponse);
     }
 }

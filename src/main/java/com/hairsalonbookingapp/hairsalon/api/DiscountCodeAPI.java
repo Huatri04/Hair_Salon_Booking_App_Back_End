@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.model.DiscountCodeResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestDiscountCode;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.DiscountCodeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -38,5 +35,17 @@ public class DiscountCodeAPI {
     public ResponseEntity getAllFeedback(){
         List<DiscountCode> discountCodes = discountCodeService.getAllDiscountCode();
         return ResponseEntity.ok(discountCodes);
+    }
+
+    @PutMapping("{id}")
+    public ResponseEntity updatedDiscountCode(@Valid @RequestBody RequestUpdateDiscountCode requestUpdateDiscountCode, @PathVariable String id){ //@PathVariable de tim thang id tu FE
+        UpdateDiscountCodeResponse oldDiscountCode = discountCodeService.updatedDiscountCode(requestUpdateDiscountCode, id);
+        return ResponseEntity.ok(oldDiscountCode);
+    }
+
+    @GetMapping("{id}")
+    public ResponseEntity getDiscountCodeInfo(@PathVariable String id){
+        DiscountCodeInfResponse discountCodeInfResponse = discountCodeService.getInfoDiscountCode(id);
+        return ResponseEntity.ok(discountCodeInfResponse);
     }
 }
