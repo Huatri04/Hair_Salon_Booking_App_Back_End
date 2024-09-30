@@ -76,4 +76,7 @@ public class AccountForCustomer implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @OneToMany(mappedBy = "accountForCustomer")
+    List<Appointment> appointments;
 }

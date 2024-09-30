@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.entity;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
@@ -100,4 +101,7 @@ public class AccountForEmployee implements UserDetails {
     public boolean isEnabled() {
         return true;
     }
+
+    @OneToMany(mappedBy = "accountForEmployee")
+    List<ShiftEmployee> shiftEmployees;
 }

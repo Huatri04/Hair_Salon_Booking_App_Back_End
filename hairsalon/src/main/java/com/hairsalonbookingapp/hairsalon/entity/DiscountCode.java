@@ -16,4 +16,7 @@ public class DiscountCode {
     @ManyToOne
     @JoinColumn(name = "discountProgram_id")
     DiscountProgram discountProgram;
+
+    @OneToOne(mappedBy = "discountCode")
+    Appointment appointment;
 }
