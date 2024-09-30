@@ -30,5 +30,5 @@ public class RegisterRequestForCustomer {
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;
 
-    private String role = "customer";
+//    private String role = "customer";
 }

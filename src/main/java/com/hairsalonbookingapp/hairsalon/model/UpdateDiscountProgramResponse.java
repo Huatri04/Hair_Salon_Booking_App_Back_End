@@ -1,21 +1,15 @@
-package com.hairsalonbookingapp.hairsalon.entity;
+package com.hairsalonbookingapp.hairsalon.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.Date;
 import java.util.List;
 
-@Getter
-@Setter
-@Entity
-@Table(name = "DiscountProgram")
-public class DiscountProgram {
-    @Id
-    @Column(unique = true, nullable = false)
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+@Data
+public class UpdateDiscountProgramResponse {
     private int discountProgramId;
 
     private String name;

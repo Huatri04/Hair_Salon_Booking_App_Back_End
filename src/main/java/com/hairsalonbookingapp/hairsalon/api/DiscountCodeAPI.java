@@ -22,9 +22,9 @@ import java.util.List;
 public class DiscountCodeAPI {
     @Autowired
     DiscountCodeService discountCodeService;
-    @PostMapping
-    public ResponseEntity createDiscountCode(@Valid @RequestBody RequestDiscountCode requestDiscountCode){
-        DiscountCodeResponse discountCodeResponse = discountCodeService.createDiscountCode(requestDiscountCode);
+    @PostMapping("{id}")
+    public ResponseEntity createDiscountCode(@Valid @RequestBody RequestDiscountCode requestDiscountCode, @PathVariable int id){
+        DiscountCodeResponse discountCodeResponse = discountCodeService.createDiscountCode(requestDiscountCode, id);
         return ResponseEntity.ok(discountCodeResponse);
     }
 

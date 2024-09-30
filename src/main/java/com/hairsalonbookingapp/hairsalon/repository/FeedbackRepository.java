@@ -8,8 +8,8 @@ import org.springframework.data.repository.query.Param;
 import java.util.List;
 import java.util.Optional;
 
-public interface FeedbackRepository extends JpaRepository<Feedback, String> {
+public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     Optional<Feedback> findTopByOrderByFeedbackIdDesc();
-    Feedback findFeedbackByFeedbackId(String feedbackId);
+    Feedback findFeedbackByFeedbackId(int feedbackId);
     List<Feedback> findFeedbacksByIsDeletedFalse();
 }

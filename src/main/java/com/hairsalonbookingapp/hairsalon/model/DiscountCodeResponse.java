@@ -8,9 +8,7 @@ import lombok.Data;
 public class DiscountCodeResponse {
     private String discountCodeId;
 
-    private String status;
-
-    private double percentage;
+    private String code;
 
     private DiscountProgram discountProgram;
 

@@ -10,7 +10,7 @@ import lombok.Data;
 @Data
 public class FeedbackResponse {
 
-    private String feedbackId;
+    private int feedbackId;
 
     private int star;
 

@@ -13,7 +13,7 @@ import org.springframework.data.annotation.CreatedBy;
 public class RegisterRequestForEmloyee {
     @Id
     @Column(unique = true, nullable = false)
-    private String id;
+    private String employeeId;
 
     @NotBlank(message = "Name can not blank!", groups = CreatedBy.class) //ko cho de trong, neu de trong se hien messsage "Name can not blank!"
     private String name;

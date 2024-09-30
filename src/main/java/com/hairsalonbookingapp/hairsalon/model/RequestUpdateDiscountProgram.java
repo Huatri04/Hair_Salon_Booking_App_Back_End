@@ -1,14 +1,11 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Id;
 import lombok.Data;
 
 import java.util.Date;
 
 @Data
-public class RequestDiscountprogram {
-
+public class RequestUpdateDiscountProgram {
     private int discountProgramId;
 
     private String name;
@@ -24,5 +21,4 @@ public class RequestDiscountprogram {
     private String status;
 
     private double percentage;
-
 }

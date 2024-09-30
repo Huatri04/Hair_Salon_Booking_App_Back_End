@@ -53,6 +53,10 @@ public class AccountForCustomer implements UserDetails {
     @JsonIgnore
     private List<DiscountCode> discountCodes;
 
+    @OneToMany(mappedBy = "customer")
+    @JsonIgnore
+    private List<SoftwareSupportApplication> softwareSupportApplications;
+
     private String appointmentId;
 
     private boolean status;

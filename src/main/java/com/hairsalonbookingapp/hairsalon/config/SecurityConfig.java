@@ -1,7 +1,10 @@
 package com.hairsalonbookingapp.hairsalon.config;
 
+import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.RequestSoftwareSupportApplication;
 import com.hairsalonbookingapp.hairsalon.service.AuthenticationService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -56,5 +59,20 @@ public class SecurityConfig {
     public ModelMapper modelMapper(){
         return new ModelMapper();
     }
+//@Bean
+//public ModelMapper modelMapper() {
+//    ModelMapper modelMapper = new ModelMapper();
+//
+//    // Đặt Matching Strategy để tăng độ chính xác
+//    modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+//
+//    // Bỏ qua ánh xạ các trường liên kết để thiết lập thủ công
+//    modelMapper.typeMap(RequestSoftwareSupportApplication.class, SoftwareSupportApplication.class).addMappings(mapper -> {
+//        mapper.skip(SoftwareSupportApplication::setCustomer);
+//        mapper.skip(SoftwareSupportApplication::setEmployee);
+//    });
+//
+//    return modelMapper;
+//}
 
 }

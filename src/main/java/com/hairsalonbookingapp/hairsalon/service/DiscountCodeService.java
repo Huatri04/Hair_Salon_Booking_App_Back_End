@@ -10,6 +10,7 @@ import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
 import com.hairsalonbookingapp.hairsalon.model.RequestDiscountCode;
 import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
+import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -27,24 +28,35 @@ public class DiscountCodeService {
     DiscountProgramService discountProgramService;
     @Autowired
     AuthenticationService authenticationService;
+    @Autowired
+    DiscountProgramRepository discountProgramRepository;
 
     // create feedback
-    public DiscountCodeResponse createDiscountCode(RequestDiscountCode requestDiscountCode){
+    public DiscountCodeResponse createDiscountCode(RequestDiscountCode requestDiscountCode, int id){
         DiscountCode discountCode = modelMapper.map(requestDiscountCode, DiscountCode.class);
         try{
             String newId = generateId();
             discountCode.setDiscountCodeId(newId);
-            DiscountProgram discountProgram = discountProgramService.getCurrentDiscountProgram();
+//            DiscountProgram discountProgram = discountProgramService.getCurrentDiscountProgram();
+//            if(discountProgram == null){
+//                throw new Duplicate("No current Discount program found.");
+//            }
+//            discountCode.setDiscountProgram(discountProgram);
+
+            DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
             if(discountProgram == null){
-                throw new Duplicate("No current customer found.");
+                throw new Duplicate("No current Discount program found.");
             }
             discountCode.setDiscountProgram(discountProgram);
+
 
             AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
             if(accountForCustomer == null){
                 throw new Duplicate("No current customer found.");
             }
             discountCode.setCustomer(accountForCustomer);
+
+
             DiscountCode newDiscountCode = discountCodeRepository.save(discountCode);
             return modelMapper.map(newDiscountCode, DiscountCodeResponse.class);
         } catch (Exception e) {

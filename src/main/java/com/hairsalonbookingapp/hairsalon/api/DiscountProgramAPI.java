@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestDiscountprogram;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import com.hairsalonbookingapp.hairsalon.service.DiscountProgramService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -30,7 +27,7 @@ public class DiscountProgramAPI {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity deleteDiscountProgram(@PathVariable String id){
+    public ResponseEntity deleteDiscountProgram(@PathVariable int id){
         DiscountProgramResponse discountProgramResponse = discountProgramService.deleteDiscountProgram(id);
         return ResponseEntity.ok(discountProgramResponse);
     }
@@ -39,5 +36,12 @@ public class DiscountProgramAPI {
     public ResponseEntity getAllDiscountProgram(){
         List<DiscountProgram> discountPrograms = discountProgramService.getAllDiscountProgram();
         return ResponseEntity.ok(discountPrograms);
+    }
+
+    // update profile cua customer
+    @PutMapping("{id}")
+    public ResponseEntity updatedDiscountProgram(@Valid @RequestBody RequestUpdateDiscountProgram requestUpdateDiscountProgram, @PathVariable int id){ //@PathVariable de tim thang id tu FE
+        UpdateDiscountProgramResponse oldDiscountProgram = discountProgramService.updatedDiscountProgram(requestUpdateDiscountProgram, id);
+        return ResponseEntity.ok(oldDiscountProgram);
     }
 }

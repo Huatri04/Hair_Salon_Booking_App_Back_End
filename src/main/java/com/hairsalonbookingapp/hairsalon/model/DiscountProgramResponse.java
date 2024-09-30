@@ -11,13 +11,17 @@ import java.util.List;
 @Data
 public class DiscountProgramResponse {
 
-    private String discountProgramId;
+    private int discountProgramId;
+
+    private String name;
+
+    private String description;
 
     private Date startedDate;
 
     private Date endedDate;
 
-    private long Amount;
+    private long amount;
 
     private String status;
 

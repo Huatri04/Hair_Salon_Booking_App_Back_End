@@ -64,4 +64,11 @@ public class AuthenticationAPI {
         EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccount(account, id);
         return ResponseEntity.ok(oldAccount);
     }
+
+    //update profile cua employee bang manager
+    @PutMapping("/profileEmployeeEditByManager/{id}")
+    public ResponseEntity updatedAccountEmployeeByManager(@Valid @RequestBody RequestUpdateProfileEmployeeByManager account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
+        EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccountByManager(account, id);
+        return ResponseEntity.ok(oldAccount);
+    }
 }

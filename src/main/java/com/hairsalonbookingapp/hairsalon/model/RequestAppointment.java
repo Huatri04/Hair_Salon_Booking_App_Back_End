@@ -20,5 +20,4 @@ public class RequestAppointment {
 
     private String serviceStylistSupport;
 
-    private boolean isDeleted;
 }

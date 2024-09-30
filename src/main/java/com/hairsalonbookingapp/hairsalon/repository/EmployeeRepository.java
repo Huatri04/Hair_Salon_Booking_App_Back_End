@@ -9,11 +9,11 @@ import java.util.Optional;
 public interface EmployeeRepository extends JpaRepository<AccountForEmployee, String> {
 
     Optional<String> findLastIdByRole(@Param("role") String role);
-    Optional<AccountForEmployee> findTopByRoleOrderByIdDesc(@Param("role") String role);
+    Optional<AccountForEmployee> findTopByRoleOrderByEmployeeIdDesc(@Param("role") String role);
 
     // Lấy account có id lớn nhất để tạo id mới
-    Optional<AccountForEmployee> findTopByOrderByIdDesc();
+    Optional<AccountForEmployee> findTopByOrderByEmployeeIdDesc();
 
-    AccountForEmployee findEmployeeById(String id);
+    AccountForEmployee findAccountForEmployeeByEmployeeId(String id);
     AccountForEmployee findAccountForEmployeeByName(String name);
 }

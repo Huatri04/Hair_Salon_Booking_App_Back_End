@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
 
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -54,6 +55,7 @@ public class AuthenticationService implements UserDetailsService {
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = accountForCustomerRepository.save(account);
+            account.setCreatAt(new Date());
             newAccount.setCreatAt(account.getCreatAt());
 
             return modelMapper.map(newAccount, AccountForCustomerResponse.class);
@@ -115,7 +117,7 @@ public class AuthenticationService implements UserDetailsService {
 
     public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
         AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
-            AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
+            AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
             if (oldAccount == null) {
                 throw new Duplicate("Account not found!");// cho dung luon
             } else {
@@ -128,10 +130,10 @@ public class AuthenticationService implements UserDetailsService {
                         oldAccount.setPhoneNumber(account.getPhoneNumber());
                     }
                     // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-                    String originPassword = account.getPassword();
-                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
-                    }
+//                    String originPassword = account.getPassword();
+//                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+//                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
+//                    }
                     // Kiểm tra và cập nhật tên
                     if (account.getName() != null && !account.getName().isEmpty()) {
                         oldAccount.setName(account.getName());
@@ -156,6 +158,40 @@ public class AuthenticationService implements UserDetailsService {
                 }
             }
             return null;
+    }
+
+    public EditProfileEmployeeResponse updatedAccountByManager(RequestUpdateProfileEmployeeByManager requestUpdateProfileEmployeeByManager, String id) {
+        AccountForEmployee account = modelMapper.map(requestUpdateProfileEmployeeByManager, AccountForEmployee.class);
+        AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+        if (oldAccount == null) {
+            throw new Duplicate("Account not found!");// cho dung luon
+        } else {
+            try{
+                if (account.getStylistLevel() != null && !account.getStylistLevel().isEmpty()) {
+                    oldAccount.setStylistLevel(account.getStylistLevel());
+                }
+
+                if (account.getStylistSelectionFee() != 0 ) {
+                    if(account.getStylistSelectionFee() < 0 ){
+                        throw new Duplicate("Stylist Selection Fee must be at least 0");
+                    }
+                    oldAccount.setStylistSelectionFee(account.getStylistSelectionFee());
+                }
+
+                if (account.getKPI() != 0) {
+                    if(account.getKPI() < 0 ){
+                        throw new Duplicate("KPI must be at least 0");
+                    }
+                    oldAccount.setKPI(account.getKPI());
+                }
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+                return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
+            } catch (Exception e) {
+                throw new UpdatedException("employee can not update!");
+            }
+        }
     }
 
 //    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
@@ -282,9 +318,10 @@ public class AuthenticationService implements UserDetailsService {
 
             // Tạo ID dựa trên vai trò
             String newId = generateIdBasedOnRole(account.getRole());
-            account.setId(newId);
-//            String originPassword = account.getPassword();
-//            account.setPassword(passwordEncoder.encode(originPassword));
+            account.setEmployeeId(newId);
+            String originPassword = account.getPassword();
+            account.setPassword(passwordEncoder.encode(originPassword));
+            account.setCreatedAt(new Date());
 
             AccountForEmployee newAccount = employeeRepository.save(account);
 
@@ -318,12 +355,12 @@ public class AuthenticationService implements UserDetailsService {
 
     public String generateIdBasedOnRole(String role) {
         // Tìm ID cuối cùng theo vai trò
-        Optional<AccountForEmployee> lastAccount = employeeRepository.findTopByRoleOrderByIdDesc(role);
+        Optional<AccountForEmployee> lastAccount = employeeRepository.findTopByRoleOrderByEmployeeIdDesc(role);
         int newIdNumber = 1; // Mặc định bắt đầu từ 1
 
         // Nếu có tài khoản cuối cùng, lấy ID
         if (lastAccount.isPresent()) {
-            String lastId = lastAccount.get().getId();
+            String lastId = lastAccount.get().getEmployeeId();
             newIdNumber = Integer.parseInt(lastId.replaceAll("\\D+", "")) + 1; // Tăng số lên 1
         }
 
@@ -432,15 +469,42 @@ public class AuthenticationService implements UserDetailsService {
 
     }
 
-    public AccountForCustomer getCurrentAccountForCustomer(){
-        AccountForCustomer account = (AccountForCustomer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return accountForCustomerRepository.findByPhoneNumber(account.getPhoneNumber());
+//    public AccountForCustomer getCurrentAccountForCustomer(){
+//        AccountForCustomer account = (AccountForCustomer) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        return accountForCustomerRepository.findByPhoneNumber(account.getPhoneNumber());
+//    }
+//
+//    public AccountForEmployee getCurrentAccountForEmployee(){
+//        AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        return employeeRepository.findAccountForEmployeeByEmployeeId(account.getEmployeeId());
+//    }
+
+    public AccountForCustomer getCurrentAccountForCustomer() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+        // Kiểm tra nếu principal là kiểu UserDetails và lấy thông tin
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            // Trích xuất thông tin từ UserDetails (username, phone number, etc.)
+            String phoneNumber = userDetails.getUsername();  // hoặc dùng getPhoneNumber nếu có
+            return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
+        } else {
+            throw new ClassCastException("Current user is not a valid customer.");
+        }
     }
 
-    public AccountForEmployee getCurrentAccountForEmployee(){
-        AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        return employeeRepository.findAccountForEmployeeByName(account.getName());
-    }
+    public AccountForEmployee getCurrentAccountForEmployee() {
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
+        // Kiểm tra nếu principal là kiểu UserDetails và lấy thông tin
+        if (principal instanceof UserDetails) {
+            UserDetails userDetails = (UserDetails) principal;
+            // Trích xuất thông tin từ UserDetails (username, employee ID, etc.)
+            String employeeId = userDetails.getUsername();  // hoặc dùng getEmployeeId nếu có
+            return employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
+        } else {
+            throw new ClassCastException("Current user is not a valid employee.");
+        }
+    }
 
 }

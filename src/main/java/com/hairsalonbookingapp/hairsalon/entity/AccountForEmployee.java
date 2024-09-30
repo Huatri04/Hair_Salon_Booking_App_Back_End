@@ -1,9 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -24,13 +22,13 @@ import java.util.List;
 public class AccountForEmployee implements UserDetails {
     @Id
     @Column(unique = true, nullable = false)
-    private String id;
+    private String employeeId;
 
     @NotBlank(message = "Name can not blank!", groups = CreatedBy.class) //ko cho de trong, neu de trong se hien messsage "Name can not blank!"
     private String name;
 
     @NotBlank(message = "Username can not blank!", groups = CreatedBy.class) //groups = CreatedBy.class chi co nhom create moi bat loi
-    @Size(min = 6, message = "Password must be more than 6 characters")
+    @Size(min = 6, message = "Username must be more than 6 characters")
     private String username;
 
     private String img;
@@ -43,19 +41,24 @@ public class AccountForEmployee implements UserDetails {
     @NotBlank(message = "phone number must not blank!", groups = CreatedBy.class)
     private String phoneNumber;
 
-    private double experience;
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<SalaryMonth> salaryMonths;
 
-    private double baseSalary;
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<Transaction> transactions;
 
-    private double serviceMoney;
+    @OneToMany(mappedBy = "employee")
+    @JsonIgnore
+    private List<SoftwareSupportApplication> softwareSupportApplications;
 
-    private String transactionId;
+    private String stylistLevel;
 
-    private String leaveRequestId;
+    private long stylistSelectionFee = 0;
 
-    private String softwareSupportApplicationId;
+    private int KPI = 0;
 
-    private String salaryMonthId;
 
     private Date createdAt;
 
@@ -70,7 +73,7 @@ public class AccountForEmployee implements UserDetails {
 
     private String Status;
 
-    boolean isDeleted = false;
+    private boolean isDeleted = false;
 
 
     @Override

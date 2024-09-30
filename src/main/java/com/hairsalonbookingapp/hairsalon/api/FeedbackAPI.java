@@ -29,7 +29,7 @@ public class FeedbackAPI {
     }
 
     @DeleteMapping("{id}")
-    public ResponseEntity deleteFeedback(@PathVariable String id){
+    public ResponseEntity deleteFeedback(@PathVariable int id){
         FeedbackResponse feedbackResponse = feedbackService.deleteFeedback(id);
         return ResponseEntity.ok(feedbackResponse);
     }

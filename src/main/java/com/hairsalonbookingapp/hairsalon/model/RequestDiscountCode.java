@@ -10,12 +10,8 @@ public class RequestDiscountCode {
     @Column(unique = true, nullable = false)
     private String discountCodeId;
 
-    private String status;
-
-    private double percentage;
-
+    private String code;
 
     private  String appointmentId;
 
-    private boolean isDeleted = false;
 }
