@@ -29,6 +29,8 @@ public class DiscountProgram {
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")
     private Date endDate;
 
+    @NotBlank(message = "Status must not be blank!")
+    @Pattern(regexp = "NotStart|InProcess|End", message = "Invalid status!")
     private String status;
 
     @NotBlank(message = "Percentage must not be blank!")
