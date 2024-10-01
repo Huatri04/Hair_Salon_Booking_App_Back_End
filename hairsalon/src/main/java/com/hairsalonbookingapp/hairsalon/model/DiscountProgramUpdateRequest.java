@@ -1,7 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.model;
 
-import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
+import jakarta.validation.constraints.*;
 import lombok.Data;
 
 import java.sql.Date;
@@ -18,14 +17,18 @@ public class DiscountProgramUpdateRequest {
     private String startDate;
 
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n|", message = "Invalid date!")
-    private Date endDate;
+    private String endDate;
 
-    @Pattern(regexp = "NotStart|InProcess|End", message = "Invalid status!")
-    private String status;
+    /*@Pattern(regexp = "NotStart|InProcess|End", message = "Invalid status!")
+    @NotBlank(message = "Status must not be blank!")
+    private String status;*/
 
-    @Pattern(regexp = "^[0-9]+$\n|", message = "Invalid percentage!")
+    @Min(value = 0, message = "Percentage must be at least 0")
+    @Max(value = 100, message = "Percentage must be at most 100")
+    @NotBlank(message = "Percentage must not be blank!")
     private double percentage;
 
-    @Pattern(regexp = "^[0-9]+$\n|", message = "Invalid amount!")
+    @Size(min = 0, message = "Invalid amount!")
+    @NotBlank(message = "Amount must not be blank!")
     private int amount;
 }
