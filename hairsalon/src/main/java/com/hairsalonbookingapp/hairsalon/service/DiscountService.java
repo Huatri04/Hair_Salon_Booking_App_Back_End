@@ -1,10 +1,13 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
+import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
+import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.DiscountProgramUpdateRequest;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -19,10 +22,17 @@ public class DiscountService {
     @Autowired
     DiscountCodeRepository discountCodeRepository;
 
+    @Autowired
+    ModelMapper modelMapper;
+
     //tạo mới discount program
-    public DiscountProgram createNewProgram(DiscountProgram discountProgram){
-        DiscountProgram newProgram = discountProgramRepository.save(discountProgram);
-        return newProgram;
+    public DiscountProgram createNewProgram(DiscountProgramUpdateRequest discountProgramUpdateRequest){
+        try{
+            DiscountProgram newProgram = discountProgramRepository.save(modelMapper.map(discountProgramUpdateRequest, DiscountProgram.class));
+            return newProgram;
+        } catch (Exception e){
+            throw new DuplicateEntity("Duplicate name!");
+        }
     }
 
     //update discount program
@@ -81,5 +91,18 @@ public class DiscountService {
         List<DiscountProgram> list = discountProgramRepository.findAll();
         return list;
     }
+
+    //get program by id
+    public DiscountProgram getProgram(int id){
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramById(id);
+        if(oldProgram != null){
+            return oldProgram;
+        } else {
+            throw new EntityNotFoundException("Program not found!");
+        }
+    }
+
+    //tạo mới discount code
+
 
 }

@@ -15,18 +15,21 @@ public class HairSalonService {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
 
-    @NotBlank(message = "Service name must not be blank!")
+    //@NotBlank(message = "Service name must not be blank!")
+    @Column(unique = true)
     private String name;
 
-    @NotBlank(message = "Service cost must not be blank!")
-    @Pattern(regexp = "^\\d+$", message = "Invalid cost!")
+    //@NotBlank(message = "Service cost must not be blank!")
+    //@Pattern(regexp = "^\\d+$", message = "Invalid cost!")
     private double cost;
 
-    @NotBlank(message = "Time must not be blank!")
-    @Pattern(regexp = "^\\d+$", message = "Invalid time!")
+    //@NotBlank(message = "Time must not be blank!")
+    //@Pattern(regexp = "^\\d+$", message = "Invalid time!")
     private int timeOfService;
 
     private String image;
+
+    private String status;
 
     @OneToMany(mappedBy = "hairSalonService")
     List<Appointment> appointments;

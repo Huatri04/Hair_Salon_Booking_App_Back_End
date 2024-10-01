@@ -19,7 +19,7 @@ public class Appointment {
 
     private String status;
 
-    @ManyToOne
+    @OneToOne
     @JoinColumn(name = "slot_Id")
     Slot slot;
 

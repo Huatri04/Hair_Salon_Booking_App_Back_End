@@ -13,4 +13,5 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     //Optional<AccountForEmployee> findTopByOrderByIdDesc();
 
     AccountForEmployee findAccountForEmployeeByUsername(String username);
+    AccountForEmployee findAccountForEmployeeById(String id);
 }
