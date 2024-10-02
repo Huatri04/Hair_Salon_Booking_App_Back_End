@@ -3,17 +3,19 @@ package com.hairsalonbookingapp.hairsalon.entity;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.*;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.sql.Date;
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class DiscountProgram {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private long id;
 
     //@NotBlank(message = "Program name must not be blank!")
     @Column(unique = true)

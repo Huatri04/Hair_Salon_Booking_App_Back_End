@@ -12,6 +12,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -56,8 +57,18 @@ public class ShiftEmployeeService {
 
     //get shift -> STYLIST LÀM
     public List<ShiftEmployee> getEmployeeShift(){
-        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByEmployeeId(authenticationService.getCurrentAccountForEmployee().getId());
+        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByEmployeeIdAndStatusTrue(authenticationService.getCurrentAccountForEmployee().getId());
         return list;
+    }
+
+    // get shift -> CUSTOMER LÀM
+    public List<ShiftEmployee> getShiftsOfEmployee(String stylistId){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByEmployeeIdAndStatusTrue(stylistId);
+        if(shiftEmployeeList != null){
+            return shiftEmployeeList;
+        } else {
+            throw new EntityNotFoundException("Shift not found!");
+        }
     }
 
 }

@@ -4,13 +4,14 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 import java.util.List;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class HairSalonService {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -29,7 +30,7 @@ public class HairSalonService {
 
     private String image;
 
-    private String status;
+    private boolean status;
 
     @OneToMany(mappedBy = "hairSalonService")
     List<Appointment> appointments;

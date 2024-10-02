@@ -82,11 +82,32 @@ public class SlotService {
         }
     }
 
+    // xem slot trong ngày dựa trên shiftEmployeeId -> CUSTOMER LÀM
+    public List<Slot> getSlots(long shiftEmployeeId){
+        List<Slot> slots = slotRepository.findSlotsByShiftEmployeeIdAndStatusTrue(shiftEmployeeId);
+        if(slots != null){
+            return slots;
+        } else {
+            throw new EntityNotFoundException("Slots not found!");
+        }
+    }
+
     //xóa slot -> STYLIST LÀM
     public Slot deleteSLot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
             slot.setStatus(false);
+            return slotRepository.save(slot);
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
+    }
+
+    //cập nhật status slot về true - đã hoàn thành -> STYLIST LÀM
+    public Slot updateSlot(long slotId){
+        Slot slot = slotRepository.findSlotById(slotId);
+        if(slot != null){
+            slot.setStatus(true);
             return slotRepository.save(slot);
         } else {
             throw new EntityNotFoundException("Slot not found!");

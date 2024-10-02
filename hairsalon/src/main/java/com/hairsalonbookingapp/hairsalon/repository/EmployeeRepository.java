@@ -4,6 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface EmployeeRepository extends JpaRepository<AccountForEmployee, String> {
@@ -14,4 +15,5 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
 
     AccountForEmployee findAccountForEmployeeByUsername(String username);
     AccountForEmployee findAccountForEmployeeById(String id);
+    List<AccountForEmployee> findAccountForEmployeesByRoleAndStatusAndisDeletedFalse(String role, String status);
 }

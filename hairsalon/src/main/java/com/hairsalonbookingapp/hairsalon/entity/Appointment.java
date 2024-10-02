@@ -4,11 +4,12 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Data
 @Entity
+@NoArgsConstructor
 public class Appointment {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;
@@ -17,21 +18,21 @@ public class Appointment {
     @Pattern(regexp = "^\\d+$", message = "Invalid cost!")
     private double cost;
 
-    private String status;
+    private boolean status;
 
     @OneToOne
-    @JoinColumn(name = "slot_Id")
+    @JoinColumn(name = "slotId")
     Slot slot;
 
     @ManyToOne
-    @JoinColumn(name = "Customer_Id")
+    @JoinColumn(name = "CustomerId")
     AccountForCustomer accountForCustomer;
 
     @ManyToOne
-    @JoinColumn(name = "Service_Id")
+    @JoinColumn(name = "ServiceId")
     HairSalonService hairSalonService;
 
     @OneToOne
-    @JoinColumn(name = "discountCode_Id")
+    @JoinColumn(name = "discountCodeId")
     DiscountCode discountCode;
 }

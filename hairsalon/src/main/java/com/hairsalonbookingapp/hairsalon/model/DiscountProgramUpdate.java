@@ -3,10 +3,8 @@ package com.hairsalonbookingapp.hairsalon.model;
 import jakarta.validation.constraints.*;
 import lombok.Data;
 
-import java.sql.Date;
-
 @Data
-public class DiscountProgramUpdateRequest {
+public class DiscountProgramUpdate {
     @Pattern(regexp = "^[a-zA-Z0-9 ]*$\n|", message = "Invalid name!")
     private String name;
 

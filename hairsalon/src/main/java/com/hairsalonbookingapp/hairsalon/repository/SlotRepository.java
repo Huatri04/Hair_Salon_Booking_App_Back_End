@@ -8,4 +8,5 @@ import java.util.List;
 public interface SlotRepository extends JpaRepository<Slot, Long> {
     List<Slot> findSlotsByShiftEmployeeId(long shiftEmployeeId);
     Slot findSlotById(long id);
+    List<Slot> findSlotsByShiftEmployeeIdAndStatusTrue(long shiftEmployeeId);
 }

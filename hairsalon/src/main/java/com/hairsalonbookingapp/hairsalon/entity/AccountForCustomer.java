@@ -79,4 +79,7 @@ public class AccountForCustomer implements UserDetails {
 
     @OneToMany(mappedBy = "accountForCustomer")
     List<Appointment> appointments;
+
+    @OneToMany(mappedBy = "accountForCustomer")
+    List<DiscountCode> discountCodes;
 }

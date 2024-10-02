@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.exception.AccountBlockedException;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.CustomerRepository;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
@@ -20,7 +21,10 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class AuthenticationService implements UserDetailsService{
@@ -42,6 +46,23 @@ public class AuthenticationService implements UserDetailsService{
 
     @Autowired
     TokenService tokenService;
+
+    //GET ALL STYLIST
+    public List<StylistInfo> getAllStylist(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<StylistInfo> stylistInfos = new ArrayList<>();
+        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndisDeletedFalse(role, status);
+        if(list != null){
+            for(AccountForEmployee account : list){
+                StylistInfo stylistInfo = modelMapper.map(account, StylistInfo.class);
+                stylistInfos.add(stylistInfo);
+            }
+            return stylistInfos;
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
+        }
+    }
 
     //CHECK INPUT LÀ SĐT HAY NAME
     public boolean isPhoneNumber(String input) {

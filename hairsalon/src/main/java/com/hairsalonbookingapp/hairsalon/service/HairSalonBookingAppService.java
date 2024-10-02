@@ -21,26 +21,37 @@ public class HairSalonBookingAppService {
     @Autowired
     ModelMapper modelMapper;
 
-    //tạo mới service
+    //tạo mới service -> MANAGER LÀM
     public HairSalonService createNewService(HairSalonServiceRequest hairSalonServiceRequest){
         try{
             HairSalonService newService = modelMapper.map(hairSalonServiceRequest, HairSalonService.class);
-            newService.setStatus("Available");
+            newService.setStatus(true);
             return serviceRepository.save(newService);
         } catch (Exception e){
             throw new DuplicateEntity("Duplicate name!");
         }
     }
 
-    //update service
+    //update service -> MANAGER LÀM
     public HairSalonService updateService(HairSalonServiceUpdate hairSalonServiceUpdate, long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceById(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
             try{
-                oldService.setName(hairSalonServiceUpdate.getName());
-                oldService.setCost(hairSalonServiceUpdate.getCost());
-                oldService.setTimeOfService(hairSalonServiceUpdate.getTimeOfService());
-                oldService.setImage(hairSalonServiceUpdate.getImage());
+                if(!hairSalonServiceUpdate.getName().isEmpty()){
+                    oldService.setName(hairSalonServiceUpdate.getName());
+                }
+
+                if(hairSalonServiceUpdate.getCost() > 0){
+                    oldService.setCost(hairSalonServiceUpdate.getCost());
+                }
+
+                if(hairSalonServiceUpdate.getTimeOfService() > 0 && hairSalonServiceUpdate.getTimeOfService() < 60){
+                    oldService.setTimeOfService(hairSalonServiceUpdate.getTimeOfService());
+                }
+
+                if(!hairSalonServiceUpdate.getImage().isEmpty()){
+                    oldService.setImage(hairSalonServiceUpdate.getImage());
+                }
 
                 HairSalonService newService = serviceRepository.save(oldService);
                 return newService;
@@ -52,32 +63,37 @@ public class HairSalonBookingAppService {
         }
     }
 
-    //delete service
+    //delete service  -> MANAGER LÀM
     public HairSalonService deleteService(long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceById(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
-            oldService.setStatus("Not available");
+            oldService.setStatus(false);
             return serviceRepository.save(oldService);
         } else {
             throw new EntityNotFoundException("Service not found!");
         }
     }
 
-    //restart service
+    //restart service -> MANAGER LÀM
     public HairSalonService startService(long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceById(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
-            oldService.setStatus("Available");
+            oldService.setStatus(true);
             return serviceRepository.save(oldService);
         } else {
             throw new EntityNotFoundException("Service not found!");
         }
     }
 
-    //get all service
+    //get all service  -> CUSTOMER LÀM
     public List<HairSalonService> getAllService(){
-        List<HairSalonService> list = serviceRepository.findAll();
-        return list;
+        List<HairSalonService> list = serviceRepository.findHairSalonServicesByStatusTrue();
+        if(list != null){
+            return list;
+        } else {
+            //throw new EntityNotFoundException("Service not found!");
+            return null;
+        }
     }
 
 
