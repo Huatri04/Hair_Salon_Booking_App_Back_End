@@ -46,7 +46,7 @@ public class AppointmentService {
     DiscountCodeRepository discountCodeRepository;
 
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
-    public List<HairSalonService> getServiceList() {
+    public List<HairSalonService> getServiceList() {            // LẤY RA DANH SÁCH DỊCH VỤ KHẢ DỤNG
         List<HairSalonService> list = hairSalonBookingAppService.getAllService();
         if (list != null) {
             return list;
@@ -55,36 +55,57 @@ public class AppointmentService {
         }
     }
 
-    public HairSalonService getService(long serviceId) {
-        return serviceRepository.findHairSalonServiceByIdAndStatusTrue(serviceId);
+    public HairSalonService getService(long serviceId) {        // HÀM LẤY SERVICE
+        HairSalonService service = serviceRepository.findHairSalonServiceByIdAndStatusTrue(serviceId);
+        if(service != null){
+            return service;
+        } else {
+            throw new EntityNotFoundException("Service not found!");
+        }
     }
 
     //CUSTOMER XEM VÀ CHỌN STYLIST
-    public List<StylistInfo> getAllStylistInFo() {
+    public List<StylistInfo> getAllStylistInFo() {              //  LẤY DANH SÁCH STYLIST KHẢ DỤNG
         List<StylistInfo> list = authenticationService.getAllStylist();
         return list;
     }
 
-    public AccountForEmployee getStylist(String stylistId) {
-        return employeeRepository.findAccountForEmployeeById(stylistId);
+    public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
+        String status = "Workday";
+        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndisDeletedFalse(stylistId, status);
+        if(account != null){
+            return account;
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
+        }
     }
 
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
-    public List<ShiftEmployee> getShiftEmployees(String stylistId) {
+    public List<ShiftEmployee> getShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
         return shiftEmployeeService.getShiftsOfEmployee(stylistId);
     }
 
-    public List<Slot> viewAvailableSlots(long shiftEmployeeId) {
+    public List<Slot> viewAvailableSlots(long shiftEmployeeId) {     // XEM CÁC SLOT KHẢ DỤNG CỦA CA
         return slotService.getSlots(shiftEmployeeId);
     }
 
-    public Slot getAvailableSlot(long slotId) {
-        return slotRepository.findSlotById(slotId);
+    public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
+        Slot slot = slotRepository.findSlotByIdAndStatusTrue(slotId);
+        if(slot != null){
+            return slot;
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
     }
 
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
-    public DiscountCode getDiscountCode(String DiscountCodeId) {
-        return discountCodeRepository.findDiscountCodeById(DiscountCodeId);
+    public DiscountCode getDiscountCode(String DiscountCodeId) {    // HÀM LẤY MÃ GIẢM GIÁ -> CẦN COI LẠI
+        DiscountCode discountCode = discountCodeRepository.findDiscountCodeById(DiscountCodeId);
+        if(discountCode != null){
+            return discountCode;
+        } else {
+            throw new EntityNotFoundException("Invalid code");
+        }
     }
 
     //HỆ THỐNG CHỐT
@@ -118,9 +139,8 @@ public class AppointmentService {
             Appointment newAppointment = appointmentRepository.save(appointment);
             return newAppointment;
         } catch (Exception e) {
-            throw new EntityNotFoundException("Can not create appointment!");
+            throw new EntityNotFoundException("Can not create appointment: " + e.getMessage());
         }
-
     }
     //CẬP NHẬT APPOINTMENT -> CUSTOMER LÀM
     // CẬP NHẬT APPOINTMENT CÓ 2 TRƯỜNG HỢP:
@@ -133,56 +153,61 @@ public class AppointmentService {
     public Appointment updateAppointment(AppointmentUpdate appointmentUpdate, long id) {
         Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusTrue(id);  //TÌM LẠI APPOINTMENT CŨ
         if (oldAppointment != null) {   // TÌM THẤY
-            double cost = 0;          // TÍNH TOÁN COST TỪ ĐẦU
-            double newBonusEmployee = 0;
-            double newBonusCode = 0;
-            if (appointmentUpdate.getServiceId() != 0) {      // NẾU CUSTOMER CÓ NHẬP ID SERVICE
-                oldAppointment.setHairSalonService(getService(appointmentUpdate.getServiceId()));       // CẬP NHẬT
-                cost += serviceRepository.findHairSalonServiceByIdAndStatusTrue(appointmentUpdate.getServiceId()).getCost(); // CẬP NHẬT LẠI VÀO COST
-            } else {                                        // NẾU CUSTOMER KHÔNG NHẬP ID SERVICE
-                cost += oldAppointment.getHairSalonService().getCost();  //  COST SERVICE NHƯ CŨ
-            }
-
-            if (appointmentUpdate.getSlotId() != 0) {         // NẾU CUSTOMER CÓ NHẬP SLOT ID
-                oldAppointment.setSlot(getAvailableSlot(appointmentUpdate.getSlotId()));  // CẬP NHẬT
-            }
-
-            if (!appointmentUpdate.getStylistId().isEmpty()) {       // NẾU CUSTOMER NHẬP STYLIST ID -> STYLIST MỚI
-
-                if (getStylist(appointmentUpdate.getStylistId()).getExpertStylistBonus() != 0) {    // NẾU STYLIST MỚI LÀ DÂN CHUYÊN
-                    AccountForEmployee accountForEmployee = getStylist(appointmentUpdate.getStylistId());
-                    newBonusEmployee += (accountForEmployee.getExpertStylistBonus()) / 100;   // CẬP NHẬT BONUS CHO NÓ
+            try{
+                double cost = 0;          // TÍNH TOÁN COST TỪ ĐẦU
+                double newBonusEmployee = 0;
+                double newBonusCode = 0;
+                if (appointmentUpdate.getServiceId() != 0) {      // NẾU CUSTOMER CÓ NHẬP ID SERVICE
+                    oldAppointment.setHairSalonService(getService(appointmentUpdate.getServiceId()));       // CẬP NHẬT
+                    cost += serviceRepository.findHairSalonServiceByIdAndStatusTrue(appointmentUpdate.getServiceId()).getCost(); // CẬP NHẬT LẠI VÀO COST
+                } else {                                        // NẾU CUSTOMER KHÔNG NHẬP ID SERVICE
+                    cost += oldAppointment.getHairSalonService().getCost();  //  COST SERVICE NHƯ CŨ
                 }
 
-            } else {                                                                        // NẾU CUSTOMER KO NHẬP -> STYLIST CŨ
-                String oldStylistId = oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getId();
-                AccountForEmployee account = getStylist(oldStylistId);
-
-                if (account.getExpertStylistBonus() != 0) {      // STYLIST CŨ VẪN LÀ DÂN CHUYÊN
-                    newBonusEmployee += (account.getExpertStylistBonus()) / 100;
+                if (appointmentUpdate.getSlotId() != 0) {         // NẾU CUSTOMER CÓ NHẬP SLOT ID
+                    oldAppointment.setSlot(getAvailableSlot(appointmentUpdate.getSlotId()));  // CẬP NHẬT
                 }
 
+                if (!appointmentUpdate.getStylistId().isEmpty()) {       // NẾU CUSTOMER NHẬP STYLIST ID -> STYLIST MỚI
+
+                    if (getStylist(appointmentUpdate.getStylistId()).getExpertStylistBonus() != 0) {    // NẾU STYLIST MỚI LÀ DÂN CHUYÊN
+                        AccountForEmployee accountForEmployee = getStylist(appointmentUpdate.getStylistId());
+                        newBonusEmployee += (accountForEmployee.getExpertStylistBonus()) / 100;   // CẬP NHẬT BONUS CHO NÓ
+                    }
+
+                } else {                                                                        // NẾU CUSTOMER KO NHẬP -> STYLIST CŨ
+                    String oldStylistId = oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getId();
+                    AccountForEmployee account = getStylist(oldStylistId);
+
+                    if (account.getExpertStylistBonus() != 0) {      // STYLIST CŨ VẪN LÀ DÂN CHUYÊN
+                        newBonusEmployee += (account.getExpertStylistBonus()) / 100;
+                    }
+
+                }
+
+                if (!appointmentUpdate.getDiscountCodeId().isEmpty()) {        //  CUSTOMER NHẬP MÃ MỚI
+
+                    DiscountCode newCode = getDiscountCode(appointmentUpdate.getDiscountCodeId());
+                    DiscountProgram discountProgram = newCode.getDiscountProgram();
+                    newBonusCode += (discountProgram.getPercentage()) / 100;
+
+                } else {      // MÃ CŨ
+
+                    DiscountCode oldCode = oldAppointment.getDiscountCode();
+                    DiscountProgram oldProgram = oldCode.getDiscountProgram();
+                    newBonusCode += (oldProgram.getPercentage()) / 100;
+
+                }
+
+                double newCost = cost + (newBonusEmployee * cost) + (newBonusCode * cost);
+                oldAppointment.setCost(newCost);
+
+                Appointment newAppontment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
+                return newAppontment;
+            } catch (Exception e) {
+                throw new EntityNotFoundException("Can not update appointment: " + e.getMessage());
             }
 
-            if (!appointmentUpdate.getDiscountCodeId().isEmpty()) {        //  CUSTOMER NHẬP MÃ MỚI
-
-                DiscountCode newCode = getDiscountCode(appointmentUpdate.getDiscountCodeId());
-                DiscountProgram discountProgram = newCode.getDiscountProgram();
-                newBonusCode += (discountProgram.getPercentage()) / 100;
-
-            } else {      // MÃ CŨ
-
-                DiscountCode oldCode = oldAppointment.getDiscountCode();
-                DiscountProgram oldProgram = oldCode.getDiscountProgram();
-                newBonusCode += (oldProgram.getPercentage()) / 100;
-
-            }
-
-            double newCost = cost + (newBonusEmployee * cost) + (newBonusCode * cost);
-            oldAppointment.setCost(newCost);
-
-            Appointment newAppontment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
-            return newAppontment;
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
@@ -199,12 +224,5 @@ public class AppointmentService {
             throw new EntityNotFoundException("Appointment not found!");
         }
     }
-
-
-
-
-
-    
-
 
 }
