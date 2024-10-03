@@ -22,6 +22,11 @@ public class RequestEditProfileEmployee {
     @Email(message = "Email invalid!")
     private String email;
 
+    private String oldPassword;
+
+    @Size(min = 6, message = "Password must at least 6 characters")
+    private String newPassword;
+
 //    @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid! ")
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b|^$", message = "phone number is invalid! ")
     private String phoneNumber;

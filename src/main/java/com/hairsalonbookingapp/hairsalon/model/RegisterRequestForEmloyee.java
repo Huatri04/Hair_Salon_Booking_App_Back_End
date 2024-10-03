@@ -20,6 +20,8 @@ public class RegisterRequestForEmloyee {
 
     @NotBlank(message = "Username can not blank!", groups = CreatedBy.class) //groups = CreatedBy.class chi co nhom create moi bat loi
     @Size(min = 6, message = "Password must be more than 6 characters")
+    @Pattern(regexp = "^[\\S]*$", message = "Username must not contain spaces")
+    @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+=\\-.,<>?/]+$", message = "Invalid characters") // cho phép và ký tự đặc biệt
     private String username;
 
     private String img;
@@ -31,6 +33,7 @@ public class RegisterRequestForEmloyee {
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "phone number is invalid!")
     @NotBlank(message = "phone number must not blank!", groups = CreatedBy.class)
     private String phoneNumber;
+
     @NotBlank(message = "Password can not blank!", groups = CreatedBy.class)
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;

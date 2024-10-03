@@ -29,6 +29,8 @@ public class AccountForEmployee implements UserDetails {
 
     @NotBlank(message = "Username can not blank!", groups = CreatedBy.class) //groups = CreatedBy.class chi co nhom create moi bat loi
     @Size(min = 6, message = "Username must be more than 6 characters")
+    @Pattern(regexp = "^[\\S]*$", message = "Username must not contain spaces")
+    @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+=\\-.,<>?/]+$", message = "Invalid characters") //cho phép  ký tự đặc biệt
     private String username;
 
     private String img;

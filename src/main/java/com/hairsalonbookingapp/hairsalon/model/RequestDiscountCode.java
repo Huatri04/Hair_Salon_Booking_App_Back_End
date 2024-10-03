@@ -10,8 +10,6 @@ public class RequestDiscountCode {
     @Column(unique = true, nullable = false)
     private String discountCodeId;
 
-    private String code;
-
     private  String appointmentId;
 
 }

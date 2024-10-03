@@ -110,9 +110,9 @@ public class DiscountCodeService {
             throw new Duplicate("Discount program not found!");// cho dung luon
         } else {
             try{
-                if (oldDiscountCode.getCode() != null && !oldDiscountCode.getCode().isEmpty()) {
-                    oldDiscountCode.setCode(oldDiscountCode.getCode());
-                }
+//                if (oldDiscountCode.getCode() != null && !oldDiscountCode.getCode().isEmpty()) {
+//                    oldDiscountCode.setCode(oldDiscountCode.getCode());
+//                }
 
                 // Lưu cập nhật vào cơ sở dữ liệu
                 DiscountCode updatedDiscountCode = discountCodeRepository.save(oldDiscountCode);

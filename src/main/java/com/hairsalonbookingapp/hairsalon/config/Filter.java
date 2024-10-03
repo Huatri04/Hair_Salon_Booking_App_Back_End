@@ -74,7 +74,7 @@ public class Filter extends OncePerRequestFilter {
                 accountForEmployee = tokenService.getAccountEmployeeByToken(token);
             } catch (ExpiredJwtException e){
                 //response token hết hạn
-                resolver.resolveException(request, response, null, new jakarta.security.auth.message.AuthException("Expired token!"));
+                resolver.resolveException(request, response, null, new AuthException("Expired token!"));
                 return;
             } catch (MalformedJwtException malformedJwtException){
                 //response token sai

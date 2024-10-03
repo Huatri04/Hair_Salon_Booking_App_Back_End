@@ -19,5 +19,10 @@ public class RequestEditProfileCustomer {
 
     private String name;
 
+    private String oldPassword;
+
+    @Size(min = 6, message = "Password must at least 6 characters")
+    private String newPassword;
+
 //    private String password;
 }

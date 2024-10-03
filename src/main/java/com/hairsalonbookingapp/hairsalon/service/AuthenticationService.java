@@ -20,6 +20,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
 
@@ -75,35 +76,90 @@ public class AuthenticationService implements UserDetailsService {
     // update profile cho customer
 
     public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer, String phone){
-        AccountForCustomer account = modelMapper.map(requestEditProfileCustomer, AccountForCustomer.class);
+//        AccountForCustomer account = modelMapper.map(requestEditProfileCustomer, AccountForCustomer.class);
         AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(phone);
         if (oldAccount == null) {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
 
             try{
-                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
-                    oldAccount.setEmail(account.getEmail());
+//                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
+//                    oldAccount.setEmail(account.getEmail());
+//                }
+//
+//                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
+////                String originPassword = account.getPassword();
+////                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+////                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
+////                }
+//
+//                // Kiểm tra và cập nhật tên
+//                if (account.getName() != null && !account.getName().isEmpty()) {
+//                    oldAccount.setName(account.getName());
+//                }
+//
+//                // Xử lý đổi mật khẩu
+//                String oldPassword = requestEditProfileCustomer.getOldPassword();
+//                String newPassword = requestEditProfileCustomer.getNewPassword();
+//
+//                if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
+//                    // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
+//                    if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+//                        throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
+//                    }
+//
+//                    // Kiểm tra mật khẩu cũ
+//                    if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+//                        throw new UpdatedException("Mật khẩu cũ không chính xác.");
+//                    }
+//
+//                    // Kiểm tra độ dài mật khẩu mới (đã được kiểm tra qua annotation @Size)
+//                    // Mã hóa mật khẩu mới và cập nhật
+//                    String encodedNewPassword = passwordEncoder.encode(newPassword);
+//                    oldAccount.setPassword(encodedNewPassword);
+//                }
+//
+//                // Lưu cập nhật vào cơ sở dữ liệu
+//                AccountForCustomer updatedAccount = accountForCustomerRepository.save(oldAccount);
+//                return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
+
+
+// vi model mapper ko nhan biet dc old vs new password nen lam ntn
+                // Cập nhật email
+                if (requestEditProfileCustomer.getEmail() != null && !requestEditProfileCustomer.getEmail().isEmpty()) {
+                    oldAccount.setEmail(requestEditProfileCustomer.getEmail());
                 }
 
-                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-//                String originPassword = account.getPassword();
-//                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-//                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
-//                }
+                // Cập nhật tên
+                if (requestEditProfileCustomer.getName() != null && !requestEditProfileCustomer.getName().isEmpty()) {
+                    oldAccount.setName(requestEditProfileCustomer.getName());
+                }
 
-                // Kiểm tra và cập nhật tên
-                if (account.getName() != null && !account.getName().isEmpty()) {
-                    oldAccount.setName(account.getName());
+                // Xử lý đổi mật khẩu
+                String oldPassword = requestEditProfileCustomer.getOldPassword();
+                String newPassword = requestEditProfileCustomer.getNewPassword();
+
+                if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
+                    if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+                        throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
+                    }
+
+                    if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+                        throw new UpdatedException("Mật khẩu cũ không chính xác.");
+                    }
+
+                    // Mã hóa mật khẩu mới
+                    String encodedNewPassword = passwordEncoder.encode(newPassword);
+                    oldAccount.setPassword(encodedNewPassword);
                 }
 
                 // Lưu cập nhật vào cơ sở dữ liệu
                 AccountForCustomer updatedAccount = accountForCustomerRepository.save(oldAccount);
                 return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage().contains(account.getEmail())){
+                if(e.getMessage().contains(requestEditProfileCustomer.getEmail())){
                     throw new UpdatedException("duplicate email!");
-                } else if (e.getMessage().contains(account.getPassword())) {
+                } else if (e.getMessage().contains(requestEditProfileCustomer.getNewPassword())) {
                     throw new UpdatedException("duplicate password!");
                 }
             }
@@ -117,43 +173,111 @@ public class AuthenticationService implements UserDetailsService {
 
 
     public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
-        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
+//        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
             AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
             if (oldAccount == null) {
                 throw new Duplicate("Account not found!");// cho dung luon
             } else {
                 try{
-                    if (account.getEmail() != null && !account.getEmail().isEmpty()) {
-                        oldAccount.setEmail(account.getEmail());
-                    }
-                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
-                    if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
-                        oldAccount.setPhoneNumber(account.getPhoneNumber());
-                    }
-                    // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-//                    String originPassword = account.getPassword();
-//                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-//                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
+//                    if (account.getEmail() != null && !account.getEmail().isEmpty()) {
+//                        oldAccount.setEmail(account.getEmail());
 //                    }
+//                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
+//                    if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
+//                        oldAccount.setPhoneNumber(account.getPhoneNumber());
+//                    }
+//                    // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
+////                    String originPassword = account.getPassword();
+////                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
+////                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
+////                    }
+//                    // Kiểm tra và cập nhật tên
+//                    if (account.getName() != null && !account.getName().isEmpty()) {
+//                        oldAccount.setName(account.getName());
+//                    }
+//
+//                    // Kiểm tra và cập nhật ảnh
+//                    if (account.getImg() != null && !account.getImg().isEmpty()) {
+//                        oldAccount.setImg(account.getImg());
+//                    }
+//
+//                    // Xử lý đổi mật khẩu
+//                    String oldPassword = requestEditProfileEmployee.getOldPassword();
+//                    String newPassword = requestEditProfileEmployee.getNewPassword();
+//
+//                    if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
+//                        // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
+//                        if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+//                            throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
+//                        }
+//
+//                        // Kiểm tra mật khẩu cũ
+//                        if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+//                            throw new UpdatedException("Mật khẩu cũ không chính xác.");
+//                        }
+//
+//                        // Kiểm tra độ dài mật khẩu mới (đã được kiểm tra qua annotation @Size)
+//                        // Mã hóa mật khẩu mới và cập nhật
+//                        String encodedNewPassword = passwordEncoder.encode(newPassword);
+//                        oldAccount.setPassword(encodedNewPassword);
+//                    }
+//
+//                    // Lưu cập nhật vào cơ sở dữ liệu
+//                    AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+//                    return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
+
+
+
+                    // phai lam nhu thu cong ntn vi modelMapper ko nhan biet dc new vs old password
+                    // Cập nhật email
+                    if (requestEditProfileEmployee.getEmail() != null && !requestEditProfileEmployee.getEmail().isEmpty()) {
+                        oldAccount.setEmail(requestEditProfileEmployee.getEmail());
+                    }
+
+                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
+                    if (requestEditProfileEmployee.getPhoneNumber() != null && !requestEditProfileEmployee.getPhoneNumber().isEmpty()) {
+                        oldAccount.setPhoneNumber(requestEditProfileEmployee.getPhoneNumber());
+                    }
+
                     // Kiểm tra và cập nhật tên
-                    if (account.getName() != null && !account.getName().isEmpty()) {
-                        oldAccount.setName(account.getName());
+                    if (requestEditProfileEmployee.getName() != null && !requestEditProfileEmployee.getName().isEmpty()) {
+                        oldAccount.setName(requestEditProfileEmployee.getName());
                     }
 
                     // Kiểm tra và cập nhật ảnh
-                    if (account.getImg() != null && !account.getImg().isEmpty()) {
-                        oldAccount.setImg(account.getImg());
+                    if (requestEditProfileEmployee.getImg() != null && !requestEditProfileEmployee.getImg().isEmpty()) {
+                        oldAccount.setImg(requestEditProfileEmployee.getImg());
+                    }
+
+                    // Xử lý đổi mật khẩu
+                    String oldPassword = requestEditProfileEmployee.getOldPassword();
+                    String newPassword = requestEditProfileEmployee.getNewPassword();
+
+                    if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
+                        // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
+                        if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+                            throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
+                        }
+
+                        // Kiểm tra mật khẩu cũ
+                        if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+                            throw new UpdatedException("Mật khẩu cũ không chính xác.");
+                        }
+
+                        // Mã hóa mật khẩu mới và cập nhật
+                        String encodedNewPassword = passwordEncoder.encode(newPassword);
+                        oldAccount.setPassword(encodedNewPassword);
                     }
 
                     // Lưu cập nhật vào cơ sở dữ liệu
                     AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
                     return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
                 } catch (Exception e) {
-                    if(e.getMessage().contains(account.getEmail())){
+                    if(e.getMessage().contains(requestEditProfileEmployee.getEmail())){
                         throw new UpdatedException("duplicate email!");
-                    } else if (e.getMessage().contains(account.getPhoneNumber())) {
+                    } else if (e.getMessage().contains(requestEditProfileEmployee.getPhoneNumber())) {
                         throw new UpdatedException("duplicate phone!");
-                    } else if (e.getMessage().contains(account.getPassword())) {
+                    } else if (e.getMessage().contains(requestEditProfileEmployee.getNewPassword())) {
                         throw new UpdatedException("duplicate password!");
                     }
                 }

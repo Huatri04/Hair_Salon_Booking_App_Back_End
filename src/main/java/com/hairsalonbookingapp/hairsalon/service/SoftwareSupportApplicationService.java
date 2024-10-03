@@ -138,9 +138,9 @@ public class SoftwareSupportApplicationService {
         }
     }
 
-    // show list of SoftwareSupportApplication
-    public List<SoftwareSupportApplication> getAllSoftwareSupportApplication(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByIsDeletedFalse();
+    // show list of SoftwareSupportApplication cua customer
+    public List<SoftwareSupportApplication> getAllSoftwareSupportApplicationOfCustomer(){
+        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
         return softwareSupportApplications;
     }
 
@@ -149,4 +149,11 @@ public class SoftwareSupportApplicationService {
         SoftwareSupportApplication softwareSupportApplication = softwareSupportApplicationRepository.findSoftwareSupportApplicationBySoftwareSupportApplicationId(id);
         return modelMapper.map(softwareSupportApplication, SoftwareSupportApplicationResponse.class);
     }
+
+    // show list of SoftwareSupportApplication cua employee
+    public List<SoftwareSupportApplication> getAllSoftwareSupportApplicationOfEmployee(){
+        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByEmployeeIsNotNullAndIsDeletedFalse();
+        return softwareSupportApplications;
+    }
+
 }

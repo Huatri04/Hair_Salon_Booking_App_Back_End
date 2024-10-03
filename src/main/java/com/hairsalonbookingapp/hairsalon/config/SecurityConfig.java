@@ -1,9 +1,14 @@
 package com.hairsalonbookingapp.hairsalon.config;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
+import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.RequestEditProfileCustomer;
+import com.hairsalonbookingapp.hairsalon.model.RequestEditProfileEmployee;
 import com.hairsalonbookingapp.hairsalon.model.RequestSoftwareSupportApplication;
 import com.hairsalonbookingapp.hairsalon.service.AuthenticationService;
 import org.modelmapper.ModelMapper;
+import org.modelmapper.TypeMap;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -59,6 +64,30 @@ public class SecurityConfig {
     public ModelMapper modelMapper(){
         return new ModelMapper();
     }
+//    @Bean
+//    public ModelMapper modelMapper() {
+//        ModelMapper modelMapper = new ModelMapper();
+//
+//        // Tạo TypeMap cho RequestEditProfileCustomer -> AccountForCustomer
+//        TypeMap<RequestEditProfileCustomer, AccountForCustomer> typeMap =
+//                modelMapper.createTypeMap(RequestEditProfileCustomer.class, AccountForCustomer.class);
+//
+//        // Bỏ qua việc ánh xạ trường password
+//        typeMap.addMappings(mapper -> {
+//            mapper.skip(AccountForCustomer::setPassword);
+//        });
+//
+//        // Tạo TypeMap cho RequestEditProfileEmployee -> AccountForEmployee
+//        TypeMap<RequestEditProfileEmployee, AccountForEmployee> employeeTypeMap =
+//                modelMapper.createTypeMap(RequestEditProfileEmployee.class, AccountForEmployee.class);
+//
+//        // Bỏ qua việc ánh xạ trường password cho Employee
+//        employeeTypeMap.addMappings(mapper -> {
+//            mapper.skip(AccountForEmployee::setPassword);
+//        });
+//
+//        return modelMapper;
+//    }
 //@Bean
 //public ModelMapper modelMapper() {
 //    ModelMapper modelMapper = new ModelMapper();

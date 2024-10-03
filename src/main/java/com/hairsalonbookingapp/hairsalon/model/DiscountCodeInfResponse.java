@@ -6,5 +6,4 @@ import lombok.Data;
 public class DiscountCodeInfResponse {
     private String discountCodeId;
 
-    private String code;
 }

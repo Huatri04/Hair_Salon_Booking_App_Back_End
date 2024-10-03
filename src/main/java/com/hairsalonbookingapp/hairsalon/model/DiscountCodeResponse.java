@@ -8,8 +8,6 @@ import lombok.Data;
 public class DiscountCodeResponse {
     private String discountCodeId;
 
-    private String code;
-
     private DiscountProgram discountProgram;
 
     private AccountForCustomer customer;

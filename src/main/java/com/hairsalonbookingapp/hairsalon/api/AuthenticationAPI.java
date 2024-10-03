@@ -71,4 +71,15 @@ public class AuthenticationAPI {
         EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccountByManager(account, id);
         return ResponseEntity.ok(oldAccount);
     }
+
+    @DeleteMapping("/banAccountCustomer/{id}")
+    public ResponseEntity banAccountCustomer(@PathVariable String id){
+        AccountForCustomerResponse accountForCustomerResponse = authenticationService.deleteAccountForCustomer(id);
+        return ResponseEntity.ok(accountForCustomerResponse);
+    }
+    @DeleteMapping("/deleteEmployee/{id}")
+    public ResponseEntity deleteEmployee(@PathVariable String id){
+        AccountForEmployeeResponse accountForEmployeeResponse = authenticationService.deleteAccountForEmployee(id);
+        return ResponseEntity.ok(accountForEmployeeResponse);
+    }
 }

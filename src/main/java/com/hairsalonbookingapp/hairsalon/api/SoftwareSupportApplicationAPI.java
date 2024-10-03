@@ -34,9 +34,15 @@ public class SoftwareSupportApplicationAPI {
         return ResponseEntity.ok(softwareSupportApplicationResponse);
     }
 
-    @GetMapping
-    public ResponseEntity getAllSoftwareSupportApplication(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplication();
+    @GetMapping("/customers")
+    public ResponseEntity getAllSoftwareSupportApplicationOfCustomer(){
+        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfCustomer();
+        return ResponseEntity.ok(softwareSupportApplications);
+    }
+
+    @GetMapping("/employees")
+    public ResponseEntity getAllSoftwareSupportApplicationOfEmployee(){
+        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfEmployee();
         return ResponseEntity.ok(softwareSupportApplications);
     }
 

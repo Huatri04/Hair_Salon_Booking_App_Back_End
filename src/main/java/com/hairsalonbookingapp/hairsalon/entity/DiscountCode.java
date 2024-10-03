@@ -13,8 +13,6 @@ public class DiscountCode {
     @Column(unique = true, nullable = false)
     private String discountCodeId;
 
-    private String code;
-
     @ManyToOne
     @JoinColumn(name = "discountProgramId", nullable = false) // day la foreign key
     private DiscountProgram discountProgram;
