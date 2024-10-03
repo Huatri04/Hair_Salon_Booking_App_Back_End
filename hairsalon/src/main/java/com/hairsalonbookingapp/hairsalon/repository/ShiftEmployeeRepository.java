@@ -7,5 +7,5 @@ import java.util.List;
 
 public interface ShiftEmployeeRepository extends JpaRepository<ShiftEmployee, Long> {
     ShiftEmployee findShiftEmployeeById(long id);
-    List<ShiftEmployee> findShiftEmployeesByEmployeeIdAndStatusTrue(String employeeId);
+    List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(String employeeId);
 }

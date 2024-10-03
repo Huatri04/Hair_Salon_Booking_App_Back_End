@@ -75,7 +75,7 @@ public class SlotService {
 
     // xem slot trong ngày dựa trên shiftEmployeeId -> STYLIST LÀM
     public List<Slot> getAllSlots(long shiftEmployeeId){
-        List<Slot> slots = slotRepository.findSlotsByShiftEmployeeId(shiftEmployeeId);
+        List<Slot> slots = slotRepository.findSlotsByShiftEmployee_Id(shiftEmployeeId);
         if(slots != null){
             return slots;
         } else {
@@ -85,7 +85,7 @@ public class SlotService {
 
     // xem slot trong ngày dựa trên shiftEmployeeId -> CUSTOMER LÀM
     public List<Slot> getSlots(long shiftEmployeeId){
-        List<Slot> slots = slotRepository.findSlotsByShiftEmployeeIdAndStatusTrue(shiftEmployeeId);
+        List<Slot> slots = slotRepository.findSlotsByShiftEmployee_IdAndStatusTrue(shiftEmployeeId);
         if(slots != null){
             return slots;
         } else {

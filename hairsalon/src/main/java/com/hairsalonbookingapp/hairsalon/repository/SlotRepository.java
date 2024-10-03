@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface SlotRepository extends JpaRepository<Slot, Long> {
-    List<Slot> findSlotsByShiftEmployeeId(long shiftEmployeeId);
+    List<Slot> findSlotsByShiftEmployee_Id(long shiftEmployeeId);
     Slot findSlotById(long id);
     Slot findSlotByIdAndStatusTrue(long id);
-    List<Slot> findSlotsByShiftEmployeeIdAndStatusTrue(long shiftEmployeeId);
+    List<Slot> findSlotsByShiftEmployee_IdAndStatusTrue(long shiftEmployeeId);
 }

@@ -72,7 +72,7 @@ public class AppointmentService {
 
     public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
         String status = "Workday";
-        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndisDeletedFalse(stylistId, status);
+        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistId, status);
         if(account != null){
             return account;
         } else {

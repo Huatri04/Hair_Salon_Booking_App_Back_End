@@ -57,13 +57,13 @@ public class ShiftEmployeeService {
 
     //get shift -> STYLIST LÀM
     public List<ShiftEmployee> getEmployeeShift(){
-        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByEmployeeIdAndStatusTrue(authenticationService.getCurrentAccountForEmployee().getId());
+        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(authenticationService.getCurrentAccountForEmployee().getId());
         return list;
     }
 
     // get shift -> CUSTOMER LÀM
     public List<ShiftEmployee> getShiftsOfEmployee(String stylistId){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByEmployeeIdAndStatusTrue(stylistId);
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(stylistId);
         if(shiftEmployeeList != null){
             return shiftEmployeeList;
         } else {

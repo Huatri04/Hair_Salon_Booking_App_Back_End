@@ -36,7 +36,7 @@ public class HairSalonServiceAPI {
         return ResponseEntity.ok(hairSalonService);
     }
 
-    @PutMapping("/service/id")
+    @PutMapping("/service/restart")
     public ResponseEntity restartHairSalonService(@PathVariable long id){
         HairSalonService hairSalonService = hairSalonBookingAppService.startService(id);
         return ResponseEntity.ok(hairSalonService);

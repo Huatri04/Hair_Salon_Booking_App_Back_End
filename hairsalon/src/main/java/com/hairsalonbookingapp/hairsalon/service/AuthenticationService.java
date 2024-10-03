@@ -52,7 +52,7 @@ public class AuthenticationService implements UserDetailsService{
         String role = "Stylist";
         String status = "Workday";
         List<StylistInfo> stylistInfos = new ArrayList<>();
-        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndisDeletedFalse(role, status);
+        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
         if(list != null){
             for(AccountForEmployee account : list){
                 StylistInfo stylistInfo = modelMapper.map(account, StylistInfo.class);

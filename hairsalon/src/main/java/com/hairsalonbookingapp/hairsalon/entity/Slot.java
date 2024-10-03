@@ -29,5 +29,5 @@ public class Slot {
     ShiftEmployee shiftEmployee;   //   CHO BIẾT SLOT THUỘC CA NÀO, CỦA AI
 
     @OneToOne(mappedBy = "slot")
-    List<Appointment> appointments;
+    Appointment appointments;
 }
