@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SlotRepository;
 import org.modelmapper.ModelMapper;
@@ -58,14 +59,14 @@ public class SlotService {
 
 
     //tạo slot -> STYLIST LÀM
-    public List<Slot> createSlots(long shiftEmployeeId, int startHour, int endHour, long duration){
+    public List<Slot> createSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH
         List<Slot> list = new ArrayList<>();
-        for(LocalTime time : shiftWeekService.getSLots(startHour, endHour, duration)){
+        for(LocalTime time : shiftWeekService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration())){
             Slot slot = new Slot();
             slot.setStartSlot(time.toString());
             slot.setStatus(true);
-            slot.setShiftEmployee(shiftEmployeeRepository.findShiftEmployeeById(shiftEmployeeId));
+            slot.setShiftEmployee(shiftEmployeeRepository.findShiftEmployeeById(slotRequest.getShiftEmployeeId()));
             Slot newSlot = slotRepository.save(slot);  // TRƯỚC KHI KẾT THÚC VÒNG LẶP SẼ LƯU XUỐNG DB, SAU ĐÓ THÊM VÀO LIST
             list.add(newSlot);
         }
