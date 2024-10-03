@@ -76,7 +76,7 @@ public class AuthenticationService implements UserDetailsService{
         try{
             account.setPoint(0);
             account.setCreatAt(new Date());
-            account.setDeleted(true);
+            account.setDeleted(false);
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = customerRepository.save(account); //lưu xuống database
@@ -135,14 +135,14 @@ public class AuthenticationService implements UserDetailsService{
                     account.setExpertStylistBonus("20%");
                 }
             }*/
-            account.setId("2");
+            account.setId("4");
             //account.setBasicSalary("100000");
             account.setCreatedAt(new Date());
-            account.setExpertStylistBonus(20);
+            account.setExpertStylistBonus(0);
             account.setStatus("Workday");
             account.setBasicSalary(600000);
             account.setKPI(50);
-            account.setDeleted(true);
+            account.setDeleted(false);
 
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));

@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
+import com.hairsalonbookingapp.hairsalon.model.ShiftWeekRequest;
+import com.hairsalonbookingapp.hairsalon.model.ShiftWeekResponse;
 import com.hairsalonbookingapp.hairsalon.service.ShiftWeekService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -19,33 +21,33 @@ public class ShiftWeekAPI {
     ShiftWeekService shiftWeekService;
 
     @PostMapping("/shiftInWeek")
-    public ResponseEntity createNewShiftWeek(@Valid @RequestBody ShiftInWeek shiftInWeek){
-        ShiftInWeek shift = shiftWeekService.createWeekShift(shiftInWeek);
+    public ResponseEntity createNewShiftWeek(@Valid @RequestBody ShiftWeekRequest shiftWeekRequest){
+        ShiftWeekResponse shift = shiftWeekService.createWeekShift(shiftWeekRequest);
         return ResponseEntity.ok(shift);
     }
 
     @PutMapping("/shiftInWeek/day")
-    public ResponseEntity updateShiftInWeek(@Valid @RequestBody ShiftInWeek shiftInWeek, @PathVariable String day){
-        ShiftInWeek shift = shiftWeekService.updateShift(shiftInWeek, day);
+    public ResponseEntity updateShiftInWeek(@Valid @RequestBody ShiftWeekRequest shiftWeekRequest, @PathVariable String day){
+        ShiftWeekResponse shift = shiftWeekService.updateShift(shiftWeekRequest, day);
         return ResponseEntity.ok(shift);
     }
 
     @DeleteMapping("/shiftInWeek/day")
     public ResponseEntity deleteShiftInWeek(@PathVariable String day){
-        ShiftInWeek shift = shiftWeekService.deleteShift(day);
+        ShiftWeekResponse shift = shiftWeekService.deleteShift(day);
         return ResponseEntity.ok(shift);
     }
 
     @GetMapping("/shiftInWeek")
     public ResponseEntity getAllShiftInWeek(){
-        List<ShiftInWeek> shiftInWeekList = shiftWeekService.getAllShift();
+        List<ShiftWeekResponse> shiftInWeekList = shiftWeekService.getAllShift();
         return ResponseEntity.ok(shiftInWeekList);
     }
 
-    @GetMapping("/shiftInWeek/day")
+    /*@GetMapping("/shiftInWeek/day")
     public ResponseEntity getshiftInWeekByday(@PathVariable String day){
         ShiftInWeek shift = shiftWeekService.getShift(day);
         return ResponseEntity.ok(shift);
-    }
+    }*/
 
 }
