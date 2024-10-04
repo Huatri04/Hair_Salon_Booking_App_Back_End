@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftWeekRepository;
@@ -34,31 +35,54 @@ public class ShiftEmployeeService {
     AuthenticationService authenticationService;
 
     //tạo shift employee -> STYLIST LÀM
-    public ShiftEmployee createNewShiftEmployee(String dayOfWeek){
+    public ShiftEmployeeResponse createNewShiftEmployee(String dayOfWeek){
         ShiftEmployee shift = new ShiftEmployee();
         shift.setStatus(true);
         shift.setAccountForEmployee(authenticationService.getCurrentAccountForEmployee());
         shift.setShiftInWeek(shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek));
         ShiftEmployee newShift = shiftEmployeeRepository.save(shift);
-        return newShift;
+
+        // GENERATE RESPONSE
+        ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(newShift, ShiftEmployeeResponse.class);
+        shiftEmployeeResponse.setDayInWeek(newShift.getShiftInWeek().getDayOfWeek());
+        shiftEmployeeResponse.setEmployeeId(newShift.getAccountForEmployee().getId());
+
+        return shiftEmployeeResponse;
     }
 
     //xóa shift -> STYLIST LÀM
-    public ShiftEmployee deleteShiftEmployee(long idShift){
+    public ShiftEmployeeResponse deleteShiftEmployee(long idShift){
         ShiftEmployee shift = shiftEmployeeRepository.findShiftEmployeeById(idShift);
         if(shift != null){
             shift.setStatus(false);
             ShiftEmployee shiftEmployee = shiftEmployeeRepository.save(shift);
-            return shiftEmployee;
+
+            // GENERATE RESPONSE
+            ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+
+            return shiftEmployeeResponse;
         } else {
             throw new EntityNotFoundException("Shift not found!");
         }
     }
 
     //get shift -> STYLIST LÀM
-    public List<ShiftEmployee> getEmployeeShift(){
+    public List<ShiftEmployeeResponse> getEmployeeShift(){
         List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(authenticationService.getCurrentAccountForEmployee().getId());
-        return list;
+        List<ShiftEmployeeResponse> shiftEmployeeResponses = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : list){
+
+            // GENERATE RESPONSE
+            ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+
+            shiftEmployeeResponses.add(shiftEmployeeResponse);
+        }
+
+        return shiftEmployeeResponses;
     }
 
     // get shift -> CUSTOMER LÀM

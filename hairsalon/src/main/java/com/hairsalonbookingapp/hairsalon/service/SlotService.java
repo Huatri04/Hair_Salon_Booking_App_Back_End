@@ -6,6 +6,7 @@ import com.hairsalonbookingapp.hairsalon.entity.Slot;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
+import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SlotRepository;
 import org.modelmapper.ModelMapper;
@@ -59,7 +60,7 @@ public class SlotService {
 
 
     //tạo slot -> STYLIST LÀM
-    public List<Slot> createSlots(SlotRequest slotRequest){
+    public List<SlotResponse> createSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH
         List<Slot> list = new ArrayList<>();
         for(LocalTime time : shiftWeekService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration())){
@@ -70,14 +71,29 @@ public class SlotService {
             Slot newSlot = slotRepository.save(slot);  // TRƯỚC KHI KẾT THÚC VÒNG LẶP SẼ LƯU XUỐNG DB, SAU ĐÓ THÊM VÀO LIST
             list.add(newSlot);
         }
-        return list;
+        //GENERATE LIST RESPONSE
+        List<SlotResponse> responseList = new ArrayList<>();
+        for(Slot slot : list){
+            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            responseList.add(slotResponse);
+        }
+        return responseList;
     }
 
     // xem slot trong ngày dựa trên shiftEmployeeId -> STYLIST LÀM
-    public List<Slot> getAllSlots(long shiftEmployeeId){
+    public List<SlotResponse> getAllSlots(long shiftEmployeeId){
         List<Slot> slots = slotRepository.findSlotsByShiftEmployee_Id(shiftEmployeeId);
         if(slots != null){
-            return slots;
+
+            //GENERATE LIST RESPONSE
+            List<SlotResponse> responseList = new ArrayList<>();
+            for(Slot slot : slots){
+                SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+                slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+                responseList.add(slotResponse);
+            }
+            return responseList;
         } else {
             throw new EntityNotFoundException("Slots not found!");
         }
@@ -94,22 +110,28 @@ public class SlotService {
     }
 
     //xóa slot -> STYLIST LÀM
-    public Slot deleteSLot(long slotId){
+    public SlotResponse deleteSLot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
             slot.setStatus(false);
-            return slotRepository.save(slot);
+            Slot newSlot = slotRepository.save(slot);
+            SlotResponse slotResponse = modelMapper.map(newSlot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(newSlot.getShiftEmployee().getId());
+            return slotResponse;
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }
     }
 
     //cập nhật status slot về true - đã hoàn thành -> STYLIST LÀM
-    public Slot updateSlot(long slotId){
+    public SlotResponse updateSlot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
             slot.setStatus(true);
-            return slotRepository.save(slot);
+            Slot newSlot = slotRepository.save(slot);
+            SlotResponse slotResponse = modelMapper.map(newSlot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(newSlot.getShiftEmployee().getId());
+            return slotResponse;
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }

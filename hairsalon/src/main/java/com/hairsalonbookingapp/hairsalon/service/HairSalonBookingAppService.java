@@ -4,12 +4,14 @@ import com.hairsalonbookingapp.hairsalon.entity.HairSalonService;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceRequest;
+import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceResponse;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceUpdate;
 import com.hairsalonbookingapp.hairsalon.repository.ServiceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -22,18 +24,19 @@ public class HairSalonBookingAppService {
     ModelMapper modelMapper;
 
     //tạo mới service -> MANAGER LÀM
-    public HairSalonService createNewService(HairSalonServiceRequest hairSalonServiceRequest){
+    public HairSalonServiceResponse createNewService(HairSalonServiceRequest hairSalonServiceRequest){
         try{
             HairSalonService newService = modelMapper.map(hairSalonServiceRequest, HairSalonService.class);
             newService.setStatus(true);
-            return serviceRepository.save(newService);
+            HairSalonService savedService = serviceRepository.save(newService);
+            return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } catch (Exception e){
             throw new DuplicateEntity("Duplicate name!");
         }
     }
 
     //update service -> MANAGER LÀM
-    public HairSalonService updateService(HairSalonServiceUpdate hairSalonServiceUpdate, long id){
+    public HairSalonServiceResponse updateService(HairSalonServiceUpdate hairSalonServiceUpdate, long id){
         HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
             try{
@@ -54,7 +57,7 @@ public class HairSalonBookingAppService {
                 }
 
                 HairSalonService newService = serviceRepository.save(oldService);
-                return newService;
+                return modelMapper.map(newService, HairSalonServiceResponse.class);
             } catch(Exception e) {
                 throw new DuplicateEntity("Duplicate name!");
             }
@@ -64,32 +67,39 @@ public class HairSalonBookingAppService {
     }
 
     //delete service  -> MANAGER LÀM
-    public HairSalonService deleteService(long id){
+    public HairSalonServiceResponse deleteService(long id){
         HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
             oldService.setStatus(false);
-            return serviceRepository.save(oldService);
+            HairSalonService savedService = serviceRepository.save(oldService);
+            return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } else {
             throw new EntityNotFoundException("Service not found!");
         }
     }
 
     //restart service -> MANAGER LÀM
-    public HairSalonService startService(long id){
+    public HairSalonServiceResponse startService(long id){
         HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
         if(oldService != null){
             oldService.setStatus(true);
-            return serviceRepository.save(oldService);
+            HairSalonService savedService = serviceRepository.save(oldService);
+            return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } else {
             throw new EntityNotFoundException("Service not found!");
         }
     }
 
-    //get all service  -> CUSTOMER LÀM
-    public List<HairSalonService> getAllService(){
+    //get all service  -> CUSTOMER, MANAGER LÀM
+    public List<HairSalonServiceResponse> getAllService(){
         List<HairSalonService> list = serviceRepository.findHairSalonServicesByStatusTrue();
         if(list != null){
-            return list;
+            List<HairSalonServiceResponse> responseList = new ArrayList<>();
+            for(HairSalonService hairSalonService : list){
+                HairSalonServiceResponse hairSalonServiceResponse = modelMapper.map(hairSalonService, HairSalonServiceResponse.class);
+                responseList.add(hairSalonServiceResponse);
+            }
+            return responseList;
         } else {
             //throw new EntityNotFoundException("Service not found!");
             return null;

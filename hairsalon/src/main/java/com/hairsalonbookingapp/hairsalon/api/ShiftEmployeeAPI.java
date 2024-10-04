@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
+import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
 import com.hairsalonbookingapp.hairsalon.service.ShiftEmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -20,19 +21,19 @@ public class ShiftEmployeeAPI {
 
     @PostMapping("/shiftEmployee")
     public ResponseEntity createShiftEmployee(@PathVariable String day){
-        ShiftEmployee shift = shiftEmployeeService.createNewShiftEmployee(day);
+        ShiftEmployeeResponse shift = shiftEmployeeService.createNewShiftEmployee(day);
         return ResponseEntity.ok(shift);
     }
 
     @DeleteMapping("/shiftEmployee/id")
     public ResponseEntity deleteShiftEmployee(@PathVariable long id){
-        ShiftEmployee shift = shiftEmployeeService.deleteShiftEmployee(id);
+        ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(id);
         return ResponseEntity.ok(shift);
     }
 
     @GetMapping("/shiftEmployee")
     public ResponseEntity getAllShiftEmployee(){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getEmployeeShift();
+        List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getEmployeeShift();
         return ResponseEntity.ok(shiftEmployeeList);
     }
 

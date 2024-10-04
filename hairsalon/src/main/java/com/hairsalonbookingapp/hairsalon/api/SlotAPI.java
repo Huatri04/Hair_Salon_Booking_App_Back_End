@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
+import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
 import com.hairsalonbookingapp.hairsalon.service.SlotService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -21,25 +22,25 @@ public class SlotAPI {
 
     @PostMapping("/slot")
     public ResponseEntity createNewSlot(@Valid @RequestBody SlotRequest slotRequest){
-        List<Slot> slots = slotService.createSlots(slotRequest);
+        List<SlotResponse> slots = slotService.createSlots(slotRequest);
         return ResponseEntity.ok(slots);
     }
 
     @GetMapping("/slot")
     public ResponseEntity getAllSLots(@PathVariable long shiftEmployeeId){
-        List<Slot> slots = slotService.getAllSlots(shiftEmployeeId);
+        List<SlotResponse> slots = slotService.getAllSlots(shiftEmployeeId);
         return ResponseEntity.ok(slots);
     }
 
     @DeleteMapping("/slot/id")
     public ResponseEntity deleteSlot(@PathVariable long slotId){
-        Slot slot = slotService.deleteSLot(slotId);
+        SlotResponse slot = slotService.deleteSLot(slotId);
         return ResponseEntity.ok(slot);
     }
 
     @PutMapping("/slot/id")
     public ResponseEntity completeSlot(@PathVariable long slotId){
-        Slot slot = slotService.updateSlot(slotId);
+        SlotResponse slot = slotService.updateSlot(slotId);
         return ResponseEntity.ok(slot);
     }
 
