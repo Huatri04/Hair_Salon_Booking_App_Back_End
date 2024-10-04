@@ -26,19 +26,19 @@ public class SlotAPI {
         return ResponseEntity.ok(slots);
     }
 
-    @GetMapping("/slot")
+    @GetMapping("/slot/{shiftEmployeeId}")
     public ResponseEntity getAllSLots(@PathVariable long shiftEmployeeId){
         List<SlotResponse> slots = slotService.getAllSlots(shiftEmployeeId);
         return ResponseEntity.ok(slots);
     }
 
-    @DeleteMapping("/slot/id")
+    @DeleteMapping("/slot/{slotId}")
     public ResponseEntity deleteSlot(@PathVariable long slotId){
         SlotResponse slot = slotService.deleteSLot(slotId);
         return ResponseEntity.ok(slot);
     }
 
-    @PutMapping("/slot/id")
+    @PutMapping("/slot/{slotId}")
     public ResponseEntity completeSlot(@PathVariable long slotId){
         SlotResponse slot = slotService.updateSlot(slotId);
         return ResponseEntity.ok(slot);

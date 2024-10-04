@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
 import com.hairsalonbookingapp.hairsalon.model.ShiftWeekRequest;
 import com.hairsalonbookingapp.hairsalon.model.ShiftWeekResponse;
+import com.hairsalonbookingapp.hairsalon.model.ShiftWeekUpdate;
 import com.hairsalonbookingapp.hairsalon.service.ShiftWeekService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -26,13 +27,13 @@ public class ShiftWeekAPI {
         return ResponseEntity.ok(shift);
     }
 
-    @PutMapping("/shiftInWeek/day")
-    public ResponseEntity updateShiftInWeek(@Valid @RequestBody ShiftWeekRequest shiftWeekRequest, @PathVariable String day){
-        ShiftWeekResponse shift = shiftWeekService.updateShift(shiftWeekRequest, day);
+    @PutMapping("/shiftInWeek/{day}")
+    public ResponseEntity updateShiftInWeek(@Valid @RequestBody ShiftWeekUpdate shiftWeekUpdate, @PathVariable String day){
+        ShiftWeekResponse shift = shiftWeekService.updateShift(shiftWeekUpdate, day);
         return ResponseEntity.ok(shift);
     }
 
-    @DeleteMapping("/shiftInWeek/day")
+    @DeleteMapping("/shiftInWeek/{day}")
     public ResponseEntity deleteShiftInWeek(@PathVariable String day){
         ShiftWeekResponse shift = shiftWeekService.deleteShift(day);
         return ResponseEntity.ok(shift);
@@ -49,5 +50,11 @@ public class ShiftWeekAPI {
         ShiftInWeek shift = shiftWeekService.getShift(day);
         return ResponseEntity.ok(shift);
     }*/
+
+    /*@PutMapping("/shiftInWeek/{day}")
+    public ResponseEntity restartShiftInWeek(@PathVariable String day){
+        ShiftWeekResponse shift = shiftWeekService.restartShift(day);
+        return ResponseEntity.ok(shift);
+    }*/   // API DỰ PHÒNG TRONG TRƯỜNG HỢP NHẬP TẦM BẬY, NHỚ COMMENT LẠI API UPDATE Ở TRÊN TRƯỚC KHI DÙNG CÁI NÀY
 
 }

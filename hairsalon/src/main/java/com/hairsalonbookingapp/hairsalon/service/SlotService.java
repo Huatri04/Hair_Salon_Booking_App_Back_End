@@ -63,13 +63,18 @@ public class SlotService {
     public List<SlotResponse> createSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH
         List<Slot> list = new ArrayList<>();
-        for(LocalTime time : shiftWeekService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration())){
-            Slot slot = new Slot();
-            slot.setStartSlot(time.toString());
-            slot.setStatus(true);
-            slot.setShiftEmployee(shiftEmployeeRepository.findShiftEmployeeById(slotRequest.getShiftEmployeeId()));
-            Slot newSlot = slotRepository.save(slot);  // TRƯỚC KHI KẾT THÚC VÒNG LẶP SẼ LƯU XUỐNG DB, SAU ĐÓ THÊM VÀO LIST
-            list.add(newSlot);
+        List<LocalTime> localTimeList = shiftWeekService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration());
+        for(LocalTime time : localTimeList){
+            if(time.equals(localTimeList.get(localTimeList.size() - 1))){
+                break;
+            } else {
+                Slot slot = new Slot();
+                slot.setStartSlot(time.toString());
+                slot.setStatus(true);
+                slot.setShiftEmployee(shiftEmployeeRepository.findShiftEmployeeById(slotRequest.getShiftEmployeeId()));
+                Slot newSlot = slotRepository.save(slot);  // TRƯỚC KHI KẾT THÚC VÒNG LẶP SẼ LƯU XUỐNG DB, SAU ĐÓ THÊM VÀO LIST
+                list.add(newSlot);
+            }
         }
         //GENERATE LIST RESPONSE
         List<SlotResponse> responseList = new ArrayList<>();

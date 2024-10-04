@@ -9,4 +9,5 @@ public interface ShiftWeekRepository extends JpaRepository<ShiftInWeek, String> 
     ShiftInWeek findShiftInWeekByDayOfWeekAndStatusTrue(String dayOfWeek);
     List<ShiftInWeek> findShiftInWeeksByStatusTrue();
     //List<String> findDayOfWeeksByStatusTrue();
+    ShiftInWeek findShiftInWeekByDayOfWeekAndStatusFalse(String dayOfWeek);
 }

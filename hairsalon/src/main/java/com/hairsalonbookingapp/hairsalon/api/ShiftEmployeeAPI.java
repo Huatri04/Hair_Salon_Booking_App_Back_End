@@ -19,13 +19,13 @@ public class ShiftEmployeeAPI {
     @Autowired
     ShiftEmployeeService shiftEmployeeService;
 
-    @PostMapping("/shiftEmployee")
+    @PostMapping("/shiftEmployee/{day}")
     public ResponseEntity createShiftEmployee(@PathVariable String day){
         ShiftEmployeeResponse shift = shiftEmployeeService.createNewShiftEmployee(day);
         return ResponseEntity.ok(shift);
     }
 
-    @DeleteMapping("/shiftEmployee/id")
+    @DeleteMapping("/shiftEmployee/{id}")
     public ResponseEntity deleteShiftEmployee(@PathVariable long id){
         ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(id);
         return ResponseEntity.ok(shift);

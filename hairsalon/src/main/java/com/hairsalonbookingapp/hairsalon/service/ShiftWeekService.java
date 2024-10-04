@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.ShiftWeekRequest;
 import com.hairsalonbookingapp.hairsalon.model.ShiftWeekResponse;
+import com.hairsalonbookingapp.hairsalon.model.ShiftWeekUpdate;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftWeekRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,12 +37,12 @@ public class ShiftWeekService {
     }
 
     //update shift
-    public ShiftWeekResponse updateShift(ShiftWeekRequest shiftWeekRequest, String dayOfWeek){
+    public ShiftWeekResponse updateShift(ShiftWeekUpdate shiftWeekUpdate, String dayOfWeek){
         ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek);
         if(shift != null){
-            shift.setStartHour(shiftWeekRequest.getStartHour());
-            shift.setEndHour(shiftWeekRequest.getEndHour());
-
+            shift.setStartHour(shiftWeekUpdate.getStartHour());
+            shift.setEndHour(shiftWeekUpdate.getEndHour());
+            //shift.setStatus(true);
             ShiftInWeek newShift = shiftWeekRepository.save(shift);
             return modelMapper.map(newShift, ShiftWeekResponse.class);
         } else {
@@ -105,6 +106,17 @@ public class ShiftWeekService {
 
         List<LocalTime> intervals = getTimeIntervals(startTime, endTime, interval);
         return intervals;
+    }
+
+    public ShiftWeekResponse restartShift(String dayOfWeek){
+        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusFalse(dayOfWeek);
+        if(shift != null){
+            shift.setStatus(true);
+            ShiftInWeek newShift = shiftWeekRepository.save(shift);
+            return modelMapper.map(newShift, ShiftWeekResponse.class);
+        } else {
+            throw new EntityNotFoundException("Shift not found!");
+        }
     }
 
     }
