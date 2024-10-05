@@ -14,6 +14,8 @@ public class ShiftEmployee { // DO STYLIST LÀM
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;  // ID CÓ THỂ TỰ GENERATE
 
+    private String name;  // TÊN EMPLOYEE LÀM CA ĐÓ
+
     private boolean status;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
 
     @ManyToOne

@@ -13,8 +13,11 @@ import java.util.List;
 @Data
 public class RegisterRequestForEmployee {
 
-    @NotBlank(message = "Name must not be blank!")
+    @NotBlank(message = "Username must not be blank!")
     private String username;
+
+    @NotBlank(message = "Name must not be blank!")
+    private String name;
 
     private String img;
 

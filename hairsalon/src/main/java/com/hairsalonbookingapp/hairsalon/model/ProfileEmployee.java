@@ -13,6 +13,7 @@ import java.util.Date;
 public class ProfileEmployee {
     String id;
     String username;
+    String name;
     String img;
     String email;
     String phoneNumber;

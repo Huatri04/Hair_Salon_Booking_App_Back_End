@@ -9,7 +9,7 @@ import lombok.Data;
 public class LoginRequestForEmployee {
 
     @NotBlank(message = "Username must not be blank!")
-    @Pattern(regexp = "^[^0-9]+$", message = "Username is invalid!")
+    @Pattern(regexp = "^(?!84|0[3-9][0-9]{8}$).*$", message = "Username is invalid!")
     String Username;
 
     String password;

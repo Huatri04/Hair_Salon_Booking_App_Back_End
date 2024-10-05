@@ -142,7 +142,7 @@ public class AuthenticationService implements UserDetailsService{
             account.setStatus("Workday");
             account.setBasicSalary(600000);
             account.setKPI(50);
-            account.setDeleted(false);
+            account.setDeleted(true);
 
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));

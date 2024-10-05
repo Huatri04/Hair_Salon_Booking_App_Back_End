@@ -39,6 +39,7 @@ public class ShiftEmployeeService {
         ShiftEmployee shift = new ShiftEmployee();
         shift.setStatus(true);
         shift.setAccountForEmployee(authenticationService.getCurrentAccountForEmployee());
+        shift.setName(authenticationService.getCurrentAccountForEmployee().getName());
         shift.setShiftInWeek(shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek));
         ShiftEmployee newShift = shiftEmployeeRepository.save(shift);
 
@@ -46,6 +47,7 @@ public class ShiftEmployeeService {
         ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(newShift, ShiftEmployeeResponse.class);
         shiftEmployeeResponse.setDayInWeek(newShift.getShiftInWeek().getDayOfWeek());
         shiftEmployeeResponse.setEmployeeId(newShift.getAccountForEmployee().getId());
+        shiftEmployeeResponse.setName(newShift.getName());
 
         return shiftEmployeeResponse;
     }
@@ -61,6 +63,7 @@ public class ShiftEmployeeService {
             ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
 
             return shiftEmployeeResponse;
         } else {
@@ -78,6 +81,7 @@ public class ShiftEmployeeService {
             ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
 
             shiftEmployeeResponses.add(shiftEmployeeResponse);
         }

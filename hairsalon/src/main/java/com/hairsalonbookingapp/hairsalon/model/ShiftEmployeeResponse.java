@@ -11,6 +11,7 @@ import java.util.List;
 @Data
 public class ShiftEmployeeResponse {
     private long id;
+    private String name;
     private boolean status;
     private String dayInWeek;
     private String employeeId;
