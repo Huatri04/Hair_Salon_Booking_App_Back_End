@@ -31,6 +31,7 @@ public class AccountForEmployee implements UserDetails {
     @Size(min = 6, message = "Username must be more than 6 characters")
     @Pattern(regexp = "^[\\S]*$", message = "Username must not contain spaces")
     @Pattern(regexp = "^[a-zA-Z0-9!@#$%^&*()_+=\\-.,<>?/]+$", message = "Invalid characters") //cho phép  ký tự đặc biệt
+    @Column(unique = true)
     private String username;
 
     private String img;
@@ -47,10 +48,6 @@ public class AccountForEmployee implements UserDetails {
 //    @JsonIgnore
 //    private List<SalaryMonth> salaryMonths;
 
-    @ManyToOne
-    @JoinColumn(name = "salaryCaculationFormulaId", nullable = true) // day la foreign key
-    private SalaryCaculationFormula salaryCaculationFormula;
-
     @OneToMany(mappedBy = "employee")
     @JsonIgnore
     private List<Transaction> transactions;
@@ -59,14 +56,25 @@ public class AccountForEmployee implements UserDetails {
     @JsonIgnore
     private List<SoftwareSupportApplication> softwareSupportApplications;
 
+
     private String stylistLevel;
 
     @OneToMany(mappedBy = "employee") // Thiết lập mối quan hệ một-nhiều
     @JsonIgnore
     private List<SalaryMonth> salaryMonths;
 
-    private int KPI = 0;
+    private Integer KPI = 0;
 
+    private Long stylistSelectionFee;
+
+    @Min(value = 0, message = "Basic Salary must at least 0")
+    private Double basicSalary;
+
+    @Min(value = 0, message = "Commession Overrated From KPI must at least 0")
+    private Double CommessionOverratedFromKPI;
+
+    @Min(value = 0, message = "Fine Underated From KPI must at least 0")
+    private Double FineUnderatedFromKPI;
 
     private Date createdAt;
 

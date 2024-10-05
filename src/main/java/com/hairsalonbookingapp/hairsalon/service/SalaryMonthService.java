@@ -11,6 +11,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
+import java.time.Month;
 import java.util.List;
 
 @Service
@@ -40,26 +42,23 @@ public class SalaryMonthService {
             }
             salaryMonth.setEmployee(employee);
 
-            // Kiểm tra ID công thức lương
-            Integer formulaId = employee.getSalaryCaculationFormula().getSalaryCaculationFormulaId(); // Giả sử đây là trường chứa ID công thức lương
-            if (formulaId == null) {
-                System.out.println("No formula ID for employee: " + employeeId);
-                throw new Duplicate("Salary Calculation Formula ID not found for Employee");
+            Month currentMonth = LocalDate.now().getMonth();
+            salaryMonth.setMonth(currentMonth);
+
+            double commessionOverratedFromKPI = 1;
+            if(employee.getCommessionOverratedFromKPI() != null){
+                commessionOverratedFromKPI = employee.getCommessionOverratedFromKPI();
             }
 
-            // Lấy công thức lương của nhân viên
-            SalaryCaculationFormula salaryCaculationFormula = employee.getSalaryCaculationFormula();
-            if (salaryCaculationFormula == null) {
-                System.out.println("formula empty");
-                throw new Duplicate("Salary Calculation Formula not found");
+            double fineUnderatedFromKPI = 1;
+            if(employee.getFineUnderatedFromKPI() != null){
+                fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
             }
-            salaryMonth.setSalaryCaculationFormula(salaryCaculationFormula);
-            // Tính toán từ KPI
 
-            salaryMonth.setCommessionOveratedFromKPI(employee.getKPI() * salaryCaculationFormula.getCommessionOveratedBasedService());
-            salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * salaryCaculationFormula.getFineUnderatedBasedService());
+            salaryMonth.setCommessionOveratedFromKPI(employee.getKPI() * commessionOverratedFromKPI);
+            salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * fineUnderatedFromKPI);
+            salaryMonth.setSumSalary(employee.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
 
-            salaryMonth.setSumSalary(salaryCaculationFormula.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
 
             SalaryMonth newSalaryMonth = salaryMonthRepository.save(salaryMonth);
             return modelMapper.map(newSalaryMonth, SalaryMonthResponse.class);

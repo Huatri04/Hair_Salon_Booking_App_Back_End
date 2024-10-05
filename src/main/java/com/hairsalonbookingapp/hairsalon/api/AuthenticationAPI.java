@@ -72,6 +72,13 @@ public class AuthenticationAPI {
         return ResponseEntity.ok(oldAccount);
     }
 
+    //update salary cua employee bang manager
+    @PutMapping("/salaryEditByManager/{id}")
+    public ResponseEntity updatedSalaryEmployeeByManager(@Valid @RequestBody RequestEditSsalaryEmployee account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
+        EditSalaryEmployeeResponse oldAccount = authenticationService.updatedSalaryEmployee(account, id);
+        return ResponseEntity.ok(oldAccount);
+    }
+
     @DeleteMapping("/banAccountCustomer/{id}")
     public ResponseEntity banAccountCustomer(@PathVariable String id){
         AccountForCustomerResponse accountForCustomerResponse = authenticationService.deleteAccountForCustomer(id);

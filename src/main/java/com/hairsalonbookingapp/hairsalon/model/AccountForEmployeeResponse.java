@@ -20,16 +20,13 @@ import java.util.List;
 @Data
 public class AccountForEmployeeResponse {
     private String employeeId;
-    private String name;
     private String username;
+    private String name;
     private String img;
     private String email;
     private String phoneNumber;
     private String role;
     private String token;
-    private List<SalaryMonth> salaryMonths;
-    private List<Transaction> transactions;
-    private List<SoftwareSupportApplication> softwareSupportApplications;
     private String stylistLevel;
     private long stylistSelectionFee;
     private int KPI;

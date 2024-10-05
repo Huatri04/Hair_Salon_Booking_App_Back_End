@@ -37,12 +37,24 @@ public class SoftwareSupportApplicationService {
             AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
 
             // Thiết lập customer hoặc employee nếu có
+//            if (accountForCustomer != null) {
+//                softwareSupportApplication.setCustomer(accountForCustomer);
+//            } else if (accountForEmployee != null) { // Chỉ nên kiểm tra một cái thôi
+//                softwareSupportApplication.setEmployee(accountForEmployee);
+//            } else {
+//                throw new Duplicate("At least one of Customer or Employee must be set.");
+//            }
             if (accountForCustomer != null) {
+                // Nếu là khách hàng, thiết lập customer
                 softwareSupportApplication.setCustomer(accountForCustomer);
-            } else if (accountForEmployee != null) { // Chỉ nên kiểm tra một cái thôi
-                softwareSupportApplication.setEmployee(accountForEmployee);
             } else {
-                throw new Duplicate("At least one of Customer or Employee must be set.");
+                // Nếu không phải khách hàng, kiểm tra tài khoản nhân viên
+                if (accountForEmployee != null) {
+                    softwareSupportApplication.setEmployee(accountForEmployee);
+                } else {
+                    // Nếu cả hai loại tài khoản đều không tồn tại, ném ra ngoại lệ
+                    throw new IllegalStateException("At least one of Customer or Employee must be set.");
+                }
             }
 
             // Kiểm tra nếu cả customer và employee đều không được thiết lập
@@ -53,15 +65,6 @@ public class SoftwareSupportApplicationService {
             SoftwareSupportApplication newSoftwareSupportApplication = softwareSupportApplicationRepository.save(softwareSupportApplication);
             return modelMapper.map(newSoftwareSupportApplication, SoftwareSupportApplicationResponse.class);
         } catch (Exception e) {
-//            if(e.getMessage().contains(feedback.getStar() + "")){
-//                throw new Duplicate("duplicate start! ");
-//            }
-//            else if (e.getMessage().contains(feedback.getFeedbackId())) {
-//                throw new Duplicate("duplicate feedback id! ");
-//            }
-//            else if (e.getMessage().contains(feedback.getCustomer() + "")) {
-//                throw new Duplicate("duplicate Customer! ");
-//            }
             System.out.println("Error creating SoftwareSupportApplication: " + e.getMessage());
             throw new Duplicate("Software Support Application duplicate id");
         }

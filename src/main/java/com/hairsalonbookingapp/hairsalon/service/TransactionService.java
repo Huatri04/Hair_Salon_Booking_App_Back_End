@@ -29,12 +29,13 @@ public class TransactionService {
 //            feedback.setFeedbackId(newId);
             AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
             if(accountForEmployee == null){
-                throw new Duplicate("No current customer found.");
+                throw new Duplicate("No current employee found.");
             }
             transaction.setEmployee(accountForEmployee);
             Transaction newTransaction = transactionRepository.save(transaction);
             return modelMapper.map(newTransaction, TransactionResponse.class);
         } catch (Exception e) {
+            System.out.println(e.getMessage());
             if(e.getMessage().contains(transaction.getEmployee() + "")){
                 throw new Duplicate("duplicate employee! ");
             }

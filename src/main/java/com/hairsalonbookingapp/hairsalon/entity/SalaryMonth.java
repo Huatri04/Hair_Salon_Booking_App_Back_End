@@ -25,10 +25,6 @@ public class SalaryMonth {
     private double sumSalary;
 
     @ManyToOne
-    @JoinColumn(name = "salaryCaculationFormulaId", nullable = true) // day la foreign key
-    private SalaryCaculationFormula salaryCaculationFormula;
-
-    @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false) // day la foreign key
     private AccountForEmployee employee;
 

@@ -3,17 +3,16 @@ package com.hairsalonbookingapp.hairsalon.model;
 import lombok.Data;
 
 @Data
-public class EditProfileEmployeeResponse {
-
+public class EditProfileEmployeeByManagerResponse {
     private String employeeId;
 
     private String name;
 
     private String img;
 
-    private String email;
-
-    private String phoneNumber;
-
     private String stylistLevel;
+
+    private Long stylistSelectionFee;
+
+    private Integer KPI;
 }

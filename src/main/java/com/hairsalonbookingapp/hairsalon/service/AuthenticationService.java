@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
+import com.hairsalonbookingapp.hairsalon.exception.AccountBlockedException;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
@@ -48,8 +49,6 @@ public class AuthenticationService implements UserDetailsService {
     AuthenticationManager authenticationManager;
 
 
-    @Autowired
-    SalaryCaculatorFormulaRepository salaryCaculatorFormulaRepository;
 
     @Autowired
     TokenService tokenService;
@@ -289,10 +288,12 @@ public class AuthenticationService implements UserDetailsService {
             return null;
     }
 
+
+
     public EditProfileEmployeeResponse updatedAccountByManager(RequestUpdateProfileEmployeeByManager requestUpdateProfileEmployeeByManager, String id) {
         AccountForEmployee account = modelMapper.map(requestUpdateProfileEmployeeByManager, AccountForEmployee.class);
         AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
-        if (oldAccount == null) {
+        if (oldAccount == null || !oldAccount.getRole().equalsIgnoreCase("Stylist")) {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
             try{
@@ -300,22 +301,21 @@ public class AuthenticationService implements UserDetailsService {
                     oldAccount.setStylistLevel(account.getStylistLevel());
                 }
 
-                if (account.getKPI() != 0) {
+                if (account.getKPI() != null) {
                     if(account.getKPI() < 0 ){
                         throw new UpdatedException("KPI must be at least 0");
                     }
                     oldAccount.setKPI(account.getKPI());
                 }
 
-                // Cập nhật SalaryCaculationFormula nếu có
-                if (requestUpdateProfileEmployeeByManager.getSalaryCaculationFormulaId() != 0) {
-                    int formulaId = requestUpdateProfileEmployeeByManager.getSalaryCaculationFormulaId();
-                    SalaryCaculationFormula salaryCaculationFormula = salaryCaculatorFormulaRepository.findSalaryCaculationFormulaBySalaryCaculationFormulaId(formulaId);
-                        if(salaryCaculationFormula == null){
-                            throw new UpdatedException("Salary Calculation Formula not found");
-                        }
-                    oldAccount.setSalaryCaculationFormula(salaryCaculationFormula);
+                if(account.getStylistSelectionFee() != null){
+                    if(account.getStylistSelectionFee() < 0){
+                        throw new UpdatedException("Stylist Selection Fee must be at least 0");
+                    }
+                    oldAccount.setStylistSelectionFee(account.getStylistSelectionFee());
                 }
+
+
 
                 // Lưu cập nhật vào cơ sở dữ liệu
                 AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
@@ -325,6 +325,94 @@ public class AuthenticationService implements UserDetailsService {
             }
         }
     }
+
+//    public EditSalaryEmployeeResponse updatedSalaryEmployee(RequestEditSsalaryEmployee requestEditSsalaryEmployee, String id) {
+//        AccountForEmployee account = modelMapper.map(requestEditSsalaryEmployee, AccountForEmployee.class);
+//        AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+//        if (oldAccount == null) {
+//            throw new Duplicate("Account not found!");// cho dung luon
+//        } else {
+//            try{
+//                if (account.getBasicSalary() != null) {
+//                    if(account.getBasicSalary() < 0 ){
+//                        throw new UpdatedException("Basic Salary must be at least 0");
+//                    }
+//                    oldAccount.setBasicSalary(account.getBasicSalary());
+//                }
+//
+//                if (account.getCommessionOverratedFromKPI() != null) {
+//                    if(account.getCommessionOverratedFromKPI() < 0 ){
+//                        throw new UpdatedException("Commession Overrated From KPI must be at least 0");
+//                    }
+//                    oldAccount.setCommessionOverratedFromKPI(account.getCommessionOverratedFromKPI());
+//                }
+//
+//                if(account.getFineUnderatedFromKPI() != null){
+//                    if(account.getFineUnderatedFromKPI() < 0){
+//                        throw new UpdatedException("Fine Underated From KPI must be at least 0");
+//                    }
+//                    oldAccount.setFineUnderatedFromKPI(account.getFineUnderatedFromKPI());
+//                }
+//
+//
+//
+//                // Lưu cập nhật vào cơ sở dữ liệu
+//                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+//                return modelMapper.map(updatedAccount, EditSalaryEmployeeResponse.class);
+//            } catch (Exception e) {
+//                System.out.println(e.getMessage());
+//                throw new UpdatedException("employee can not update!");
+//            }
+//        }
+//    }
+
+    public EditSalaryEmployeeResponse updatedSalaryEmployee(RequestEditSsalaryEmployee requestEditSsalaryEmployee, String id) {
+        AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+        if (oldAccount == null) {
+            throw new Duplicate("Account not found!");
+        } else {
+            try{
+                String role = oldAccount.getRole();
+
+                // Ánh xạ thủ công cho các thuộc tính có vấn đề
+                if (requestEditSsalaryEmployee.getBasicSalary() != null) {
+                    if(requestEditSsalaryEmployee.getBasicSalary() < 0){
+                        throw new UpdatedException("Basic Salary must be at least 0");
+                    }
+                    oldAccount.setBasicSalary(requestEditSsalaryEmployee.getBasicSalary());
+                }
+
+                if("Stylist".equalsIgnoreCase(role)){
+                    if (requestEditSsalaryEmployee.getCommessionOverratedFromKPI() != null) {
+                        if(requestEditSsalaryEmployee.getCommessionOverratedFromKPI() < 0){
+                            throw new UpdatedException("Commession Overrated From KPI must be at least 0");
+                        }
+                        oldAccount.setCommessionOverratedFromKPI(requestEditSsalaryEmployee.getCommessionOverratedFromKPI());
+                    }
+
+                    if(requestEditSsalaryEmployee.getFineUnderatedFromKPI() != null){
+                        if(requestEditSsalaryEmployee.getFineUnderatedFromKPI() < 0){
+                            throw new UpdatedException("Fine Underated From KPI must be at least 0");
+                        }
+                        oldAccount.setFineUnderatedFromKPI(requestEditSsalaryEmployee.getFineUnderatedFromKPI());
+                    }
+                }else{
+                    oldAccount.setCommessionOverratedFromKPI(null);
+                    oldAccount.setFineUnderatedFromKPI(null);
+                }
+
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+                return modelMapper.map(updatedAccount, EditSalaryEmployeeResponse.class);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                throw new UpdatedException("employee can not update!");
+            }
+        }
+    }
+
+
 
 //    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
 //        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
@@ -550,7 +638,6 @@ public class AuthenticationService implements UserDetailsService {
 
     }
 
-
     //LOGIN EMPLOYEE
     public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
         try{
@@ -562,7 +649,7 @@ public class AuthenticationService implements UserDetailsService {
             //=> tài khoản có tồn tại
             AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
             if(account.isDeleted()){
-                throw new Duplicate("Your account is blocked!");
+                throw new AccountBlockedException("Your account is blocked!");
             } else {
                 AccountForEmployeeResponse accountResponseForEmployee = modelMapper.map(account, AccountForEmployeeResponse.class);
                 accountResponseForEmployee.setToken(tokenService.generateTokenEmployee(account));
@@ -573,6 +660,29 @@ public class AuthenticationService implements UserDetailsService {
         }
 
     }
+
+//    //LOGIN EMPLOYEE
+//    public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
+//        try{
+//            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+//                    loginRequestForEmployee.getUsername(),
+//                    loginRequestForEmployee.getPassword()
+//            ));
+//
+//            //=> tài khoản có tồn tại
+//            AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
+//            if(account.isDeleted()){
+//                throw new AccountBlockedException("Your account is blocked!");
+//            } else {
+//                AccountForEmployeeResponse accountResponseForEmployee = modelMapper.map(account, AccountForEmployeeResponse.class);
+//                accountResponseForEmployee.setToken(tokenService.generateTokenEmployee(account));
+//                return accountResponseForEmployee;
+//            }
+//        } catch (BadCredentialsException e) { //lỗi này xuất hiện khi xác thực thất bại
+//            throw new AccountNotFoundException("Username or password invalid!");
+//        }
+//
+//    }
 
     //delete Acc customer
     public AccountForCustomerResponse deleteAccountForCustomer(String phoneNumber){
@@ -630,9 +740,9 @@ public class AuthenticationService implements UserDetailsService {
         }
     }
 
-    public UserDetails loadUserByName(String name) throws UsernameNotFoundException {
-        if(employeeRepository.findAccountForEmployeeByName(name)!=null){
-            return employeeRepository.findAccountForEmployeeByName(name);
+    public UserDetails loadUserByName(String username) throws UsernameNotFoundException {
+        if(employeeRepository.findAccountForEmployeeByUsername(username)!=null){
+            return employeeRepository.findAccountForEmployeeByUsername(username);
         } else {
             throw new AccountNotFoundException("Username or password invalid!");
         }
@@ -649,6 +759,7 @@ public class AuthenticationService implements UserDetailsService {
 //        return employeeRepository.findAccountForEmployeeByEmployeeId(account.getEmployeeId());
 //    }
 
+
     public AccountForCustomer getCurrentAccountForCustomer() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
@@ -659,22 +770,36 @@ public class AuthenticationService implements UserDetailsService {
             String phoneNumber = userDetails.getUsername();  // hoặc dùng getPhoneNumber nếu có
             return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
         } else {
-            throw new ClassCastException("Current user is not a valid customer.");
+//            throw new ClassCastException("Current user is not a valid customer.");
+            return null;
         }
     }
 
     public AccountForEmployee getCurrentAccountForEmployee() {
         Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 
-        // Kiểm tra nếu principal là kiểu UserDetails và lấy thông tin
-        if (principal instanceof UserDetails) {
-            UserDetails userDetails = (UserDetails) principal;
-            // Trích xuất thông tin từ UserDetails (username, employee ID, etc.)
-            String employeeId = userDetails.getUsername();  // hoặc dùng getEmployeeId nếu có
-            return employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
+        // Kiểm tra nếu principal là kiểu AccountForEmployee
+        if (principal instanceof AccountForEmployee) {
+            AccountForEmployee account = (AccountForEmployee) principal;
+            return employeeRepository.findAccountForEmployeeByEmployeeId(account.getEmployeeId());
         } else {
-            throw new ClassCastException("Current user is not a valid employee.");
+            return null;
+//            throw new ClassCastException("Current user is not an employee.");
         }
     }
+
+//    public AccountForEmployee getCurrentAccountForEmployee() {
+//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//
+//        // Kiểm tra nếu principal là kiểu UserDetails và lấy thông tin
+//        if (principal instanceof UserDetails) {
+//            UserDetails userDetails = (UserDetails) principal;
+//            // Trích xuất thông tin từ UserDetails (username, employee ID, etc.)
+//            String employeeId = userDetails.getUsername();  // hoặc dùng getEmployeeId nếu có
+//            return employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
+//        } else {
+//            throw new ClassCastException("Current user is not a valid employee.");
+//        }
+//    }
 
 }

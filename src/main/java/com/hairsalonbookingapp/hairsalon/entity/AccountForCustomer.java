@@ -29,7 +29,7 @@ public class AccountForCustomer implements UserDetails {
     private String name;
 
     @Min(value = 0, message = "Score must at least 0")
-    private long score;
+    private long point;
 
     private String role = "customer";
 

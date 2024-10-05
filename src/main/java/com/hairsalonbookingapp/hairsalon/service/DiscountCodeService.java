@@ -43,16 +43,17 @@ public class DiscountCodeService {
 
             DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
             if(discountProgram == null){
+                System.out.println("No current Discount program found.");
                 throw new Duplicate("No current Discount program found.");
             }
             discountCode.setDiscountProgram(discountProgram);
 
 
             AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
-            if(accountForCustomer == null){
-                throw new Duplicate("No current customer found.");
+            if(accountForCustomer != null){
+                discountCode.setCustomer(accountForCustomer);
             }
-            discountCode.setCustomer(accountForCustomer);
+
 
 
             DiscountCode newDiscountCode = discountCodeRepository.save(discountCode);
@@ -61,6 +62,7 @@ public class DiscountCodeService {
             if(e.getMessage().contains(discountCode.getDiscountCodeId())){
                 throw new Duplicate("duplicate start! ");
             }
+            System.out.println(e.getMessage());
         }
         return null;
     }
