@@ -15,15 +15,18 @@ public class SalaryMonth {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int salaryMonthId;
 
-    private long basicSalary;
+    private double commessionOveratedFromKPI;
 
-    private long CommessionOveratedFromKPI;
+    private double fineUnderatedFromKPI;
 
-    private long fineUnderatedFromKPI;
-
+    @Enumerated(EnumType.STRING)
     private Month month;
 
-    private long sumSalary;
+    private double sumSalary;
+
+    @ManyToOne
+    @JoinColumn(name = "salaryCaculationFormulaId", nullable = true) // day la foreign key
+    private SalaryCaculationFormula salaryCaculationFormula;
 
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false) // day la foreign key

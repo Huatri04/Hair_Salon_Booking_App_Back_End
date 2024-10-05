@@ -47,6 +47,10 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     AuthenticationManager authenticationManager;
 
+
+    @Autowired
+    SalaryCaculatorFormulaRepository salaryCaculatorFormulaRepository;
+
     @Autowired
     TokenService tokenService;
     @Validated(CreatedBy.class)// phan vao nhom created
@@ -296,18 +300,21 @@ public class AuthenticationService implements UserDetailsService {
                     oldAccount.setStylistLevel(account.getStylistLevel());
                 }
 
-                if (account.getStylistSelectionFee() != 0 ) {
-                    if(account.getStylistSelectionFee() < 0 ){
-                        throw new Duplicate("Stylist Selection Fee must be at least 0");
-                    }
-                    oldAccount.setStylistSelectionFee(account.getStylistSelectionFee());
-                }
-
                 if (account.getKPI() != 0) {
                     if(account.getKPI() < 0 ){
-                        throw new Duplicate("KPI must be at least 0");
+                        throw new UpdatedException("KPI must be at least 0");
                     }
                     oldAccount.setKPI(account.getKPI());
+                }
+
+                // Cập nhật SalaryCaculationFormula nếu có
+                if (requestUpdateProfileEmployeeByManager.getSalaryCaculationFormulaId() != 0) {
+                    int formulaId = requestUpdateProfileEmployeeByManager.getSalaryCaculationFormulaId();
+                    SalaryCaculationFormula salaryCaculationFormula = salaryCaculatorFormulaRepository.findSalaryCaculationFormulaBySalaryCaculationFormulaId(formulaId);
+                        if(salaryCaculationFormula == null){
+                            throw new UpdatedException("Salary Calculation Formula not found");
+                        }
+                    oldAccount.setSalaryCaculationFormula(salaryCaculationFormula);
                 }
 
                 // Lưu cập nhật vào cơ sở dữ liệu

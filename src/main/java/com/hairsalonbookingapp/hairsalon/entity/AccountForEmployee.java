@@ -43,9 +43,13 @@ public class AccountForEmployee implements UserDetails {
     @NotBlank(message = "phone number must not blank!", groups = CreatedBy.class)
     private String phoneNumber;
 
-    @OneToMany(mappedBy = "employee")
-    @JsonIgnore
-    private List<SalaryMonth> salaryMonths;
+//    @OneToMany(mappedBy = "employee")
+//    @JsonIgnore
+//    private List<SalaryMonth> salaryMonths;
+
+    @ManyToOne
+    @JoinColumn(name = "salaryCaculationFormulaId", nullable = true) // day la foreign key
+    private SalaryCaculationFormula salaryCaculationFormula;
 
     @OneToMany(mappedBy = "employee")
     @JsonIgnore
@@ -57,7 +61,9 @@ public class AccountForEmployee implements UserDetails {
 
     private String stylistLevel;
 
-    private long stylistSelectionFee = 0;
+    @OneToMany(mappedBy = "employee") // Thiết lập mối quan hệ một-nhiều
+    @JsonIgnore
+    private List<SalaryMonth> salaryMonths;
 
     private int KPI = 0;
 

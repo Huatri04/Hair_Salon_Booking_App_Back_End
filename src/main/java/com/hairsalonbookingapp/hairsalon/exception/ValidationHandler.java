@@ -37,6 +37,10 @@ public class ValidationHandler {
     public ResponseEntity handleValidation(UpdatedException exception){
         return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
     }
+    public ResponseEntity handleValidation(CreateException exception){
+        return new ResponseEntity(exception.getMessage(), HttpStatus.BAD_REQUEST);
+    }
+
     @ExceptionHandler(Exception.class)
     //@ResponseStatus(HttpStatus.BAD_REQUEST)// cái này báo cho front end biết mã lỗi status: INPUT đầu vào sai, front end check lại
     public ResponseEntity handleGenericException(Exception exception){

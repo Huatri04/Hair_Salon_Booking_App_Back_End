@@ -26,7 +26,7 @@ public class DiscountProgramService {
     @Autowired
     ModelMapper modelMapper;
 
-    // create feedback
+    // create DiscountProgram
     public DiscountProgramResponse createDiscountProgram(RequestDiscountprogram requestDiscountprogram){
         DiscountProgram discountProgram = modelMapper.map(requestDiscountprogram, DiscountProgram.class);
         try{
@@ -73,7 +73,7 @@ public class DiscountProgramService {
         return modelMapper.map(deletedDiscountProgramm, DiscountProgramResponse.class);
     }
 
-    // show list of feedback
+    // show list of DiscountProgram
     public List<DiscountProgram> getAllDiscountProgram(){
         List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramsByIsDeletedFalse();
         return discountPrograms;

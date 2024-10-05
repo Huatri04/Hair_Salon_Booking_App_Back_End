@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
+import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
@@ -31,17 +32,42 @@ public class SalaryMonthService {
         try{
 //            String newId = generateId();
 //            feedback.setFeedbackId(newId);
-            AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
-            if(accountForEmployee == null){
-                throw new Duplicate("No current employee found.");
+            // Tìm nhân viên theo ID
+            AccountForEmployee employee = employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
+            if (employee == null) {
+                System.out.println("employee empty");
+                throw new Duplicate("Employee not found");
             }
-            salaryMonth.setEmployee(accountForEmployee);
+            salaryMonth.setEmployee(employee);
+
+            // Kiểm tra ID công thức lương
+            Integer formulaId = employee.getSalaryCaculationFormula().getSalaryCaculationFormulaId(); // Giả sử đây là trường chứa ID công thức lương
+            if (formulaId == null) {
+                System.out.println("No formula ID for employee: " + employeeId);
+                throw new Duplicate("Salary Calculation Formula ID not found for Employee");
+            }
+
+            // Lấy công thức lương của nhân viên
+            SalaryCaculationFormula salaryCaculationFormula = employee.getSalaryCaculationFormula();
+            if (salaryCaculationFormula == null) {
+                System.out.println("formula empty");
+                throw new Duplicate("Salary Calculation Formula not found");
+            }
+            salaryMonth.setSalaryCaculationFormula(salaryCaculationFormula);
+            // Tính toán từ KPI
+
+            salaryMonth.setCommessionOveratedFromKPI(employee.getKPI() * salaryCaculationFormula.getCommessionOveratedBasedService());
+            salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * salaryCaculationFormula.getFineUnderatedBasedService());
+
+            salaryMonth.setSumSalary(salaryCaculationFormula.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
+
             SalaryMonth newSalaryMonth = salaryMonthRepository.save(salaryMonth);
             return modelMapper.map(newSalaryMonth, SalaryMonthResponse.class);
         } catch (Exception e) {
-            if(e.getMessage().contains(salaryMonth.getEmployee() + "")){
-                throw new Duplicate("duplicate employee! ");
-            }
+//            if(e.getMessage().contains(salaryMonth.get)){
+//                throw new Duplicate("duplicate employee! ");
+//            }
+            System.out.println(e.getMessage());
         }
         return null;
     }
@@ -80,6 +106,12 @@ public class SalaryMonthService {
     // show list of SalaryMonth
     public List<SalaryMonth> getAllSalaryMonth(){
         List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
+        return salaryMonths;
+    }
+
+    // show list of SalaryMonth chi acc do thay
+    public List<SalaryMonth> getAllSalaryMonthOfAnEmployee(String employeeId){
+        List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByEmployee_EmployeeIdAndIsDeletedFalse(employeeId);
         return salaryMonths;
     }
 

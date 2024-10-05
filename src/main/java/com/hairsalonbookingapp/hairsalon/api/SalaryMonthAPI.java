@@ -21,6 +21,7 @@ public class SalaryMonthAPI {
     @Autowired
     SalaryMonthService salaryMonthService;
 
+
     @PostMapping("{id}")
 //    @PreAuthorize("hasAuthority('customer')")
     public ResponseEntity createSalaryMonth(@Valid @RequestBody RequestSalaryMonth requestSalaryMonth, @PathVariable String id){
@@ -37,6 +38,12 @@ public class SalaryMonthAPI {
     @GetMapping
     public ResponseEntity getAllSalaryMonth(){
         List<SalaryMonth> salaryMonths = salaryMonthService.getAllSalaryMonth();
+        return ResponseEntity.ok(salaryMonths);
+    }
+
+    @GetMapping("/employee/{id}")
+    public ResponseEntity getAllSalaryMonthOfAnEmployee(@PathVariable String id){
+        List<SalaryMonth> salaryMonths = salaryMonthService.getAllSalaryMonthOfAnEmployee(id);
         return ResponseEntity.ok(salaryMonths);
     }
 
