@@ -37,10 +37,10 @@ public class ShiftEmployeeService {
     //tạo shift employee -> STYLIST LÀM
     public ShiftEmployeeResponse createNewShiftEmployee(String dayOfWeek){
         ShiftEmployee shift = new ShiftEmployee();
-        shift.setStatus(true);
+
         shift.setAccountForEmployee(authenticationService.getCurrentAccountForEmployee());
         shift.setName(authenticationService.getCurrentAccountForEmployee().getName());
-        shift.setShiftInWeek(shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek));
+        shift.setShiftInWeek(shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek));
         ShiftEmployee newShift = shiftEmployeeRepository.save(shift);
 
         // GENERATE RESPONSE
@@ -56,7 +56,26 @@ public class ShiftEmployeeService {
     public ShiftEmployeeResponse deleteShiftEmployee(long idShift){
         ShiftEmployee shift = shiftEmployeeRepository.findShiftEmployeeById(idShift);
         if(shift != null){
-            shift.setStatus(false);
+            shift.setAvailable(false);
+            ShiftEmployee shiftEmployee = shiftEmployeeRepository.save(shift);
+
+            // GENERATE RESPONSE
+            ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+
+            return shiftEmployeeResponse;
+        } else {
+            throw new EntityNotFoundException("Shift not found!");
+        }
+    }
+
+    // RESTART SHIFT -> STYLIST LÀM
+    public ShiftEmployeeResponse restartShiftEmployee(long idShift){
+        ShiftEmployee shift = shiftEmployeeRepository.findShiftEmployeeById(idShift);
+        if(shift != null){
+            shift.setAvailable(true);
             ShiftEmployee shiftEmployee = shiftEmployeeRepository.save(shift);
 
             // GENERATE RESPONSE
@@ -73,7 +92,7 @@ public class ShiftEmployeeService {
 
     //get shift -> STYLIST LÀM
     public List<ShiftEmployeeResponse> getEmployeeShift(){
-        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(authenticationService.getCurrentAccountForEmployee().getId());
+        List<ShiftEmployee> list = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_Id(authenticationService.getCurrentAccountForEmployee().getId());
         List<ShiftEmployeeResponse> shiftEmployeeResponses = new ArrayList<>();
         for(ShiftEmployee shiftEmployee : list){
 
@@ -91,7 +110,7 @@ public class ShiftEmployeeService {
 
     // get shift -> CUSTOMER LÀM -> DÙNG BÊN APPOINTMENT SERVICE
     public List<ShiftEmployee> getShiftsOfEmployee(String stylistId){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(stylistId);
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndIsAvailableTrue(stylistId);
         if(shiftEmployeeList != null){
             return shiftEmployeeList;
         } else {

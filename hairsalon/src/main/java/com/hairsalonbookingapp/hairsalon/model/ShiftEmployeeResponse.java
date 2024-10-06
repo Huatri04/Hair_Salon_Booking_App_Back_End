@@ -12,7 +12,7 @@ import java.util.List;
 public class ShiftEmployeeResponse {
     private long id;
     private String name;
-    private boolean status;
     private String dayInWeek;
     private String employeeId;
+    private boolean isCompleted;
 }

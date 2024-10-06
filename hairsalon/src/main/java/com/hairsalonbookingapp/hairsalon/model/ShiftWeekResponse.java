@@ -11,5 +11,5 @@ public class ShiftWeekResponse {
     private String dayOfWeek;
     private String startHour;
     private String endHour;
-    private boolean status;
+    private boolean isAvailable;
 }

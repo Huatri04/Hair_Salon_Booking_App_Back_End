@@ -22,7 +22,7 @@ public class Slot {
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")
     private String date;*/
 
-    private boolean status;  // SLOT CÒN TRỐNG KHÔNG
+    private boolean isAvailable = true;  // SLOT CÒN TRỐNG KHÔNG
 
     private boolean isCompleted = false;   // SLOT CHƯA HOÀN THÀNH, XONG 1 KHÁCH THÌ STYLIST CHECK TRUE
 

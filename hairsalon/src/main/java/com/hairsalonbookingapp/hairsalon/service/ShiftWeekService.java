@@ -38,11 +38,11 @@ public class ShiftWeekService {
 
     //update shift -> MANAGER LÀM
     public ShiftWeekResponse updateShift(ShiftWeekUpdate shiftWeekUpdate, String dayOfWeek){
-        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek);
+        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek);
         if(shift != null){
             shift.setStartHour(shiftWeekUpdate.getStartHour());
             shift.setEndHour(shiftWeekUpdate.getEndHour());
-            //shift.setStatus(true);
+
             ShiftInWeek newShift = shiftWeekRepository.save(shift);
             return modelMapper.map(newShift, ShiftWeekResponse.class);
         } else {
@@ -52,9 +52,9 @@ public class ShiftWeekService {
 
     //delete shift -> MANAGER LÀM
     public ShiftWeekResponse deleteShift(String dayOfWeek){
-        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek);
+        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek);
         if(shift != null){
-            shift.setStatus(false);
+            shift.setAvailable(false);
             ShiftInWeek newShift = shiftWeekRepository.save(shift);
             return modelMapper.map(newShift, ShiftWeekResponse.class);
         } else {
@@ -62,9 +62,9 @@ public class ShiftWeekService {
         }
     }
 
-    //get all shift -> DÙNG BÊN APPOINTMENT SERVICE
+    //get all shift -> MANAGER LÀM
     public List<ShiftWeekResponse> getAllShift(){
-        List<ShiftInWeek> list = shiftWeekRepository.findShiftInWeeksByStatusTrue();
+        List<ShiftInWeek> list = shiftWeekRepository.findAll();
         if(list != null){
             List<ShiftWeekResponse> shiftWeekResponseList = new ArrayList<>();
             for(ShiftInWeek shiftInWeek : list){
@@ -110,9 +110,9 @@ public class ShiftWeekService {
 
     //RESTART SHIFT -> MANAGER LÀM
     public ShiftWeekResponse restartShift(String dayOfWeek){
-        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusFalse(dayOfWeek);
+        ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableFalse(dayOfWeek);
         if(shift != null){
-            shift.setStatus(true);
+            shift.setAvailable(true);
             ShiftInWeek newShift = shiftWeekRepository.save(shift);
             return modelMapper.map(newShift, ShiftWeekResponse.class);
         } else {
@@ -120,4 +120,4 @@ public class ShiftWeekService {
         }
     }
 
-    }
+}

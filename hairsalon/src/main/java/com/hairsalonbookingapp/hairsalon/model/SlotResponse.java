@@ -9,7 +9,7 @@ import lombok.Data;
 public class SlotResponse {
     private long id;
     private String startSlot;
-    private boolean status;
+    private boolean isAvailable;
     private long shiftEmployeeId;
     private boolean isCompleted;
 }

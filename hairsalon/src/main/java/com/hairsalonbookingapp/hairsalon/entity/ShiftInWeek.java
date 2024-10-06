@@ -28,7 +28,7 @@ public class ShiftInWeek { //CÁC NGÀY TRONG TUẦN (THỨ 2, 3, 4,....)-> DATA
     /*@Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")
     private String dateApply;*/
 
-    private boolean status = true; // NGÀY LÀM VIỆC CÓ KHẢ DỤNG KHÔNG
+    private boolean isAvailable = true; // NGÀY LÀM VIỆC CÓ KHẢ DỤNG KHÔNG
 
     @OneToMany(mappedBy = "shiftInWeek")
     List<ShiftEmployee> shiftEmployees;

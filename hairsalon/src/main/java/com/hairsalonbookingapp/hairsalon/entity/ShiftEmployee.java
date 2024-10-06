@@ -16,7 +16,7 @@ public class ShiftEmployee { // DO STYLIST LÀM
 
     private String name;  // TÊN EMPLOYEE LÀM CA ĐÓ
 
-    private boolean status;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
+    private boolean isAvailable = true;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
 
     private boolean isCompleted = false;
 

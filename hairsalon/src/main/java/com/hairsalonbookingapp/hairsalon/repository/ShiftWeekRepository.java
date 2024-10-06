@@ -6,8 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ShiftWeekRepository extends JpaRepository<ShiftInWeek, String> {
-    ShiftInWeek findShiftInWeekByDayOfWeekAndStatusTrue(String dayOfWeek);
-    List<ShiftInWeek> findShiftInWeeksByStatusTrue();
+    ShiftInWeek findShiftInWeekByDayOfWeekAndIsAvailableTrue(String dayOfWeek);
+    List<ShiftInWeek> findShiftInWeeksByIsAvailableTrue();
     //List<String> findDayOfWeeksByStatusTrue();
-    ShiftInWeek findShiftInWeekByDayOfWeekAndStatusFalse(String dayOfWeek);
+    ShiftInWeek findShiftInWeekByDayOfWeekAndIsAvailableFalse(String dayOfWeek);
 }
