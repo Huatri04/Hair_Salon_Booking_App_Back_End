@@ -70,11 +70,16 @@ public class AccountForEmployee implements UserDetails {
 
     //@NotBlank(message = "Status must not be blank!")
     //@Pattern(regexp = "Workday|On leave", message = "Status is invalid!")
-    private String status;
+    private String status;   // TRẠNG THÁI LÀM VIỆC [ĐANG LÀM / TẠM NGHỈ]
 
     private int KPI; // KPI của stylist // [Stylist]
 
-    boolean isDeleted = false;
+    boolean isDeleted = false;  // TÀI KHOẢN CÒN KHẢ DỤNG KHÔNG
+
+    private int completedShift = 0;  // SỐ SHIFT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC TỚI KHI ĐỦ BAO NHIÊU ĐÓ THÌ DỪNG LẠI ĐỂ
+                                                                        // TÍNH CÁC THỨ KHÁC RỒI RESET VỀ 0
+
+    private int completedSlot = 0;   // SỐ SLOT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC NHƯ TRÊN, CUỐI CÙNG RESET VỀ 0
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

@@ -104,7 +104,7 @@ public class SlotService {
         }
     }
 
-    // xem slot trong ngày dựa trên shiftEmployeeId -> CUSTOMER LÀM
+    // xem slot trong ngày dựa trên shiftEmployeeId -> CUSTOMER LÀM -> DÙNG CHO APPOINTMENT SERVICE
     public List<Slot> getSlots(long shiftEmployeeId){
         List<Slot> slots = slotRepository.findSlotsByShiftEmployee_IdAndStatusTrue(shiftEmployeeId);
         if(slots != null){
@@ -114,7 +114,7 @@ public class SlotService {
         }
     }
 
-    //xóa slot -> STYLIST LÀM
+    //xóa slot -> SLOT KO CÒN KHẢ DỤNG NỮA, HOẶC ĐÃ CÓ KHÁCH ĐẶT RỒI -> STYLIST LÀM
     public SlotResponse deleteSLot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
@@ -128,7 +128,7 @@ public class SlotService {
         }
     }
 
-    //cập nhật status slot về true - đã hoàn thành -> STYLIST LÀM
+    //cập nhật status slot về true - KHỞI ĐỘNG SLOT -> STYLIST LÀM SAU KHI XONG 1 SLOT
     public SlotResponse updateSlot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
@@ -141,6 +141,7 @@ public class SlotService {
             throw new EntityNotFoundException("Slot not found!");
         }
     }
+
 
 
 }

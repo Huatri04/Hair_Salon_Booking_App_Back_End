@@ -18,6 +18,8 @@ public class ShiftEmployee { // DO STYLIST LÀM
 
     private boolean status;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
 
+    private boolean isCompleted = false;
+
     @ManyToOne
     @JoinColumn(name = "dayInWeek")
     ShiftInWeek shiftInWeek;    // STYLIST CÓ THỂ CÓ NHIỀU CA(THỨ 2,3,4...) TRONG TUẦN

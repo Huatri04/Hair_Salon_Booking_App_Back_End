@@ -89,7 +89,7 @@ public class ShiftEmployeeService {
         return shiftEmployeeResponses;
     }
 
-    // get shift -> CUSTOMER LÀM
+    // get shift -> CUSTOMER LÀM -> DÙNG BÊN APPOINTMENT SERVICE
     public List<ShiftEmployee> getShiftsOfEmployee(String stylistId){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndStatusTrue(stylistId);
         if(shiftEmployeeList != null){
@@ -98,5 +98,11 @@ public class ShiftEmployeeService {
             throw new EntityNotFoundException("Shift not found!");
         }
     }
+
+
+    // XÁC NHẬN HOÀN THÀNH TOÀN BỘ SHIFT CỦA MỌI STYLIST TRONG NGÀY -> MANAGER LÀM MỖI NGÀY
+    /*public void completeAllShiftEmployeeInDay(String day){
+        shiftEmployeeRepository.
+    }*/
 
 }

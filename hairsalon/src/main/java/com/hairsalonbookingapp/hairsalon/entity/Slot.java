@@ -24,6 +24,8 @@ public class Slot {
 
     private boolean status;  // SLOT CÒN TRỐNG KHÔNG
 
+    private boolean isCompleted = false;   // SLOT CHƯA HOÀN THÀNH, XONG 1 KHÁCH THÌ STYLIST CHECK TRUE
+
     @ManyToOne
     @JoinColumn(name = "shiftEmployeeId")
     ShiftEmployee shiftEmployee;   //   CHO BIẾT SLOT THUỘC CA NÀO, CỦA AI

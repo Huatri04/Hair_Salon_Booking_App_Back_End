@@ -19,4 +19,8 @@ public class EmployeeInfo {
     String stylistLevel; // [Stylist]
     double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
     int KPI; // KPI của stylist // [Stylist]
+    int completedShift;  // SỐ SHIFT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC TỚI KHI ĐỦ BAO NHIÊU ĐÓ THÌ DỪNG LẠI ĐỂ
+    // TÍNH CÁC THỨ KHÁC RỒI RESET VỀ 0
+
+    int completedSlot;
 }

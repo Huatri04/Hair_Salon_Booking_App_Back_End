@@ -8,6 +8,8 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -80,6 +82,8 @@ public class AppointmentService {
     }
 
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
+    //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
+    //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
     public List<ShiftEmployeeResponse> getShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getShiftsOfEmployee(stylistId);
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
@@ -89,6 +93,21 @@ public class AppointmentService {
         }
         return shiftEmployeeResponseList;
     }
+
+    //HÀM DƯỚI LÀ TÍNH CHÍNH XÁC THEO THỜI GIAN THỰC ĐỂ XEM KHÁCH CÒN NHỮNG NGÀY KHẢ DỤNG NÀO, NHƯNG SẼ KHÓ TEST NÊN TẠM THỜI KHÔNG LÀM
+    /*public List<String> getAvailableShiftEmployee(String stylistId){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getShiftsOfEmployee(stylistId);
+        List<String> daysOfWeek = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : shiftEmployeeList){
+            String dayOfWeek = shiftEmployee.getShiftInWeek().getDayOfWeek();
+            daysOfWeek.add(dayOfWeek);
+        }
+        LocalDate currentDate = LocalDate.now();
+        DayOfWeek dayInWeek = currentDate.getDayOfWeek();
+
+    }*/
+
+
 
     public List<SlotResponse> viewAvailableSlots(long shiftEmployeeId) {     // XEM CÁC SLOT KHẢ DỤNG CỦA CA
         List<Slot> slotList = slotService.getSlots(shiftEmployeeId);

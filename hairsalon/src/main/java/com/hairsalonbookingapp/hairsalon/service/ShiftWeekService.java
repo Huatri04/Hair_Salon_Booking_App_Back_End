@@ -25,7 +25,7 @@ public class ShiftWeekService {
     @Autowired
     ModelMapper modelMapper;
 
-    //tạo mới shift
+    //tạo mới shift -> MANAGER LÀM
     public ShiftWeekResponse createWeekShift(ShiftWeekRequest shiftWeekRequest){
         try{
             ShiftInWeek newShift = modelMapper.map(shiftWeekRequest, ShiftInWeek.class);
@@ -36,7 +36,7 @@ public class ShiftWeekService {
         }
     }
 
-    //update shift
+    //update shift -> MANAGER LÀM
     public ShiftWeekResponse updateShift(ShiftWeekUpdate shiftWeekUpdate, String dayOfWeek){
         ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek);
         if(shift != null){
@@ -50,7 +50,7 @@ public class ShiftWeekService {
         }
     }
 
-    //delete shift
+    //delete shift -> MANAGER LÀM
     public ShiftWeekResponse deleteShift(String dayOfWeek){
         ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusTrue(dayOfWeek);
         if(shift != null){
@@ -62,7 +62,7 @@ public class ShiftWeekService {
         }
     }
 
-    //get all shift
+    //get all shift -> DÙNG BÊN APPOINTMENT SERVICE
     public List<ShiftWeekResponse> getAllShift(){
         List<ShiftInWeek> list = shiftWeekRepository.findShiftInWeeksByStatusTrue();
         if(list != null){
@@ -83,7 +83,7 @@ public class ShiftWeekService {
         return shift;
     }*/
 
-    //chia các slot
+    //chia các slot -> HỖ TRỢ HÀM DƯỚI
     public List<LocalTime> getTimeIntervals(LocalTime startTime, LocalTime endTime, Duration interval) {
         List<LocalTime> timeIntervals = new ArrayList<>();
 
@@ -97,7 +97,7 @@ public class ShiftWeekService {
         return timeIntervals;
     }
 
-    // chia slot dựa vào giờ bắt đầu và kết thúc
+    // chia slot dựa vào giờ bắt đầu và kết thúc -> HÀM NÀY GIÚP SLOT SERVICE CHIA SLOT
     public List<LocalTime> getSLots(int startHour, int endHour, long duration){
         LocalTime startTime = LocalTime.of(startHour, 0);
         LocalTime endTime = LocalTime.of(endHour, 0);
@@ -108,6 +108,7 @@ public class ShiftWeekService {
         return intervals;
     }
 
+    //RESTART SHIFT -> MANAGER LÀM
     public ShiftWeekResponse restartShift(String dayOfWeek){
         ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndStatusFalse(dayOfWeek);
         if(shift != null){

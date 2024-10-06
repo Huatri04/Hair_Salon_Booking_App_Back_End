@@ -11,4 +11,5 @@ public class SlotResponse {
     private String startSlot;
     private boolean status;
     private long shiftEmployeeId;
+    private boolean isCompleted;
 }
