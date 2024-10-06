@@ -14,6 +14,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,6 +29,28 @@ public class DiscountService {
 
     @Autowired
     ModelMapper modelMapper;
+
+    //HÀM GENERATE DISCOUNT CODE NGẪU NHIÊN GỒM 5 KÝ TỰ BAO GỒM CÁC SỐ , KÝ TỰ THƯỜNG, HOA VÀ ĐẶC BIỆT
+    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+                                            + "abcdefghijklmnopqrstuvwxyz"
+                                            + "0123456789"
+                                            + "!@#$%^&*()-_+=<>?";
+
+    private final int CODE_LENGTH = 5;
+
+    public String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(CODE_LENGTH);
+
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            code.append(CHARACTERS.charAt(randomIndex));
+        }
+
+        return code.toString();
+    }
+
+    //----------------------------------------------------------------------------------------
 
     //tạo mới discount program -> MANAGER LÀM
     public DiscountProgramResponse createNewProgram(DiscountProgramRequest discountProgramRequest){
@@ -80,7 +103,7 @@ public class DiscountService {
 
     //Start program -> MANAGER LÀM
     public DiscountProgramResponse startProgram(long id){
-        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramById(id);
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "NotStart");
         if(oldProgram != null){
             oldProgram.setStatus("In process");
             DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
@@ -91,8 +114,8 @@ public class DiscountService {
     }
 
     //End program -> MANAGER LÀM
-    public DiscountProgramResponse deleteProgram(long id){
-        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramById(id);
+    public DiscountProgramResponse endProgram(long id){
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "In process");
         if(oldProgram != null){
             oldProgram.setStatus("Ended");
             DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
@@ -113,7 +136,7 @@ public class DiscountService {
         return responseList;
     }
 
-    //get program by id
+    //get program by id -> cái này có vẻ không dùng
     public DiscountProgram getProgram(long id){
         DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramById(id);
         if(oldProgram != null){

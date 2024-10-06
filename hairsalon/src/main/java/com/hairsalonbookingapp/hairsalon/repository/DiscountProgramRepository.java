@@ -7,4 +7,5 @@ import java.util.List;
 
 public interface DiscountProgramRepository extends JpaRepository<DiscountProgram, Long> {
     DiscountProgram findDiscountProgramById(long id);
+    DiscountProgram findDiscountProgramByIdAndStatus(long id, String status);
 }

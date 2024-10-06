@@ -33,16 +33,16 @@ public class DiscountProgram {
 
     /*@NotBlank(message = "Status must not be blank!")
     @Pattern(regexp = "NotStart|InProcess|End", message = "Invalid status!")*/
-    private String status = "Not start";
+    private String status = "NotStart";
 
     //@NotBlank(message = "Percentage must not be blank!")
     //@Min(value = 0, message = "Percentage must be at least 0")
     //@Max(value = 100, message = "Percentage must be at most 100")
-    private double percentage;
+    private double percentage;      // GIẢM BAO NHIÊU %
 
     //@NotBlank(message = "Amount must not be blank!")
     //@Size(min = 0, message = "Invalid amount!")
-    private int amount;
+    private int amount;      // SỐ LƯỢNG MÃ
 
     @OneToMany(mappedBy = "discountProgram")
     List<DiscountCode> discountCodes;

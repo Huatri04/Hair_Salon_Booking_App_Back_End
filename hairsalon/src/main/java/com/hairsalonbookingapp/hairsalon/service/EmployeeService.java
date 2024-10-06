@@ -26,9 +26,9 @@ public class EmployeeService {
         List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
         if(findEmployeeRequest.getRole().equals("Stylist")){
             if(findEmployeeRequest.getStylistLevel().equals("Normal")){
-                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleStylistAndStylistLevelNormalAndStatusWorkdayAndIsDeletedFalse();
+                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Normal", status);
             } else if(findEmployeeRequest.getStylistLevel().equals("Expert")){
-                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleStylistAndStylistLevelExpertAndStatusWorkdayAndIsDeletedFalse();
+                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Expert", status);
             } else {
                 throw new EntityNotFoundException("Stylist not found!");
             }

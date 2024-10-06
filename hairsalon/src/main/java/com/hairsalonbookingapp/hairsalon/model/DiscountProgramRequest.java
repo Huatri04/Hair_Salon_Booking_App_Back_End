@@ -16,23 +16,21 @@ public class DiscountProgramRequest {
     private String description;
 
     @NotBlank(message = "Start date must not be blank!")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Invalid date!")
     private String startDate;
 
     @NotBlank(message = "End date must not be blank!")
-    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")
+    @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$", message = "Invalid date!")
     private String endDate;
 
     /*@NotBlank(message = "Status must not be blank!")
     @Pattern(regexp = "NotStart|InProcess|End", message = "Invalid status!")
     private String status = "Not start";*/
 
-    @NotBlank(message = "Percentage must not be blank!")
     @Min(value = 0, message = "Percentage must be at least 0")
     @Max(value = 100, message = "Percentage must be at most 100")
     private double percentage;
 
-    @NotBlank(message = "Amount must not be blank!")
-    @Size(min = 0, message = "Invalid amount!")
+    @Min(value = 0, message = "Invalid amount!")
     private int amount;  // SỐ LƯỢNG MÃ CODE
 }

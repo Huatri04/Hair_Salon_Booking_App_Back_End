@@ -6,6 +6,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface ServiceRepository extends JpaRepository<HairSalonService, Long> {
-    HairSalonService findHairSalonServiceByIdAndStatusTrue(long id);
-    List<HairSalonService> findHairSalonServicesByStatusTrue();
+    HairSalonService findHairSalonServiceByIdAndIsAvailableTrue(long id);
+    List<HairSalonService> findHairSalonServicesByIsAvailableTrue();
+    //List<HairSalonService> findHairSalonServicesByIsAvailableTrue();
+    HairSalonService findHairSalonServiceById(long id);
 }

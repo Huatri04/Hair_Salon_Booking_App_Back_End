@@ -27,7 +27,6 @@ public class HairSalonBookingAppService {
     public HairSalonServiceResponse createNewService(HairSalonServiceRequest hairSalonServiceRequest){
         try{
             HairSalonService newService = modelMapper.map(hairSalonServiceRequest, HairSalonService.class);
-            newService.setStatus(true);
             HairSalonService savedService = serviceRepository.save(newService);
             return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } catch (Exception e){
@@ -37,14 +36,14 @@ public class HairSalonBookingAppService {
 
     //update service -> MANAGER LÀM
     public HairSalonServiceResponse updateService(HairSalonServiceUpdate hairSalonServiceUpdate, long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(id);
         if(oldService != null){
             try{
-                if(!hairSalonServiceUpdate.getName().isEmpty()){
+                if(!hairSalonServiceUpdate.getName().isEmpty()){       // NẾU ĐỂ TRỐNG TÊN
                     oldService.setName(hairSalonServiceUpdate.getName());
                 }
 
-                if(hairSalonServiceUpdate.getCost() > 0){
+                if(hairSalonServiceUpdate.getCost() > 0){               // NẾU NHẬP SỐ LỚN HƠN 0 THÌ LẤY SỐ ĐÓ, KO THÌ CỨ ĐÊ 0
                     oldService.setCost(hairSalonServiceUpdate.getCost());
                 }
 
@@ -68,9 +67,9 @@ public class HairSalonBookingAppService {
 
     //delete service  -> MANAGER LÀM
     public HairSalonServiceResponse deleteService(long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(id);
         if(oldService != null){
-            oldService.setStatus(false);
+            oldService.setAvailable(false);
             HairSalonService savedService = serviceRepository.save(oldService);
             return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } else {
@@ -80,9 +79,9 @@ public class HairSalonBookingAppService {
 
     //restart service -> MANAGER LÀM
     public HairSalonServiceResponse startService(long id){
-        HairSalonService oldService = serviceRepository.findHairSalonServiceByIdAndStatusTrue(id);
+        HairSalonService oldService = serviceRepository.findHairSalonServiceById(id);
         if(oldService != null){
-            oldService.setStatus(true);
+            oldService.setAvailable(true);
             HairSalonService savedService = serviceRepository.save(oldService);
             return modelMapper.map(savedService, HairSalonServiceResponse.class);
         } else {
@@ -90,9 +89,9 @@ public class HairSalonBookingAppService {
         }
     }
 
-    //get all service  -> CUSTOMER, MANAGER LÀM
+    //get all service  -> MANAGER LÀM
     public List<HairSalonServiceResponse> getAllService(){
-        List<HairSalonService> list = serviceRepository.findHairSalonServicesByStatusTrue();
+        List<HairSalonService> list = serviceRepository.findAll();       // LẤY TẤT CẢ SERVICE BẤT KỂ KHẢ DỤNG HAY KHÔNG
         if(list != null){
             List<HairSalonServiceResponse> responseList = new ArrayList<>();
             for(HairSalonService hairSalonService : list){
@@ -101,8 +100,23 @@ public class HairSalonBookingAppService {
             }
             return responseList;
         } else {
-            //throw new EntityNotFoundException("Service not found!");
-            return null;
+            throw new EntityNotFoundException("Service not found!");
+            //return null;
+        }
+    }
+
+    // VIEW AVAILABLE SERVICE -> CUSTOMER LÀM
+    public List<HairSalonServiceResponse> getAllAvailableService(){
+        List<HairSalonService> list = serviceRepository.findHairSalonServicesByIsAvailableTrue();       // LẤY TẤT CẢ SERVICE BẤT KỂ KHẢ DỤNG HAY KHÔNG
+        if(list != null){
+            List<HairSalonServiceResponse> responseList = new ArrayList<>();
+            for(HairSalonService hairSalonService : list){
+                HairSalonServiceResponse hairSalonServiceResponse = modelMapper.map(hairSalonService, HairSalonServiceResponse.class);
+                responseList.add(hairSalonServiceResponse);
+            }
+            return responseList;
+        } else {
+            throw new EntityNotFoundException("Service not found!");
         }
     }
 

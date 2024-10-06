@@ -30,7 +30,7 @@ public class HairSalonService {
 
     private String image;
 
-    private boolean status;
+    private boolean isAvailable = true;   //SERVICE CÓ KHẢ DỤNG KHÔNG
 
     @OneToMany(mappedBy = "hairSalonService")
     List<Appointment> appointments;

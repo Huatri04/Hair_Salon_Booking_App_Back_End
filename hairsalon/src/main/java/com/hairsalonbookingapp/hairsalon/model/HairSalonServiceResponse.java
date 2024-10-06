@@ -13,5 +13,5 @@ public class HairSalonServiceResponse {
     private double cost;
     private int timeOfService;
     private String image;
-    private boolean status;
+    private boolean isAvailable;
 }
