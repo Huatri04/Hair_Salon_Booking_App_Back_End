@@ -25,8 +25,14 @@ public class SalaryMonthAPI {
     @PostMapping("{id}")
 //    @PreAuthorize("hasAuthority('customer')")
     public ResponseEntity createSalaryMonth(@Valid @RequestBody RequestSalaryMonth requestSalaryMonth, @PathVariable String id){
-        SalaryMonthResponse salaryMonthResponse = salaryMonthService.createSalaryMonth(requestSalaryMonth, id);
+        SalaryMonthResponse salaryMonthResponse = salaryMonthService.createSalaryMonthForAnEmployee(requestSalaryMonth, id);
         return ResponseEntity.ok(salaryMonthResponse);
+    }
+
+    @PostMapping
+    public ResponseEntity createSalaryMonthForAll(){
+        List<SalaryMonthResponse> responses = salaryMonthService.createSalaryForAllEmployees();
+        return ResponseEntity.ok(responses);
     }
 
     @DeleteMapping("{id}")

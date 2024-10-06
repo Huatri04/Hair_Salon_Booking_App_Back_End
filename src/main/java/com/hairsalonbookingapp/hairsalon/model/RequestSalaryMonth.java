@@ -17,7 +17,7 @@ public class RequestSalaryMonth {
 //
 //    private double fineUnderatedFromKPI;
 
-    private Month month;
+//    private Month month;
 
 //    private double sumSalary;
 }

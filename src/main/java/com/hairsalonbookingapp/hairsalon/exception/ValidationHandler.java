@@ -43,6 +43,9 @@ public class ValidationHandler {
     public ResponseEntity handleValidation(AccountBlockedException exception){
         return new ResponseEntity(exception.getMessage(), HttpStatus.FORBIDDEN);
     }
+    public ResponseEntity handleValidation(NoContentException exception){
+        return new ResponseEntity(exception.getMessage(), HttpStatus.NO_CONTENT);
+    }
 
     @ExceptionHandler(Exception.class)
     //@ResponseStatus(HttpStatus.BAD_REQUEST)// cái này báo cho front end biết mã lỗi status: INPUT đầu vào sai, front end check lại
