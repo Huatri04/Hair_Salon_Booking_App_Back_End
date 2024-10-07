@@ -22,18 +22,6 @@ public class AppointmentAPI {
     @Autowired
     AppointmentService appointmentService;
 
-    @GetMapping("/shiftForAppointment")
-    public ResponseEntity getAllAvailableStylistShift(@PathVariable String stylistId){
-        List<ShiftEmployeeResponse> list = appointmentService.getShiftEmployees(stylistId);
-        return ResponseEntity.ok(list);
-    }
-
-    @GetMapping("/slotForAppointment")
-    public ResponseEntity getAllAvailableStylistSlot(@PathVariable long shiftEmployeeId){
-        List<SlotResponse> list = appointmentService.viewAvailableSlots(shiftEmployeeId);
-        return ResponseEntity.ok(list);
-    }
-
     @PostMapping("/appointment")
     public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
         AppointmentResponse appointment = appointmentService.createNewAppointment(appointmentRequest);
@@ -41,7 +29,7 @@ public class AppointmentAPI {
     }
 
     @PutMapping("/appointment/id")
-    public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long id){
+    public ResponseEntity updateNewAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long id){
         AppointmentResponse appointment = appointmentService.updateAppointment(appointmentUpdate, id);
         return ResponseEntity.ok(appointment);
     }
@@ -49,6 +37,24 @@ public class AppointmentAPI {
     @DeleteMapping("/appointment/id")
     public ResponseEntity deleteAppointment(@PathVariable long id){
         AppointmentResponse appointment = appointmentService.deleteAppointment(id);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @GetMapping("/availableAppointment")
+    public ResponseEntity getAvailableAppointment(){
+        List<AppointmentResponse> appointments = appointmentService.viewAllAvailableAppointment();
+        return ResponseEntity.ok(appointments);
+    }
+
+    @PutMapping("/appointment/approve")
+    public ResponseEntity approveAppointment(@PathVariable long appointmentID){
+        AppointmentResponse appointment = appointmentService.approveAppointment(appointmentID);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @GetMapping("/appointment/check")
+    public ResponseEntity checkAppointment(@PathVariable long appointmentID){
+        AppointmentResponse appointment = appointmentService.checkAppointment(appointmentID);
         return ResponseEntity.ok(appointment);
     }
 

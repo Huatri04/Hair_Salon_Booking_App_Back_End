@@ -49,5 +49,11 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(shift);
     }
 
+    @GetMapping("/availableShiftEmployee")
+    public ResponseEntity getAvailableShiftEmployee(@PathVariable String stylistId){
+        List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getAvailableShiftEmployees(stylistId);
+        return ResponseEntity.ok(shiftEmployeeList);
+    }
+
 
 }
