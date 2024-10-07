@@ -47,23 +47,6 @@ public class AuthenticationService implements UserDetailsService{
     @Autowired
     TokenService tokenService;
 
-    //GET ALL STYLIST
-    public List<StylistInfo> getAllStylist(){
-        String role = "Stylist";
-        String status = "Workday";
-        List<StylistInfo> stylistInfos = new ArrayList<>();
-        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
-        if(list != null){
-            for(AccountForEmployee account : list){
-                StylistInfo stylistInfo = modelMapper.map(account, StylistInfo.class);
-                stylistInfos.add(stylistInfo);
-            }
-            return stylistInfos;
-        } else {
-            throw new EntityNotFoundException("Stylist not found!");
-        }
-    }
-
     //CHECK INPUT LÀ SĐT HAY NAME
     public boolean isPhoneNumber(String input) {
         // Logic để kiểm tra input có phải là số điện thoại

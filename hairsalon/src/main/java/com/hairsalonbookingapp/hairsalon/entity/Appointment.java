@@ -12,27 +12,26 @@ import lombok.NoArgsConstructor;
 public class Appointment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;
+    private long id;            // ID LỊCH HẸN
 
-    @NotBlank(message = "Cost must not be blank!")
-    @Pattern(regexp = "^\\d+$", message = "Invalid cost!")
-    private double cost;
+    private double cost;        // GIÁ TIỀN
 
-    private boolean status;
+    private String status = "Appointment sent!";  // HIỂN THỊ TRẠNG THÁI ĐƠN HIỆN TẠI
+    // KHÁCH ĐẶT ĐƠN VÀ STAFF NHẬN ĐƠN THÔNG QUA GET TRÊN DB
 
     @OneToOne
-    @JoinColumn(name = "slotId")
+    @JoinColumn(name = "slotId")            // THỜI GIAN + STYLIST
     Slot slot;
 
     @ManyToOne
-    @JoinColumn(name = "CustomerId")
+    @JoinColumn(name = "CustomerId")        // KHÁCH ĐẶT
     AccountForCustomer accountForCustomer;
 
     @ManyToOne
-    @JoinColumn(name = "ServiceId")
+    @JoinColumn(name = "ServiceId")         // DỊCH VỤ
     HairSalonService hairSalonService;
 
     @OneToOne
-    @JoinColumn(name = "discountCodeId")
+    @JoinColumn(name = "discountCodeId")     // MÃ GIẢM GIÁ
     DiscountCode discountCode;
 }

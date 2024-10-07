@@ -147,7 +147,7 @@ public class DiscountService {
     }
 
     //tạo mới discount code -> MANAGER LÀM
-    public DiscountCodeResponse createNewCode(String code, long programId){
+    /*public DiscountCodeResponse createNewCode(String code, long programId){
         try{
             DiscountCode discountCode = new DiscountCode();
             discountCode.setId(code);
@@ -162,7 +162,7 @@ public class DiscountService {
         } catch (Exception e) {
             throw new DuplicateEntity("Duplicate code!");
         }
-    }
+    }*/
 
 
 

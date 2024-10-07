@@ -47,17 +47,16 @@ public class AppointmentService {
     DiscountCodeRepository discountCodeRepository;
 
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
-    public List<HairSalonServiceResponse> getServiceList() {            // LẤY RA DANH SÁCH DỊCH VỤ KHẢ DỤNG
-        List<HairSalonServiceResponse> list = hairSalonBookingAppService.getAllService();
-        if (list != null) {
-            return list;
-        } else {
-            throw new EntityNotFoundException("Service not found!");
-        }
-    }
+    /*public List<HairSalonServiceResponse> getServiceList() {            // LẤY RA DANH SÁCH DỊCH VỤ KHẢ DỤNG
+        List<HairSalonServiceResponse> list = hairSalonBookingAppService.getAllAvailableService();
+        return list;
+    }*/
+
+    // CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
+
 
     public HairSalonService getService(long serviceId) {        // HÀM LẤY SERVICE
-        HairSalonService service = serviceRepository.findHairSalonServiceByIdAndStatusTrue(serviceId);
+        HairSalonService service = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(serviceId);
         if(service != null){
             return service;
         } else {
@@ -66,10 +65,12 @@ public class AppointmentService {
     }
 
     //CUSTOMER XEM VÀ CHỌN STYLIST
-    public List<StylistInfo> getAllStylistInFo() {              //  LẤY DANH SÁCH STYLIST KHẢ DỤNG
+    /*public List<StylistInfo> getAllStylistInFo() {
         List<StylistInfo> list = authenticationService.getAllStylist();
         return list;
-    }
+    }*/
+
+    //  CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
 
     public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
         String status = "Workday";
@@ -84,11 +85,13 @@ public class AppointmentService {
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
     //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
     //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
-    public List<ShiftEmployeeResponse> getShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
+    public List<ShiftEmployeeResponse> getAvailableShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getShiftsOfEmployee(stylistId);
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
         for(ShiftEmployee shiftEmployee : shiftEmployeeList){
             ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            shiftEmployeeResponse.setEmployeeId(stylistId);
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
         return shiftEmployeeResponseList;
@@ -114,13 +117,14 @@ public class AppointmentService {
         List<SlotResponse> slotResponseList = new ArrayList<>();
         for(Slot slot : slotList){
             SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(shiftEmployeeId);
             slotResponseList.add(slotResponse);
         }
         return slotResponseList;
     }
 
     public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
-        Slot slot = slotRepository.findSlotByIdAndStatusTrue(slotId);
+        Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
         if(slot != null){
             return slot;
         } else {
@@ -141,9 +145,9 @@ public class AppointmentService {
     //HỆ THỐNG CHỐT
     public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {
-            double bonusDiscountCode = 0;
-            double bonusEmployee = 0;
-            double serviceFee = serviceRepository.findHairSalonServiceByIdAndStatusTrue(appointmentRequest.getServiceId()).getCost();
+            double bonusDiscountCode = 0;    // PHÍ GIẢM GIÁ CỦA MÃ (NẾU CÓ)
+            double bonusEmployee = 0;   // PHÍ TRẢ THÊM CHO STYLIST DỰA TRÊN CẤP ĐỘ
+            double serviceFee = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(appointmentRequest.getServiceId()).getCost();  // PHÍ GỐC CỦA SERVICE
             Appointment appointment = new Appointment();
             appointment.setSlot(getAvailableSlot(appointmentRequest.getSlotId()));
             appointment.setAccountForCustomer(authenticationService.getCurrentAccountForCustomer());
@@ -164,15 +168,20 @@ public class AppointmentService {
 
             double cost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
             appointment.setCost(cost);
-            appointment.setStatus(true);
 
             Appointment newAppointment = appointmentRepository.save(appointment);
 
             AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
-            appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+            /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());
+            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+
+            appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+            appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setService(newAppointment.getHairSalonService().getName());
+            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
 
             return appointmentResponse;
         } catch (Exception e) {
@@ -188,7 +197,8 @@ public class AppointmentService {
     // B. CUSTOMER LẤY LẠI ĐƠN VÀ UPDATE LẠI THÔNG TIN
 
     public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long id) {
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusTrue(id);  //TÌM LẠI APPOINTMENT CŨ
+        String status = "Appointment sent!";
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatus(id, status);  //TÌM LẠI APPOINTMENT CŨ
         if (oldAppointment != null) {   // TÌM THẤY
             try{
                 double cost = 0;          // TÍNH TOÁN COST TỪ ĐẦU
@@ -196,7 +206,8 @@ public class AppointmentService {
                 double newBonusCode = 0;
                 if (appointmentUpdate.getServiceId() != 0) {      // NẾU CUSTOMER CÓ NHẬP ID SERVICE
                     oldAppointment.setHairSalonService(getService(appointmentUpdate.getServiceId()));       // CẬP NHẬT
-                    cost += serviceRepository.findHairSalonServiceByIdAndStatusTrue(appointmentUpdate.getServiceId()).getCost(); // CẬP NHẬT LẠI VÀO COST
+                    //cost += serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(appointmentUpdate.getServiceId()).getCost(); // CẬP NHẬT LẠI VÀO COST
+                    cost += oldAppointment.getHairSalonService().getCost();
                 } else {                                        // NẾU CUSTOMER KHÔNG NHẬP ID SERVICE
                     cost += oldAppointment.getHairSalonService().getCost();  //  COST SERVICE NHƯ CŨ
                 }

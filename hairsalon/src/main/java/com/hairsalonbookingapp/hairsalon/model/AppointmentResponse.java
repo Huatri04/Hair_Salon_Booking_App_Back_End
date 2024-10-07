@@ -13,9 +13,16 @@ import lombok.Data;
 public class AppointmentResponse {
     private long id;
     private double cost;
-    private boolean status;
-    private long slotId;
+    private String status;
+    private String day;
+    private String startHour;
+    private String customer;  // USERNAME
+    private String service;
+    private String stylist;
+
+
+    /*private long slotId;
     private String CustomerId;
     private long ServiceId;
-    private String discountCodeId;
+    private String discountCodeId;*/
 }

@@ -4,6 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.EmployeeInfo;
 import com.hairsalonbookingapp.hairsalon.model.FindEmployeeRequest;
+import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -46,6 +47,24 @@ public class EmployeeService {
             return employeeInfoList;
         } else {
             throw new EntityNotFoundException("Employee not found!");
+        }
+    }
+
+
+    //GET ALL STYLIST
+    public List<StylistInfo> getAllAvailableStylist(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<StylistInfo> stylistInfos = new ArrayList<>();
+        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(list != null){
+            for(AccountForEmployee account : list){
+                StylistInfo stylistInfo = modelMapper.map(account, StylistInfo.class);
+                stylistInfos.add(stylistInfo);
+            }
+            return stylistInfos;
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
         }
     }
 

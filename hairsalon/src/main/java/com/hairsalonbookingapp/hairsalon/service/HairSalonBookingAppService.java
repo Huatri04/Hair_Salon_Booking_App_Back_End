@@ -107,7 +107,7 @@ public class HairSalonBookingAppService {
 
     // VIEW AVAILABLE SERVICE -> CUSTOMER LÀM
     public List<HairSalonServiceResponse> getAllAvailableService(){
-        List<HairSalonService> list = serviceRepository.findHairSalonServicesByIsAvailableTrue();       // LẤY TẤT CẢ SERVICE BẤT KỂ KHẢ DỤNG HAY KHÔNG
+        List<HairSalonService> list = serviceRepository.findHairSalonServicesByIsAvailableTrue();       // LẤY TẤT CẢ SERVICE KHẢ DỤNG
         if(list != null){
             List<HairSalonServiceResponse> responseList = new ArrayList<>();
             for(HairSalonService hairSalonService : list){

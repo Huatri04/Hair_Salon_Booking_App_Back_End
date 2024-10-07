@@ -146,11 +146,15 @@ public class ShiftEmployeeService {
                 ShiftEmployee newShift = shiftEmployeeRepository.save(shiftEmployee);
                 AccountForEmployee account = newShift.getAccountForEmployee();
 
-                if(account.getCompletedShift() == MAXSHIFT){
+                account.setCompletedShift(account.getCompletedShift() + 1);
+
+                if(account.getCompletedShift() == MAXSHIFT){        // CÓ NGƯỜI ĐẠT ĐỦ 15 CA
                     String message = compareToKPI(account.getId());
                     StylistGetSalary.add(message);
+                    account.setCompletedShift(0);   // RESET VỀ 0
+                    account.setCompletedSlot(0);    // RESET VỀ 0
                 }
-                account.setCompletedShift(account.getCompletedShift() + 1);
+
                 AccountForEmployee newAccount = employeeRepository.save(account);
             }
 
