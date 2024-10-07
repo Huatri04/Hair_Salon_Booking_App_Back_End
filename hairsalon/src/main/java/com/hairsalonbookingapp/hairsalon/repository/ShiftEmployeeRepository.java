@@ -9,4 +9,5 @@ public interface ShiftEmployeeRepository extends JpaRepository<ShiftEmployee, Lo
     ShiftEmployee findShiftEmployeeById(long id);
     List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_IdAndIsAvailableTrue(String employeeId);
     List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_Id(String employeeId);
+    List<ShiftEmployee> findShiftEmployeesByShiftInWeek_DayOfWeekAndIsAvailableTrue(String dayOfWeek);
 }

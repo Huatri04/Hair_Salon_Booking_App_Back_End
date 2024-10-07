@@ -139,8 +139,10 @@ public class SlotService {
         }
     }
 
-    //xóa slot -> SLOT KO CÒN KHẢ DỤNG NỮA, HOẶC ĐÃ CÓ KHÁCH ĐẶT RỒI -> STYLIST LÀM ĐỂ XÁC NHẬN SLOT ĐÓ NÓ BẬN
-    //                                                                   HOẶC SYSTEM(APPOINTMENT SERVICE) LÀM ĐỂ XÁC NHẬN SLOT ĐÓ CÓ NGƯỜI ĐẶT
+    //xóa slot
+    //CÓ 2 TRƯỜNG HỢP XẢY RA:
+    //1. TRƯỚC: STYLIST BẬN, NÓ THÔNG BÁO MANAGER VÀ ĐC CHẤP THUẬN, STYLIST TẠM THỜI GỠ SLOT ĐÓ RA ĐỂ KHÁCH KHÔNG CHỌN
+    //2. SAU: KHÁCH ĐẶT LỊCH HẸN TẠI SLOT NÀY, APPOINTMENT SERVICE TỰ FALSE SLOT ĐÓ
     public SlotResponse deleteSLot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
@@ -155,12 +157,12 @@ public class SlotService {
     }
 
 
-    //COMPLETE SLOT -> STYLIST LÀM SAU KHI XONG 1 SLOT
+    //COMPLETE SLOT -> STAFF LÀM SAU KHI XONG 1 SLOT
     public SlotResponse completeSlot(long slotId){
         Slot slot = slotRepository.findSlotById(slotId);
         if(slot != null){
             slot.setCompleted(true);
-            AccountForEmployee account = authenticationService.getCurrentAccountForEmployee();
+            AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
             account.setCompletedSlot(account.getCompletedSlot() + 1);     // CẬP NHẬT VÀO SLOT ĐỂ TÍNH KPI
             AccountForEmployee updatedAccount = employeeRepository.save(account);
 
@@ -184,6 +186,18 @@ public class SlotService {
         }
         String message = "Reset complete!";
         return message;
+    }
+
+    // STAFF XEM SLOT CỦA STYLIST ĐỂ XÁC NHẬN COMPLETE
+    public SlotResponse viewSlotInfo(String stylistID, String day, String startSlot){
+        Slot slot = slotRepository.findSlotByStartSlotAndShiftEmployee_AccountForEmployee_IdAndShiftEmployee_ShiftInWeek_DayOfWeek(startSlot, stylistID, day);
+        if(slot != null){
+            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            return slotResponse;
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
     }
 
 

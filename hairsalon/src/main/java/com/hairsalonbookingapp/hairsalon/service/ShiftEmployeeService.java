@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
+import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
@@ -34,6 +35,8 @@ public class ShiftEmployeeService {
     @Autowired
     AuthenticationService authenticationService;
 
+    private final int MAXSHIFT = 15;        // SỐ SHIFT STYLIST CẦN LÀM ĐỂ NHẬN LƯƠNG
+
     //tạo shift employee -> STYLIST LÀM
     public ShiftEmployeeResponse createNewShiftEmployee(String dayOfWeek){
         ShiftEmployee shift = new ShiftEmployee();
@@ -52,7 +55,7 @@ public class ShiftEmployeeService {
         return shiftEmployeeResponse;
     }
 
-    //xóa shift -> STYLIST LÀM
+    //xóa shift -> STYLIST LÀM KHI NÓ MUỐN HỦY SHIFT, NHƯNG PHẢI THÔNG BÁO CHO MANAGER TRƯỚC
     public ShiftEmployeeResponse deleteShiftEmployee(long idShift){
         ShiftEmployee shift = shiftEmployeeRepository.findShiftEmployeeById(idShift);
         if(shift != null){
@@ -119,9 +122,48 @@ public class ShiftEmployeeService {
     }
 
 
+    // HÀM LẤY SỐ SLOT STYLIST LÀM ĐỂ SO SÁNH KPI -> HỖ TRỢ HÀM DƯỚI
+    public String compareToKPI(String stylistID){
+        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistID, "Workday");
+        if(account != null){
+            int completedSlot = account.getCompletedSlot();
+            int KPI = account.getKPI();
+            String message = "STYLIST = " + account.getName() + ", ID = " + account.getId() + ", KPI = " + KPI + ", SLOT COMPLETE = " + completedSlot;
+            return message;
+        } else {
+            throw new AccountNotFoundException("Stylist not found!");
+        }
+    }
+
+
     // XÁC NHẬN HOÀN THÀNH TOÀN BỘ SHIFT CỦA MỌI STYLIST TRONG NGÀY -> MANAGER LÀM MỖI NGÀY
-    /*public void completeAllShiftEmployeeInDay(String day){
-        shiftEmployeeRepository.
-    }*/
+    public String completeAllShiftEmployeeInDay(String day){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByShiftInWeek_DayOfWeekAndIsAvailableTrue(day);
+        List<String> StylistGetSalary = new ArrayList<>();  // DANH SÁCH STYLIST NHẬN LƯƠNG
+        if(shiftEmployeeList != null){
+            for(ShiftEmployee shiftEmployee : shiftEmployeeList){
+                shiftEmployee.setCompleted(true);
+                ShiftEmployee newShift = shiftEmployeeRepository.save(shiftEmployee);
+                AccountForEmployee account = newShift.getAccountForEmployee();
+
+                if(account.getCompletedShift() == MAXSHIFT){
+                    String message = compareToKPI(account.getId());
+                    StylistGetSalary.add(message);
+                }
+                account.setCompletedShift(account.getCompletedShift() + 1);
+                AccountForEmployee newAccount = employeeRepository.save(account);
+            }
+
+            String notification = "Complete all shift in " + day + "\n";
+            if(StylistGetSalary.isEmpty()){
+                return notification;
+            } else {
+                return notification + StylistGetSalary;
+            }
+
+        } else {
+            throw new EntityNotFoundException("Shift not found!");
+        }
+    }
 
 }
