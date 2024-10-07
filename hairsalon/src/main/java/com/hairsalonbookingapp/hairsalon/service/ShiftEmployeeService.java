@@ -137,10 +137,12 @@ public class ShiftEmployeeService {
 
 
     // XÁC NHẬN HOÀN THÀNH TOÀN BỘ SHIFT CỦA MỌI STYLIST TRONG NGÀY -> MANAGER LÀM MỖI NGÀY
-    public String completeAllShiftEmployeeInDay(String day){
+    public List<String> completeAllShiftEmployeeInDay(String day){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByShiftInWeek_DayOfWeekAndIsAvailableTrue(day);
         List<String> StylistGetSalary = new ArrayList<>();  // DANH SÁCH STYLIST NHẬN LƯƠNG
+        String notification = "Complete all shift in " + day;
         if(shiftEmployeeList != null){
+            StylistGetSalary.add(notification);
             for(ShiftEmployee shiftEmployee : shiftEmployeeList){
                 shiftEmployee.setCompleted(true);
                 ShiftEmployee newShift = shiftEmployeeRepository.save(shiftEmployee);
@@ -158,16 +160,25 @@ public class ShiftEmployeeService {
                 AccountForEmployee newAccount = employeeRepository.save(account);
             }
 
-            String notification = "Complete all shift in " + day + "\n";
-            if(StylistGetSalary.isEmpty()){
-                return notification;
-            } else {
-                return notification + StylistGetSalary;
-            }
+            return StylistGetSalary;
 
         } else {
             throw new EntityNotFoundException("Shift not found!");
         }
+    }
+
+    //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
+    //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
+    public List<ShiftEmployeeResponse> getAvailableShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
+        List<ShiftEmployee> shiftEmployeeList = getShiftsOfEmployee(stylistId);
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : shiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            shiftEmployeeResponse.setEmployeeId(stylistId);
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+        return shiftEmployeeResponseList;
     }
 
 }

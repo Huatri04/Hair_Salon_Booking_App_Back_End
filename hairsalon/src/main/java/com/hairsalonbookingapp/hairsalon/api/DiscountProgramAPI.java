@@ -29,7 +29,7 @@ public class DiscountProgramAPI {
         return ResponseEntity.ok(discountProgram);
     }
 
-    @PutMapping("/discountProgram/id")
+    /*@PutMapping("/discountProgram/id")
     public ResponseEntity updateDiscountProgram(@Valid @RequestBody DiscountProgramUpdate discountProgramUpdate, @PathVariable long id){
         DiscountProgramResponse discountProgram = discountService.updateProgram(discountProgramUpdate, id);
         return ResponseEntity.ok(discountProgram);
@@ -57,6 +57,6 @@ public class DiscountProgramAPI {
     public ResponseEntity createNewDiscountCode(@RequestBody String code, @PathVariable long programId){
         DiscountCodeResponse discountCode = discountService.createNewCode(code, programId);
         return ResponseEntity.ok(discountCode);
-    }
+    }*/
 
 }

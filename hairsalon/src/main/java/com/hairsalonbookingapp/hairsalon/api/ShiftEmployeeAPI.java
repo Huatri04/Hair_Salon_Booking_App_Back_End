@@ -26,8 +26,14 @@ public class ShiftEmployeeAPI {
     }
 
     @DeleteMapping("/shiftEmployee/{id}")
-    public ResponseEntity deleteShiftEmployee(@PathVariable long id){
-        ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(id);
+    public ResponseEntity deleteShiftEmployee(@PathVariable long idShift){
+        ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(idShift);
+        return ResponseEntity.ok(shift);
+    }
+
+    @PutMapping("/shiftEmployee/restart/{idShift}")
+    public ResponseEntity restartShiftEmployee(@PathVariable long idShift){
+        ShiftEmployeeResponse shift = shiftEmployeeService.restartShiftEmployee(idShift);
         return ResponseEntity.ok(shift);
     }
 
@@ -35,6 +41,12 @@ public class ShiftEmployeeAPI {
     public ResponseEntity getAllShiftEmployee(){
         List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getEmployeeShift();
         return ResponseEntity.ok(shiftEmployeeList);
+    }
+
+    @PutMapping("/shiftEmployee/completeAll/{day}")
+    public ResponseEntity completeAllShiftEmployeeInDay(@PathVariable String day){
+        List<String> shift = shiftEmployeeService.completeAllShiftEmployeeInDay(day);
+        return ResponseEntity.ok(shift);
     }
 
 

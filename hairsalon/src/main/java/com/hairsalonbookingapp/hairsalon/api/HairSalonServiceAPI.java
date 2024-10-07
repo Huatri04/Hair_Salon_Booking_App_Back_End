@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api")
 @SecurityRequirement(name = "api")
@@ -37,9 +39,21 @@ public class HairSalonServiceAPI {
         return ResponseEntity.ok(hairSalonService);
     }
 
-    @PutMapping("/service/restart")
+    @PutMapping("/service/restart/id")
     public ResponseEntity restartHairSalonService(@PathVariable long id){
         HairSalonServiceResponse hairSalonService = hairSalonBookingAppService.startService(id);
         return ResponseEntity.ok(hairSalonService);
+    }
+
+    @GetMapping("/service")
+    public ResponseEntity getAllService(){
+        List<HairSalonServiceResponse> hairSalonServices = hairSalonBookingAppService.getAllService();
+        return ResponseEntity.ok(hairSalonServices);
+    }
+
+    @GetMapping("/availableService")
+    public ResponseEntity getAllAvailableService(){
+        List<HairSalonServiceResponse> hairSalonServices = hairSalonBookingAppService.getAllAvailableService();
+        return ResponseEntity.ok(hairSalonServices);
     }
 }

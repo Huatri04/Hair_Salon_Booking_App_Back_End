@@ -83,19 +83,8 @@ public class AppointmentService {
     }
 
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
-    //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
-    //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
-    public List<ShiftEmployeeResponse> getAvailableShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getShiftsOfEmployee(stylistId);
-        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
-        for(ShiftEmployee shiftEmployee : shiftEmployeeList){
-            ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
-            shiftEmployeeResponse.setEmployeeId(stylistId);
-            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
-            shiftEmployeeResponseList.add(shiftEmployeeResponse);
-        }
-        return shiftEmployeeResponseList;
-    }
+    // CHỨC NĂNG getAvailableShiftEmployees(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST
+
 
     //HÀM DƯỚI LÀ TÍNH CHÍNH XÁC THEO THỜI GIAN THỰC ĐỂ XEM KHÁCH CÒN NHỮNG NGÀY KHẢ DỤNG NÀO, NHƯNG SẼ KHÓ TEST NÊN TẠM THỜI KHÔNG LÀM
     /*public List<String> getAvailableShiftEmployee(String stylistId){
@@ -110,18 +99,10 @@ public class AppointmentService {
 
     }*/
 
+    // CUSTOMER CHỌN CÁC SLOT KHẢ DỤNG CỦA CA:
+    // CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
 
 
-    public List<SlotResponse> viewAvailableSlots(long shiftEmployeeId) {     // XEM CÁC SLOT KHẢ DỤNG CỦA CA
-        List<Slot> slotList = slotService.getSlots(shiftEmployeeId);
-        List<SlotResponse> slotResponseList = new ArrayList<>();
-        for(Slot slot : slotList){
-            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
-            slotResponse.setShiftEmployeeId(shiftEmployeeId);
-            slotResponseList.add(slotResponse);
-        }
-        return slotResponseList;
-    }
 
     public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
         Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);

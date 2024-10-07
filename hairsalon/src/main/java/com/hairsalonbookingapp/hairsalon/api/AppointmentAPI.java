@@ -22,18 +22,6 @@ public class AppointmentAPI {
     @Autowired
     AppointmentService appointmentService;
 
-    @GetMapping("/serviceForAppointment")
-    public ResponseEntity getAllAvailableServices(){
-        List<HairSalonServiceResponse> list = appointmentService.getServiceList();
-        return ResponseEntity.ok(list);
-    }
-
-    @GetMapping("/stylistForAppointment")
-    public ResponseEntity getAllAvailableStylist(){
-        List<StylistInfo> list = appointmentService.getAllStylistInFo();
-        return ResponseEntity.ok(list);
-    }
-
     @GetMapping("/shiftForAppointment")
     public ResponseEntity getAllAvailableStylistShift(@PathVariable String stylistId){
         List<ShiftEmployeeResponse> list = appointmentService.getShiftEmployees(stylistId);

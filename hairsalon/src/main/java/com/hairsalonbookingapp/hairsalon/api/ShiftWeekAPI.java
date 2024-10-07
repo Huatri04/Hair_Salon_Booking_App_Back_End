@@ -39,6 +39,12 @@ public class ShiftWeekAPI {
         return ResponseEntity.ok(shift);
     }
 
+    /*@PutMapping("/shiftInWeek/restart/{day}")
+    public ResponseEntity restartShiftInWeek(@PathVariable String day){
+        ShiftWeekResponse shift = shiftWeekService.restartShift(day);
+        return ResponseEntity.ok(shift);
+    }*/  // API DỰ PHÒNG TRONG TRƯỜNG HỢP NHẬP TẦM BẬY
+
     @GetMapping("/shiftInWeek")
     public ResponseEntity getAllShiftInWeek(){
         List<ShiftWeekResponse> shiftInWeekList = shiftWeekService.getAllShift();
@@ -51,10 +57,5 @@ public class ShiftWeekAPI {
         return ResponseEntity.ok(shift);
     }*/
 
-    /*@PutMapping("/shiftInWeek/{day}")
-    public ResponseEntity restartShiftInWeek(@PathVariable String day){
-        ShiftWeekResponse shift = shiftWeekService.restartShift(day);
-        return ResponseEntity.ok(shift);
-    }*/   // API DỰ PHÒNG TRONG TRƯỜNG HỢP NHẬP TẦM BẬY, NHỚ COMMENT LẠI API UPDATE Ở TRÊN TRƯỚC KHI DÙNG CÁI NÀY
 
 }

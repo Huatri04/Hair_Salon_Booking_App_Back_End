@@ -27,8 +27,14 @@ public class SlotAPI {
     }
 
     @GetMapping("/slot/{shiftEmployeeId}")
-    public ResponseEntity getAllSLots(@PathVariable long shiftEmployeeId){
-        List<SlotResponse> slots = slotService.getAllSlots(shiftEmployeeId);
+    public ResponseEntity getAllSLotsByShiftEmployeeId(@PathVariable long shiftEmployeeId){
+        List<SlotResponse> slots = slotService.getAllSlotsInDay(shiftEmployeeId);
+        return ResponseEntity.ok(slots);
+    }
+
+    @GetMapping("/slot")
+    public ResponseEntity getAllSLots(){
+        List<SlotResponse> slots = slotService.getAllSlots();
         return ResponseEntity.ok(slots);
     }
 
@@ -38,10 +44,28 @@ public class SlotAPI {
         return ResponseEntity.ok(slot);
     }
 
-    @PutMapping("/slot/{slotId}")
-    public ResponseEntity completeSlot(@PathVariable long slotId){
-        SlotResponse slot = slotService.updateSlot(slotId);
+    @GetMapping("/slot/appointmentID")
+    public ResponseEntity viewSlotInfo(@PathVariable long appointmentID){
+        SlotResponse slot = slotService.viewSlotInfo(appointmentID);
         return ResponseEntity.ok(slot);
+    }
+
+    @PutMapping("/slot/complete/{slotId}")
+    public ResponseEntity completeSlot(@PathVariable long slotId){
+        SlotResponse slot = slotService.completeSlot(slotId);
+        return ResponseEntity.ok(slot);
+    }
+
+    @PutMapping("/slot/reset")
+    public ResponseEntity resetAllSlot(){
+        String message = slotService.resetAllSlots();
+        return ResponseEntity.ok(message);
+    }
+
+    @GetMapping("/availableSlot")
+    public ResponseEntity viewAvailableSlot(@PathVariable long shiftEmployeeId){
+        List<SlotResponse> slots = slotService.viewAvailableSlots(shiftEmployeeId);
+        return ResponseEntity.ok(slots);
     }
 
 }

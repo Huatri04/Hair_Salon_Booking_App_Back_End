@@ -213,5 +213,17 @@ public class SlotService {
         }
     }
 
+    // CUSTOMER XEM CÁC SLOT PHÙ HỢP
+    public List<SlotResponse> viewAvailableSlots(long shiftEmployeeId) {     // XEM CÁC SLOT KHẢ DỤNG CỦA CA
+        List<Slot> slotList = getSlots(shiftEmployeeId);
+        List<SlotResponse> slotResponseList = new ArrayList<>();
+        for(Slot slot : slotList){
+            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(shiftEmployeeId);
+            slotResponseList.add(slotResponse);
+        }
+        return slotResponseList;
+    }
+
 
 }
