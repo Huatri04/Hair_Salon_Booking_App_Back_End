@@ -1,13 +1,11 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
-import com.hairsalonbookingapp.hairsalon.entity.Slot;
+import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
+import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SlotRepository;
@@ -40,6 +38,9 @@ public class SlotService {
 
     @Autowired
     EmployeeRepository employeeRepository;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
 
     /*try{
                 //Chia khung thời gian thành các khoảng nhỏ
@@ -189,7 +190,7 @@ public class SlotService {
     }
 
     // STAFF XEM SLOT CỦA STYLIST ĐỂ XÁC NHẬN COMPLETE
-    public SlotResponse viewSlotInfo(String stylistID, String day, String startSlot){
+    /*public SlotResponse viewSlotInfo(String stylistID, String day, String startSlot){
         Slot slot = slotRepository.findSlotByStartSlotAndShiftEmployee_AccountForEmployee_IdAndShiftEmployee_ShiftInWeek_DayOfWeek(startSlot, stylistID, day);
         if(slot != null){
             SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
@@ -197,6 +198,18 @@ public class SlotService {
             return slotResponse;
         } else {
             throw new EntityNotFoundException("Slot not found!");
+        }
+    }*/
+
+    public SlotResponse viewSlotInfo(long appointmentID) {
+        Appointment appointment = appointmentRepository.findAppointmentByIdAndIsDeletedFalse(appointmentID);
+        if (appointment != null) {
+            Slot slot = appointment.getSlot();
+            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            return slotResponse;
+        } else {
+            throw new EntityNotFoundException("Appointment not found!");
         }
     }
 

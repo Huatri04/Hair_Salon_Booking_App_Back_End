@@ -194,11 +194,11 @@ public class AppointmentService {
     // SAU ĐÓ CHỈNH SỬA ĐẦU VÀO CỦA createNewAppointment LÀ XONG
     //2. CUSTOMER ĐÃ GỬI ĐƠN VÀ MUỐN LẤY LẠI ĐƠN ĐỂ SỬA: CÓ 2 CÁCH GIẢI QUYẾT:
     // A. CUSTOMER HỦY ĐƠN VÀ LÀM LẠI ĐƠN KHÁC
-    // B. CUSTOMER LẤY LẠI ĐƠN VÀ UPDATE LẠI THÔNG TIN
+    // B. CUSTOMER LẤY LẠI ĐƠN VÀ UPDATE LẠI THÔNG TIN (TRƯỚC KHI ĐC APPROVE)
 
     public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long id) {
         String status = "Appointment sent!";
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatus(id, status);  //TÌM LẠI APPOINTMENT CŨ
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusAndIsDeletedFalse(id, status);  //TÌM LẠI APPOINTMENT CŨ
         if (oldAppointment != null) {   // TÌM THẤY
             try{
                 double cost = 0;          // TÍNH TOÁN COST TỪ ĐẦU
@@ -253,38 +253,114 @@ public class AppointmentService {
                 Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
                 AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
-                appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+                /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
                 appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
                 appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-                appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());
+                appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+
+                appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+                appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
+                appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+                appointmentResponse.setService(newAppointment.getHairSalonService().getName());
+                appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
 
                 return appointmentResponse;
             } catch (Exception e) {
                 throw new EntityNotFoundException("Can not update appointment: " + e.getMessage());
             }
-
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
     }
 
-    // XÓA APPOINTMENT  -> CUSTOMER LÀM
+    // XÓA APPOINTMENT  -> CUSTOMER LÀM   -> TRƯỚC KHI APPROVE
     public AppointmentResponse deleteAppointment(long id){
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusTrue(id);  //TÌM LẠI APPOINTMENT CŨ
+        String status = "Appointment sent!";
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusAndIsDeletedFalse(id, status);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
-            oldAppointment.setStatus(false);
+            oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
-            appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+            /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());
+            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+
+            appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+            appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setService(newAppointment.getHairSalonService().getName());
+            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
 
             return appointmentResponse;
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
     }
+
+    // STAFF XEM CÁC APPOINMENT
+    public List<AppointmentResponse> viewAllAvailableAppointment(){
+        String status = "Appointment sent!";
+        List<Appointment> appointmentList = appointmentRepository.findAppointmentsByStatusAndIsDeletedFalse(status);
+        if(appointmentList != null){
+            List<AppointmentResponse> appointmentResponseList = new ArrayList<>();
+            for(Appointment appointment : appointmentList) {
+                AppointmentResponse appointmentResponse = modelMapper.map(appointment, AppointmentResponse.class);
+
+                appointmentResponse.setDay(appointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+                appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getUsername());
+                appointmentResponse.setService(appointment.getHairSalonService().getName());
+                appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getName());
+
+                appointmentResponseList.add(appointmentResponse);
+            }
+            return appointmentResponseList;
+        } else {
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+    }
+
+    // STAFF APPROVE CÁC APPOINTMENT
+    public AppointmentResponse approveAppointment(long appointmentID){
+        String status = "Appointment sent!";
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusAndIsDeletedFalse(appointmentID, status);
+        if(oldAppointment != null){
+            oldAppointment.setStatus("Approve!");
+            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
+
+            AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+
+            appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+            appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setService(newAppointment.getHairSalonService().getName());
+            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
+
+            return appointmentResponse;
+        } else {
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+    }
+
+    // CUSTOMER XEM LẠI APPOINTMENT CÓ APPROVE CHƯA
+    public AppointmentResponse checkAppointment(long appointmentID){
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndIsDeletedFalse(appointmentID);
+        if(oldAppointment != null){
+            AppointmentResponse appointmentResponse = modelMapper.map(oldAppointment, AppointmentResponse.class);
+
+            appointmentResponse.setDay(oldAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+            appointmentResponse.setStartHour(oldAppointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(oldAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setService(oldAppointment.getHairSalonService().getName());
+            appointmentResponse.setStylist(oldAppointment.getSlot().getShiftEmployee().getName());
+
+            return appointmentResponse;
+        } else {
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+    }
+
 
 }

@@ -19,6 +19,8 @@ public class Appointment {
     private String status = "Appointment sent!";  // HIỂN THỊ TRẠNG THÁI ĐƠN HIỆN TẠI
     // KHÁCH ĐẶT ĐƠN VÀ STAFF NHẬN ĐƠN THÔNG QUA GET TRÊN DB
 
+    private boolean isDeleted = false;  // CHỈ CUSTOMER ĐƯỢC PHÉP HỦY ĐƠN
+
     @OneToOne
     @JoinColumn(name = "slotId")            // THỜI GIAN + STYLIST
     Slot slot;
