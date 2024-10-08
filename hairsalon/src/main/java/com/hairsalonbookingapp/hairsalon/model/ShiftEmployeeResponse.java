@@ -15,4 +15,5 @@ public class ShiftEmployeeResponse {
     private String dayInWeek;
     private String employeeId;
     private boolean isCompleted;
+    private boolean isAvailable;
 }

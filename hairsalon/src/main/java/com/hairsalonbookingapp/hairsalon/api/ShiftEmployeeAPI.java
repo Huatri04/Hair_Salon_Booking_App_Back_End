@@ -19,37 +19,43 @@ public class ShiftEmployeeAPI {
     @Autowired
     ShiftEmployeeService shiftEmployeeService;
 
+    // [STYLIST]
     @PostMapping("/shiftEmployee/{day}")
     public ResponseEntity createShiftEmployee(@PathVariable String day){
         ShiftEmployeeResponse shift = shiftEmployeeService.createNewShiftEmployee(day);
         return ResponseEntity.ok(shift);
     }
 
-    @DeleteMapping("/shiftEmployee/{idShift}")
-    public ResponseEntity deleteShiftEmployee(@PathVariable long idShift){
-        ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(idShift);
+    // [STYLIST]
+    @DeleteMapping("/shiftEmployee/{day}")
+    public ResponseEntity deleteShiftEmployee(@PathVariable String day){
+        List<String> shifts = shiftEmployeeService.deleteShiftEmployee(day);
+        return ResponseEntity.ok(shifts);
+    }
+
+    // [STYLIST]
+    @PutMapping("/shiftEmployee/restart/{day}")
+    public ResponseEntity restartShiftEmployee(@PathVariable String day){
+        ShiftEmployeeResponse shift = shiftEmployeeService.restartShiftEmployee(day);
         return ResponseEntity.ok(shift);
     }
 
-    @PutMapping("/shiftEmployee/restart/{idShift}")
-    public ResponseEntity restartShiftEmployee(@PathVariable long idShift){
-        ShiftEmployeeResponse shift = shiftEmployeeService.restartShiftEmployee(idShift);
-        return ResponseEntity.ok(shift);
-    }
-
+    // [STYLIST]
     @GetMapping("/shiftEmployee")
     public ResponseEntity getAllShiftEmployee(){
         List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getEmployeeShift();
         return ResponseEntity.ok(shiftEmployeeList);
     }
 
+    // [MANAGER]
     @PutMapping("/shiftEmployee/completeAll/{day}")
     public ResponseEntity completeAllShiftEmployeeInDay(@PathVariable String day){
         List<String> shift = shiftEmployeeService.completeAllShiftEmployeeInDay(day);
         return ResponseEntity.ok(shift);
     }
 
-    @GetMapping("/availableShiftEmployee")
+    // [CUSTOMER]
+    @GetMapping("/availableShiftEmployee/{stylistId}")
     public ResponseEntity getAvailableShiftEmployee(@PathVariable String stylistId){
         List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getAvailableShiftEmployees(stylistId);
         return ResponseEntity.ok(shiftEmployeeList);

@@ -9,4 +9,5 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Appointment findAppointmentByIdAndStatusAndIsDeletedFalse(long id, String status);
     List<Appointment> findAppointmentsByStatusAndIsDeletedFalse(String status);
     Appointment findAppointmentByIdAndIsDeletedFalse(long id);
+    Appointment findAppointmentBySlot_Id(long slotID);
 }
