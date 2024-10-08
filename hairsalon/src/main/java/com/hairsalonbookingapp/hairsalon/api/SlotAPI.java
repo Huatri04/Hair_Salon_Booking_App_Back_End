@@ -58,7 +58,7 @@ public class SlotAPI {
 
     @PutMapping("/slot/reset")
     public ResponseEntity resetAllSlot(){
-        String message = slotService.resetAllSlots();
+        String message = slotService.resetAll();
         return ResponseEntity.ok(message);
     }
 

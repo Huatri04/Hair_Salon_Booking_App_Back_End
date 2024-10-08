@@ -21,6 +21,8 @@ public class Appointment {
 
     private boolean isDeleted = false;  // CHỈ CUSTOMER ĐƯỢC PHÉP HỦY ĐƠN
 
+    private boolean isCompleted = false;  //
+
     @OneToOne
     @JoinColumn(name = "slotId")            // THỜI GIAN + STYLIST
     Slot slot;

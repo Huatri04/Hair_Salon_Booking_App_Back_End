@@ -60,7 +60,6 @@ public class ShiftEmployeeService {
         ShiftEmployee newShift = shiftEmployeeRepository.save(shift);
 
         // GENERATE RESPONSE
-        //ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(newShift, ShiftEmployeeResponse.class);
         ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
         shiftEmployeeResponse.setCompleted(false);
         shiftEmployeeResponse.setAvailable(true);
@@ -90,16 +89,18 @@ public class ShiftEmployeeService {
             for(Slot slot : slotList){
                 slot.setAvailable(false);
                 Slot savedSlot = slotRepository.save(slot);
-
-                Appointment checkAppointment = appointmentRepository.findAppointmentBySlot_Id(savedSlot.getId());
+                // TÌM APPOINTMENT NẰM TRONG SLOT ĐÓ VÀ CHƯA HOÀN THÀNH - VD STYLIST ĐANG LÀM THỨ 2 MUỐN NGHỈ THỨ 3 MÀ THỨ 3 CÓ ĐƠN
+                Appointment checkAppointment = appointmentRepository.findAppointmentBySlot_IdAndIsCompletedFalse(savedSlot.getId());
                 if(checkAppointment != null){
-                    String appointmentID = String.valueOf(checkAppointment.getId());
-                    String message = "FOUND " + appointmentID;
-                    appointment.add(message);
+                    if(!checkAppointment.isCompleted()){   // TÌM RA APPOINTMENT VÀ NÓ CHƯA COMPLETE
+                        String appointmentID = String.valueOf(checkAppointment.getId());
+                        String message = "FOUND " + appointmentID;
+                        appointment.add(message);
+                    }
                 }
             }
 
-            if (appointment.size() == 1){
+            if (appointment.size() == 1){  // LIST CHỈ CÓ DÒNG DELETE COMPLETE
                 appointment.add("NO APPOINTMENT FOUND");
             }
             // GENERATE RESPONSE
@@ -217,12 +218,39 @@ public class ShiftEmployeeService {
             return StylistGetSalary;
 
         } else {
-            throw new EntityNotFoundException("Shift not found!");
+            throw new EntityNotFoundException("Can not complete shift!");
         }
     }
 
+
+    /*//HÀM NÀY TRẢ VỀ DANH SÁCH CÁC THỨ TRONG TUẦN
+    public List<String> getAllDaysInWeek(){
+        List<String> days = new ArrayList<>();
+        days.add("MONDAY");
+        days.add("TUESDAY");
+        days.add("WEDNESDAY");
+        days.add("THURSDAY");
+        days.add("FRIDAY");
+        days.add("SATURDAY");
+        return days;
+    }*/
+
+    /*// CHECK XEM DAY CỦA STYLIST LÀ Ỏ THỨ TỰ NÀO TRÊN LIST
+    public int checkDay(String day){
+        int number = 0; // STT
+        List<String> days = getAllDaysInWeek();
+        for(int i = 0; i < days.size(); i++){
+            if(getAllDaysInWeek().get(i).equals(day)){
+                number = i;
+                break;
+            }
+        }
+        return number;
+    }*/
+
     //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
     //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
+    // THEO QUY TẮC THÌ SAU NGÀY THỨ 7 MANAGER SẼ RESET MỌI THỨ VỀ TRẠNG THÁI BAN ĐẦU NÊN NẾU CUSTOMER ĐẶT LỊCH TRƯỚC NGÀY HIỆN TẠI THÌ LỊCH ĐÓ SẼ BỊ XÓA
     public List<ShiftEmployeeResponse> getAvailableShiftEmployees(String stylistId) {     //CUSTOMER TÌM CÁC CA LÀM VIỆC KHẢ DỤNG CỦA STYLIST
         List<ShiftEmployee> shiftEmployeeList = getShiftsOfEmployee(stylistId);
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();

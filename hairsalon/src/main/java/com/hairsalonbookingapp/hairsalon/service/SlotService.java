@@ -87,8 +87,14 @@ public class SlotService {
         //GENERATE LIST RESPONSE
         List<SlotResponse> responseList = new ArrayList<>();
         for(Slot slot : list){
-            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            //SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+            SlotResponse slotResponse = new SlotResponse();
             slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setId(slot.getId());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setCompleted(slot.isCompleted());
+            slotResponse.setAvailable(slot.isAvailable());
+
             responseList.add(slotResponse);
         }
         return responseList;
@@ -96,14 +102,20 @@ public class SlotService {
 
     // xem slot trong ngày dựa trên shiftEmployeeId -> STYLIST LÀM
     public List<SlotResponse> getAllSlotsInDay(long shiftEmployeeId){
-        List<Slot> slots = slotRepository.findSlotsByShiftEmployee_Id(shiftEmployeeId);
+        AccountForEmployee account = authenticationService.getCurrentAccountForEmployee();
+        List<Slot> slots = slotRepository.findSlotsByShiftEmployee_AccountForEmployee_IdAndShiftEmployee_Id(account.getId(), shiftEmployeeId);
         if(slots != null){
 
             //GENERATE LIST RESPONSE
             List<SlotResponse> responseList = new ArrayList<>();
             for(Slot slot : slots){
-                SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+                SlotResponse slotResponse = new SlotResponse();
                 slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+                slotResponse.setId(slot.getId());
+                slotResponse.setStartSlot(slot.getStartSlot());
+                slotResponse.setCompleted(slot.isCompleted());
+                slotResponse.setAvailable(slot.isAvailable());
+
                 responseList.add(slotResponse);
             }
             return responseList;
@@ -120,8 +132,13 @@ public class SlotService {
             //GENERATE LIST RESPONSE
             List<SlotResponse> responseList = new ArrayList<>();
             for(Slot slot : slots){
-                SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+                SlotResponse slotResponse = new SlotResponse();
                 slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+                slotResponse.setId(slot.getId());
+                slotResponse.setStartSlot(slot.getStartSlot());
+                slotResponse.setCompleted(slot.isCompleted());
+                slotResponse.setAvailable(slot.isAvailable());
+
                 responseList.add(slotResponse);
             }
             return responseList;
@@ -145,12 +162,19 @@ public class SlotService {
     //1. TRƯỚC: STYLIST BẬN, NÓ THÔNG BÁO MANAGER VÀ ĐC CHẤP THUẬN, STYLIST TẠM THỜI GỠ SLOT ĐÓ RA ĐỂ KHÁCH KHÔNG CHỌN
     //2. SAU: KHÁCH ĐẶT LỊCH HẸN TẠI SLOT NÀY, APPOINTMENT SERVICE TỰ FALSE SLOT ĐÓ
     public SlotResponse deleteSLot(long slotId){
-        Slot slot = slotRepository.findSlotById(slotId);
+        AccountForEmployee account = authenticationService.getCurrentAccountForEmployee();
+        Slot slot = slotRepository.findSlotByShiftEmployee_AccountForEmployee_IdAndId(account.getId(), slotId);
         if(slot != null){
             slot.setAvailable(false);
             Slot newSlot = slotRepository.save(slot);
-            SlotResponse slotResponse = modelMapper.map(newSlot, SlotResponse.class);
+
+            SlotResponse slotResponse = new SlotResponse();
             slotResponse.setShiftEmployeeId(newSlot.getShiftEmployee().getId());
+            slotResponse.setId(newSlot.getId());
+            slotResponse.setStartSlot(newSlot.getStartSlot());
+            slotResponse.setCompleted(newSlot.isCompleted());
+            slotResponse.setAvailable(newSlot.isAvailable());
+
             return slotResponse;
         } else {
             throw new EntityNotFoundException("Slot not found!");
@@ -169,8 +193,14 @@ public class SlotService {
 
             slot.setAvailable(true);
             Slot newSlot = slotRepository.save(slot);
-            SlotResponse slotResponse = modelMapper.map(newSlot, SlotResponse.class);
+
+            SlotResponse slotResponse = new SlotResponse();
             slotResponse.setShiftEmployeeId(newSlot.getShiftEmployee().getId());
+            slotResponse.setId(newSlot.getId());
+            slotResponse.setStartSlot(newSlot.getStartSlot());
+            slotResponse.setCompleted(newSlot.isCompleted());
+            slotResponse.setAvailable(newSlot.isAvailable());
+
             return slotResponse;
         } else {
             throw new EntityNotFoundException("Slot not found!");
@@ -178,13 +208,26 @@ public class SlotService {
     }
 
     // CHUYỂN TẤT CẢ COMPLETE VỀ FALSE -> MANAGER LÀM VÀO THỨ 7
-    public String resetAllSlots(){
+    public String resetAll(){
         List<Slot> slots = slotRepository.findAll();
-        for(Slot slot : slots){
+        for(Slot slot : slots){         // RESET ALL SLOTS
             slot.setAvailable(true);
             slot.setCompleted(false);
             Slot updatedSlot = slotRepository.save(slot);
+
+            Appointment checkAppontment = appointmentRepository.findAppointmentBySlot_IdAndIsCompletedFalse(slot.getId());
+            if(checkAppontment != null){
+                checkAppontment.setCompleted(true);
+                Appointment newAppointment = appointmentRepository.save(checkAppontment);
+            }
         }
+
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll();
+        for(ShiftEmployee shiftEmployee : shiftEmployeeList){
+            shiftEmployee.setCompleted(false);
+            ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
+        }
+
         String message = "Reset complete!";
         return message;
     }
@@ -205,8 +248,14 @@ public class SlotService {
         Appointment appointment = appointmentRepository.findAppointmentByIdAndIsDeletedFalse(appointmentID);
         if (appointment != null) {
             Slot slot = appointment.getSlot();
-            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
+
+            SlotResponse slotResponse = new SlotResponse();
             slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setId(slot.getId());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setCompleted(slot.isCompleted());
+            slotResponse.setAvailable(slot.isAvailable());
+
             return slotResponse;
         } else {
             throw new EntityNotFoundException("Appointment not found!");
@@ -218,8 +267,13 @@ public class SlotService {
         List<Slot> slotList = getSlots(shiftEmployeeId);
         List<SlotResponse> slotResponseList = new ArrayList<>();
         for(Slot slot : slotList){
-            SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
-            slotResponse.setShiftEmployeeId(shiftEmployeeId);
+            SlotResponse slotResponse = new SlotResponse();
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setId(slot.getId());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setCompleted(slot.isCompleted());
+            slotResponse.setAvailable(slot.isAvailable());
+
             slotResponseList.add(slotResponse);
         }
         return slotResponseList;
