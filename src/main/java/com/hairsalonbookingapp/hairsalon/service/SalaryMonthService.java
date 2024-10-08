@@ -10,6 +10,8 @@ import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SalaryMonthRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
@@ -168,6 +170,13 @@ public class SalaryMonthService {
     public List<SalaryMonth> getAllSalaryMonth(){
         List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
         return salaryMonths;
+//        Page SalaryMonthPage = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse(PageRequest.of(page, size));
+//        SalaryMonthListResponse salaryMonthListResponse = new SalaryMonthListResponse();
+//        salaryMonthListResponse.setTotalPage(salaryMonthPa.getTotalPages());
+//        feedbackListResponse.setContent(feedbackPage.getContent());
+//        feedbackListResponse.setPageNumber(feedbackPage.getNumber());
+//        feedbackListResponse.setTotalElement(feedbackPage.getTotalElements());
+//        return feedbackListResponse;
     }
 
     // show list of SalaryMonth chi acc do thay

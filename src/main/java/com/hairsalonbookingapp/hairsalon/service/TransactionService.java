@@ -9,6 +9,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -31,6 +32,7 @@ public class TransactionService {
             if(accountForEmployee == null){
                 throw new Duplicate("No current employee found.");
             }
+            transaction.setDate(new Date());
             transaction.setEmployee(accountForEmployee);
             Transaction newTransaction = transactionRepository.save(transaction);
             return modelMapper.map(newTransaction, TransactionResponse.class);

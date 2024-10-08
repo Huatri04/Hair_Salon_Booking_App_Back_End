@@ -13,6 +13,7 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 @SpringBootApplication
 @OpenAPIDefinition(info = @Info(title = "Hair Salon Booking API", version = "1.0", description = "Information"))
 @SecurityScheme(name = "api", scheme = "bearer", type = SecuritySchemeType.HTTP, in = SecuritySchemeIn.HEADER)
+@EnableScheduling
 public class HairsalonApplication {
 
 	public static void main(String[] args) {

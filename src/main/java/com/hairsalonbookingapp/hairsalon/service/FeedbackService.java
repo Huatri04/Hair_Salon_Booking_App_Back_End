@@ -6,15 +6,19 @@ import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.model.DiscountProgramInfoResponse;
+import com.hairsalonbookingapp.hairsalon.model.FeedbackListResponse;
 import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
 import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class FeedbackService {
@@ -86,10 +90,19 @@ public class FeedbackService {
     }
 
     // show list of feedback
-    public List<Feedback> getAllFeedback(){
-        List<Feedback> feedbacks = feedbackRepository.findFeedbacksByIsDeletedFalse();
-        return feedbacks;
+    public FeedbackListResponse getAllFeedback(int page, int size){
+//        List<Feedback> feedbacks = feedbackRepository.findFeedbacksByIsDeletedFalse();
+//        return feedbacks;
+//        return feedbackRepository.findFeedbacksByIsDeletedFalse(PageRequest.of(page, size));
+        Page feedbackPage = feedbackRepository.findFeedbacksByIsDeletedFalse(PageRequest.of(page, size));
+        FeedbackListResponse feedbackListResponse = new FeedbackListResponse();
+        feedbackListResponse.setTotalPage(feedbackPage.getTotalPages());
+        feedbackListResponse.setContent(feedbackPage.getContent());
+        feedbackListResponse.setPageNumber(feedbackPage.getNumber());
+        feedbackListResponse.setTotalElement(feedbackPage.getTotalElements());
+        return feedbackListResponse;
     }
+
 
     //GET PROFILE Feedback
     public FeedbackResponse getInfoFeedback(int id){
