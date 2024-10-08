@@ -28,6 +28,10 @@ public class ShiftWeekService {
     //tạo mới shift -> MANAGER LÀM
     public ShiftWeekResponse createWeekShift(ShiftWeekRequest shiftWeekRequest){
         try{
+            ShiftInWeek checkExistedShift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(shiftWeekRequest.getDayOfWeek());
+            if(checkExistedShift != null){
+                throw new DuplicateEntity("Duplicate day!");
+            }
             ShiftInWeek newShift = modelMapper.map(shiftWeekRequest, ShiftInWeek.class);
             ShiftInWeek savedShift = shiftWeekRepository.save(newShift);
             return modelMapper.map(savedShift, ShiftWeekResponse.class);
