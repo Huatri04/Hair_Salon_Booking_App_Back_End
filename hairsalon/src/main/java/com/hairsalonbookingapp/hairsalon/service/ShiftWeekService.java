@@ -73,7 +73,7 @@ public class ShiftWeekService {
             }
             return shiftWeekResponseList;
         } else {
-            throw new EntityNotFoundException("List not found!");
+            throw new EntityNotFoundException("Shift not found!");
         }
     }
 

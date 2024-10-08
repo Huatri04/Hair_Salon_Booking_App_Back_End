@@ -21,30 +21,35 @@ public class ShiftWeekAPI {
     @Autowired
     ShiftWeekService shiftWeekService;
 
+    // [MANAGER]
     @PostMapping("/shiftInWeek")
     public ResponseEntity createNewShiftWeek(@Valid @RequestBody ShiftWeekRequest shiftWeekRequest){
         ShiftWeekResponse shift = shiftWeekService.createWeekShift(shiftWeekRequest);
         return ResponseEntity.ok(shift);
     }
 
+    // [MANAGER]
     @PutMapping("/shiftInWeek/{day}")
     public ResponseEntity updateShiftInWeek(@Valid @RequestBody ShiftWeekUpdate shiftWeekUpdate, @PathVariable String day){
         ShiftWeekResponse shift = shiftWeekService.updateShift(shiftWeekUpdate, day);
         return ResponseEntity.ok(shift);
     }
 
+    // [MANAGER]
     @DeleteMapping("/shiftInWeek/{day}")
     public ResponseEntity deleteShiftInWeek(@PathVariable String day){
         ShiftWeekResponse shift = shiftWeekService.deleteShift(day);
         return ResponseEntity.ok(shift);
     }
 
+    // [MANAGER]
     /*@PutMapping("/shiftInWeek/restart/{day}")
     public ResponseEntity restartShiftInWeek(@PathVariable String day){
         ShiftWeekResponse shift = shiftWeekService.restartShift(day);
         return ResponseEntity.ok(shift);
     }*/  // API DỰ PHÒNG TRONG TRƯỜNG HỢP NHẬP TẦM BẬY
 
+    // [MANAGER]
     @GetMapping("/shiftInWeek")
     public ResponseEntity getAllShiftInWeek(){
         List<ShiftWeekResponse> shiftInWeekList = shiftWeekService.getAllShift();

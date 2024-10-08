@@ -8,6 +8,8 @@ import lombok.Data;
 
 @Data
 public class ShiftWeekRequest {
+    @NotBlank(message = "Day must not be blank!")
+    @Pattern(regexp = "MONDAY|TUESDAY|WEDNESDAY|THURSDAY|FRIDAY|SATURDAY")
     private String dayOfWeek;
 
     @NotBlank(message = "Start hour must not be blank!")
