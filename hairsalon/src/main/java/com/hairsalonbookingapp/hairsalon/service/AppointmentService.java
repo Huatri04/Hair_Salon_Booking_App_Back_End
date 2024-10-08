@@ -152,12 +152,15 @@ public class AppointmentService {
 
             Appointment newAppointment = appointmentRepository.save(appointment);
 
-            AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+            //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+            AppointmentResponse appointmentResponse = new AppointmentResponse();
             /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
             appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
 
+            appointmentResponse.setId(newAppointment.getId());
+            appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
             appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());

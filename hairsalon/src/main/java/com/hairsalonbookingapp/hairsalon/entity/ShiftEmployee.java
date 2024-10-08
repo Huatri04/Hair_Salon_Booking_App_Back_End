@@ -21,7 +21,7 @@ public class ShiftEmployee { // DO STYLIST LÀM
     private boolean isCompleted = false;
 
     @ManyToOne
-    @JoinColumn(name = "dayInWeek")
+    @JoinColumn(name = "dayInWeek", nullable = true)
     ShiftInWeek shiftInWeek;    // STYLIST CÓ THỂ CÓ NHIỀU CA(THỨ 2,3,4...) TRONG TUẦN
 
     @ManyToOne

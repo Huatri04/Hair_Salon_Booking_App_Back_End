@@ -13,6 +13,7 @@ import com.hairsalonbookingapp.hairsalon.repository.ShiftWeekRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,15 +36,19 @@ public class ShiftEmployeeService {
     @Autowired
     AuthenticationService authenticationService;
 
-    private final int MAXSHIFT = 15;        // SỐ SHIFT STYLIST CẦN LÀM ĐỂ NHẬN LƯƠNG
+    private final int MAXSHIFT = 2;        // SỐ SHIFT STYLIST CẦN LÀM ĐỂ NHẬN LƯƠNG
 
     //tạo shift employee -> STYLIST LÀM
     public ShiftEmployeeResponse createNewShiftEmployee(String dayOfWeek){
         ShiftEmployee shift = new ShiftEmployee();
-
+        ShiftInWeek shiftInWeek = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek);
+        if(shiftInWeek != null){
+            shift.setShiftInWeek(shiftInWeek);
+        } else {
+            throw new EntityNotFoundException("Invalid day!");
+        }
         shift.setAccountForEmployee(authenticationService.getCurrentAccountForEmployee());
         shift.setName(authenticationService.getCurrentAccountForEmployee().getName());
-        shift.setShiftInWeek(shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek));
         ShiftEmployee newShift = shiftEmployeeRepository.save(shift);
 
         // GENERATE RESPONSE

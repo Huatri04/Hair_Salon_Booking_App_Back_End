@@ -25,7 +25,7 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(shift);
     }
 
-    @DeleteMapping("/shiftEmployee/{id}")
+    @DeleteMapping("/shiftEmployee/{idShift}")
     public ResponseEntity deleteShiftEmployee(@PathVariable long idShift){
         ShiftEmployeeResponse shift = shiftEmployeeService.deleteShiftEmployee(idShift);
         return ResponseEntity.ok(shift);
