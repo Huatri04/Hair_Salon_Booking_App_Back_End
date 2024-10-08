@@ -107,6 +107,8 @@ public class AppointmentService {
     public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
         Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
         if(slot != null){
+            /*slot.setAvailable(false);
+            Slot newSlot = slotRepository.save(slot);*/
             return slot;
         } else {
             throw new EntityNotFoundException("Slot not found!");
@@ -166,6 +168,7 @@ public class AppointmentService {
             appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
+            appointmentResponse.setStatus(newAppointment.getStatus());
 
             return appointmentResponse;
         } catch (Exception e) {
@@ -182,7 +185,8 @@ public class AppointmentService {
 
     public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long id) {
         String status = "Appointment sent!";
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusAndIsDeletedFalse(id, status);  //TÌM LẠI APPOINTMENT CŨ
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndAccountForCustomerAndStatusAndIsDeletedFalse(id, accountForCustomer, status);  //TÌM LẠI APPOINTMENT CŨ
         if (oldAppointment != null) {   // TÌM THẤY
             try{
                 double cost = 0;          // TÍNH TOÁN COST TỪ ĐẦU
@@ -236,17 +240,22 @@ public class AppointmentService {
 
                 Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
-                AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+                //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
                 /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
                 appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
                 appointmentResponse.setSlotId(newAppointment.getSlot().getId());
                 appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
 
+                AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+                appointmentResponse.setId(newAppointment.getId());
+                appointmentResponse.setCost(newAppointment.getCost());
                 appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
                 appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
                 appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
                 appointmentResponse.setService(newAppointment.getHairSalonService().getName());
                 appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
+                appointmentResponse.setStatus(newAppointment.getStatus());
 
                 return appointmentResponse;
             } catch (Exception e) {
@@ -260,22 +269,27 @@ public class AppointmentService {
     // XÓA APPOINTMENT  -> CUSTOMER LÀM   -> TRƯỚC KHI APPROVE
     public AppointmentResponse deleteAppointment(long id){
         String status = "Appointment sent!";
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndStatusAndIsDeletedFalse(id, status);  //TÌM LẠI APPOINTMENT CŨ
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndAccountForCustomerAndStatusAndIsDeletedFalse(id, accountForCustomer,status);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
-            AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
             /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
             appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
 
+            AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+            appointmentResponse.setId(newAppointment.getId());
+            appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
             appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
+            appointmentResponse.setStatus(newAppointment.getStatus());
 
             return appointmentResponse;
         } else {
@@ -290,13 +304,16 @@ public class AppointmentService {
         if(appointmentList != null){
             List<AppointmentResponse> appointmentResponseList = new ArrayList<>();
             for(Appointment appointment : appointmentList) {
-                AppointmentResponse appointmentResponse = modelMapper.map(appointment, AppointmentResponse.class);
+                AppointmentResponse appointmentResponse = new AppointmentResponse();
 
+                appointmentResponse.setId(appointment.getId());
+                appointmentResponse.setCost(appointment.getCost());
                 appointmentResponse.setDay(appointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
                 appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
                 appointmentResponse.setCustomer(appointment.getAccountForCustomer().getUsername());
                 appointmentResponse.setService(appointment.getHairSalonService().getName());
                 appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getName());
+                appointmentResponse.setStatus(appointment.getStatus());
 
                 appointmentResponseList.add(appointmentResponse);
             }
@@ -314,13 +331,20 @@ public class AppointmentService {
             oldAppointment.setStatus("Approve!");
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
-            AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+            Slot slot = newAppointment.getSlot();   // SET SLOT VỀ NOT AVAILABLE -> SLOT KO CÒN KHẢ DỤNG
+            slot.setAvailable(false);
+            Slot newSlot = slotRepository.save(slot);
 
+            AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+            appointmentResponse.setId(newAppointment.getId());
+            appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
             appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
+            appointmentResponse.setStatus(newAppointment.getStatus());
 
             return appointmentResponse;
         } else {
@@ -330,15 +354,20 @@ public class AppointmentService {
 
     // CUSTOMER XEM LẠI APPOINTMENT CÓ APPROVE CHƯA
     public AppointmentResponse checkAppointment(long appointmentID){
-        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndIsDeletedFalse(appointmentID);
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        String status = "Approve!";
+        Appointment oldAppointment = appointmentRepository.findAppointmentByIdAndAccountForCustomerAndStatusAndIsDeletedFalse(appointmentID, accountForCustomer, status);
         if(oldAppointment != null){
-            AppointmentResponse appointmentResponse = modelMapper.map(oldAppointment, AppointmentResponse.class);
+            AppointmentResponse appointmentResponse = new AppointmentResponse();
 
+            appointmentResponse.setId(oldAppointment.getId());
+            appointmentResponse.setCost(oldAppointment.getCost());
             appointmentResponse.setDay(oldAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(oldAppointment.getSlot().getStartSlot());
             appointmentResponse.setCustomer(oldAppointment.getAccountForCustomer().getUsername());
             appointmentResponse.setService(oldAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(oldAppointment.getSlot().getShiftEmployee().getName());
+            appointmentResponse.setStatus(oldAppointment.getStatus());
 
             return appointmentResponse;
         } else {
