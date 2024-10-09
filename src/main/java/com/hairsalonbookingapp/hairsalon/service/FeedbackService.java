@@ -16,6 +16,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -34,22 +35,18 @@ public class FeedbackService {
     public FeedbackResponse createFeedback(RequestFeedback requestFeedback){
         Feedback feedback = modelMapper.map(requestFeedback, Feedback.class);
         try{
-//            String newId = generateId();
-//            feedback.setFeedbackId(newId);
             AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
             if(accountForCustomer == null){
                 throw new Duplicate("No current customer found.");
             }
             feedback.setCustomer(accountForCustomer);
+            feedback.setCreatedAt(new Date());
             Feedback newFeedback = feedbackRepository.save(feedback);
             return modelMapper.map(newFeedback, FeedbackResponse.class);
         } catch (Exception e) {
             if(e.getMessage().contains(feedback.getStar() + "")){
                 throw new Duplicate("duplicate start! ");
             }
-//            else if (e.getMessage().contains(feedback.getFeedbackId())) {
-//                throw new Duplicate("duplicate feedback id! ");
-//            }
             else if (e.getMessage().contains(feedback.getCustomer() + "")) {
                 System.out.println("Error creating SoftwareSupportApplication: " + e.getMessage());
                 throw new Duplicate("duplicate Customer! ");
@@ -57,23 +54,6 @@ public class FeedbackService {
         }
         return null;
     }
-
-//    public String generateId() {
-//        // Tìm ID cuối cùng theo vai trò
-//        Optional<Feedback> lastFeedback = feedbackRepository.findTopByOrderByFeedbackIdDesc();
-//        int newIdNumber = 1; // Mặc định bắt đầu từ 1
-//
-//        // Nếu có tài khoản cuối cùng, lấy ID
-//        if (lastFeedback.isPresent()) {
-//            String lastId = lastFeedback.get().getFeedbackId();
-//            newIdNumber = Integer.parseInt(lastId.replaceAll("\\D+", "")) + 1; // Tăng số lên 1
-//        }
-//
-//
-//        String prefix = "FB";
-//
-//        return String.format("%s%06d", prefix, newIdNumber); // Tạo ID mới với format
-//    }
 
 
     //delete feedback
@@ -94,7 +74,7 @@ public class FeedbackService {
 //        List<Feedback> feedbacks = feedbackRepository.findFeedbacksByIsDeletedFalse();
 //        return feedbacks;
 //        return feedbackRepository.findFeedbacksByIsDeletedFalse(PageRequest.of(page, size));
-        Page feedbackPage = feedbackRepository.findFeedbacksByIsDeletedFalse(PageRequest.of(page, size));
+        Page feedbackPage = feedbackRepository.findFeedbacksByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
         FeedbackListResponse feedbackListResponse = new FeedbackListResponse();
         feedbackListResponse.setTotalPage(feedbackPage.getTotalPages());
         feedbackListResponse.setContent(feedbackPage.getContent());

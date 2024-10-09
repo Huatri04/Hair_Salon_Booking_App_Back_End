@@ -8,6 +8,7 @@ import jakarta.persistence.ManyToOne;
 import lombok.Data;
 
 import java.time.Month;
+import java.util.Date;
 
 @Data
 public class SalaryMonthResponse {
@@ -19,6 +20,8 @@ public class SalaryMonthResponse {
 
     @Enumerated(EnumType.STRING)
     private Month month;
+
+    private Date createdAt;
 
     private double sumSalary;
 

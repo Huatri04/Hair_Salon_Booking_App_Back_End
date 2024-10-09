@@ -15,5 +15,5 @@ public interface FeedbackRepository extends JpaRepository<Feedback, Integer> {
     Feedback findFeedbackByFeedbackId(int feedbackId);
     List<Feedback> findFeedbacksByIsDeletedFalse();
 
-    Page<Feedback> findFeedbacksByIsDeletedFalse(Pageable pageable);
+    Page<Feedback> findFeedbacksByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

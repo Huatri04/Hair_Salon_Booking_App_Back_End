@@ -11,6 +11,4 @@ public class RequestTransaction {
     private long money;
 
     private String description;
-
-    private Date date;
 }

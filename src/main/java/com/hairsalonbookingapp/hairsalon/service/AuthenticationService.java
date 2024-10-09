@@ -25,6 +25,7 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -48,6 +49,8 @@ public class AuthenticationService implements UserDetailsService {
     @Autowired
     AuthenticationManager authenticationManager;
 
+    @Autowired
+    EmailService emailService;
 
 
     @Autowired
@@ -56,12 +59,32 @@ public class AuthenticationService implements UserDetailsService {
     // logic dang ki tk cho guest
     public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer){
         AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
+        List<String> errors = new ArrayList<>();
+        if (accountForCustomerRepository.existsByEmail(account.getEmail())) {
+            errors.add("Email exist!");
+        }
+
+        // Kiểm tra xem số điện thoại đã tồn tại chưa
+        if (accountForCustomerRepository.existsByPhoneNumber(account.getPhoneNumber())) {
+            errors.add("Phone number exist!");
+        }
+        // Nếu có bất kỳ lỗi nào, ném ngoại lệ chứa danh sách các lỗi
+        if (!errors.isEmpty()) {
+            throw new Duplicate(errors + "");
+        }
         try {
+
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
-            AccountForCustomer newAccount = accountForCustomerRepository.save(account);
             account.setCreatAt(new Date());
+            AccountForCustomer newAccount = accountForCustomerRepository.save(account);
+
             newAccount.setCreatAt(account.getCreatAt());
+            EmailDetail emailDetail = new EmailDetail();
+            emailDetail.setReceiver(newAccount);
+            emailDetail.setSubject("Welcome to our hairsalon!");
+            emailDetail.setLink("http://localhost:5173/loginCustomer");
+            emailService.sendEmail(emailDetail);
 
             return modelMapper.map(newAccount, AccountForCustomerResponse.class);
         } catch (Exception e) {
@@ -72,6 +95,7 @@ public class AuthenticationService implements UserDetailsService {
             } else if (e.getMessage().contains(account.getPassword())) {
                 throw new Duplicate("duplicate password!");
             }
+
         }
         return null;
     }
@@ -147,6 +171,9 @@ public class AuthenticationService implements UserDetailsService {
                         throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
                     }
 
+                    if (newPassword.length() < 6) {
+                        throw new UpdatedException("Mật khẩu mới phải có ít nhất 6 ký tự.");
+                    }
                     if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
                         throw new UpdatedException("Mật khẩu cũ không chính xác.");
                     }
@@ -182,55 +209,6 @@ public class AuthenticationService implements UserDetailsService {
                 throw new Duplicate("Account not found!");// cho dung luon
             } else {
                 try{
-//                    if (account.getEmail() != null && !account.getEmail().isEmpty()) {
-//                        oldAccount.setEmail(account.getEmail());
-//                    }
-//                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
-//                    if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
-//                        oldAccount.setPhoneNumber(account.getPhoneNumber());
-//                    }
-//                    // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-////                    String originPassword = account.getPassword();
-////                    if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-////                        oldAccount.setPassword(passwordEncoder.encode(originPassword));
-////                    }
-//                    // Kiểm tra và cập nhật tên
-//                    if (account.getName() != null && !account.getName().isEmpty()) {
-//                        oldAccount.setName(account.getName());
-//                    }
-//
-//                    // Kiểm tra và cập nhật ảnh
-//                    if (account.getImg() != null && !account.getImg().isEmpty()) {
-//                        oldAccount.setImg(account.getImg());
-//                    }
-//
-//                    // Xử lý đổi mật khẩu
-//                    String oldPassword = requestEditProfileEmployee.getOldPassword();
-//                    String newPassword = requestEditProfileEmployee.getNewPassword();
-//
-//                    if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
-//                        // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
-//                        if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
-//                            throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
-//                        }
-//
-//                        // Kiểm tra mật khẩu cũ
-//                        if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
-//                            throw new UpdatedException("Mật khẩu cũ không chính xác.");
-//                        }
-//
-//                        // Kiểm tra độ dài mật khẩu mới (đã được kiểm tra qua annotation @Size)
-//                        // Mã hóa mật khẩu mới và cập nhật
-//                        String encodedNewPassword = passwordEncoder.encode(newPassword);
-//                        oldAccount.setPassword(encodedNewPassword);
-//                    }
-//
-//                    // Lưu cập nhật vào cơ sở dữ liệu
-//                    AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
-//                    return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
-
-
-
                     // phai lam nhu thu cong ntn vi modelMapper ko nhan biet dc new vs old password
                     // Cập nhật email
                     if (requestEditProfileEmployee.getEmail() != null && !requestEditProfileEmployee.getEmail().isEmpty()) {
@@ -260,6 +238,10 @@ public class AuthenticationService implements UserDetailsService {
                         // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
                         if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
                             throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
+                        }
+
+                        if (newPassword.length() < 6) {
+                            throw new UpdatedException("Mật khẩu mới phải có ít nhất 6 ký tự.");
                         }
 
                         // Kiểm tra mật khẩu cũ
@@ -326,45 +308,29 @@ public class AuthenticationService implements UserDetailsService {
         }
     }
 
-//    public EditSalaryEmployeeResponse updatedSalaryEmployee(RequestEditSsalaryEmployee requestEditSsalaryEmployee, String id) {
-//        AccountForEmployee account = modelMapper.map(requestEditSsalaryEmployee, AccountForEmployee.class);
-//        AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
-//        if (oldAccount == null) {
-//            throw new Duplicate("Account not found!");// cho dung luon
-//        } else {
-//            try{
-//                if (account.getBasicSalary() != null) {
-//                    if(account.getBasicSalary() < 0 ){
-//                        throw new UpdatedException("Basic Salary must be at least 0");
-//                    }
-//                    oldAccount.setBasicSalary(account.getBasicSalary());
-//                }
-//
-//                if (account.getCommessionOverratedFromKPI() != null) {
-//                    if(account.getCommessionOverratedFromKPI() < 0 ){
-//                        throw new UpdatedException("Commession Overrated From KPI must be at least 0");
-//                    }
-//                    oldAccount.setCommessionOverratedFromKPI(account.getCommessionOverratedFromKPI());
-//                }
-//
-//                if(account.getFineUnderatedFromKPI() != null){
-//                    if(account.getFineUnderatedFromKPI() < 0){
-//                        throw new UpdatedException("Fine Underated From KPI must be at least 0");
-//                    }
-//                    oldAccount.setFineUnderatedFromKPI(account.getFineUnderatedFromKPI());
-//                }
-//
-//
-//
-//                // Lưu cập nhật vào cơ sở dữ liệu
-//                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
-//                return modelMapper.map(updatedAccount, EditSalaryEmployeeResponse.class);
-//            } catch (Exception e) {
-//                System.out.println(e.getMessage());
-//                throw new UpdatedException("employee can not update!");
-//            }
-//        }
-//    }
+    public EditSalaryEmployeeResponse updatedBasicSalaryEmployee(RequestEditBasicSalaryEmployee requestEditBasicSalaryEmployee, String id) {
+        AccountForEmployee account = modelMapper.map(requestEditBasicSalaryEmployee, AccountForEmployee.class);
+        AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+        if (oldAccount == null) {
+            throw new Duplicate("Account not found!");// cho dung luon
+        } else {
+            try{
+                if (account.getBasicSalary() != null) {
+                    if(account.getBasicSalary() < 0 ){
+                        throw new UpdatedException("Basic Salary must be at least 0");
+                    }
+                    oldAccount.setBasicSalary(account.getBasicSalary());
+                }
+
+                // Lưu cập nhật vào cơ sở dữ liệu
+                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+                return modelMapper.map(updatedAccount, EditSalaryEmployeeResponse.class);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+                throw new UpdatedException("employee can not update!");
+            }
+        }
+    }
 
     public EditSalaryEmployeeResponse updatedSalaryEmployee(RequestEditSsalaryEmployee requestEditSsalaryEmployee, String id) {
         AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
@@ -532,6 +498,23 @@ public class AuthenticationService implements UserDetailsService {
     @Validated(CreatedBy.class)// phan vao nhom created
     public AccountForEmployeeResponse register(RegisterRequestForEmloyee registerRequestForEmloyee) {
         AccountForEmployee account = modelMapper.map(registerRequestForEmloyee, AccountForEmployee.class);
+        List<String> errors = new ArrayList<>();
+        if (employeeRepository.existsByEmail(account.getEmail())) {
+            errors.add("Email exist!");
+        }
+
+        // Kiểm tra xem số điện thoại đã tồn tại chưa
+        if (employeeRepository.existsByPhoneNumber(account.getPhoneNumber())) {
+            errors.add("Phone number exist!");
+        }
+
+        if (employeeRepository.existsByUsername(account.getUsername())) {
+            errors.add("Username exist!");
+        }
+        // Nếu có bất kỳ lỗi nào, ném ngoại lệ chứa danh sách các lỗi
+        if (!errors.isEmpty()) {
+            throw new Duplicate(errors + "");
+        }
         try {
 //            account.setId(generateNewId());
 //            return employeeRepository.save(account);

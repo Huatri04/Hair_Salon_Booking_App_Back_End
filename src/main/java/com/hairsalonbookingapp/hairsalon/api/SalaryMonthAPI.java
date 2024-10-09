@@ -40,8 +40,8 @@ public class SalaryMonthAPI {
     }
 
     @GetMapping
-    public ResponseEntity getAllSalaryMonth(){
-        List<SalaryMonth> salaryMonths = salaryMonthService.getAllSalaryMonth();
+    public ResponseEntity getAllSalaryMonth(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SalaryMonthListResponse salaryMonths = salaryMonthService.getAllSalaryMonth(page, size);
         return ResponseEntity.ok(salaryMonths);
     }
 

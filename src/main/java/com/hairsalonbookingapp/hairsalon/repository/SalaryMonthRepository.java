@@ -18,5 +18,5 @@ public interface SalaryMonthRepository extends JpaRepository<SalaryMonth, Intege
     List<SalaryMonth> findSalaryMonthsByEmployee_EmployeeIdAndIsDeletedFalse(String employeeId);
 
     Optional<SalaryMonth> findByEmployeeAndMonth(AccountForEmployee employee, Month month);
-//    Page<SalaryMonth> findSalaryMonthsByIsDeletedFalse(Pageable pageable);
+    Page<SalaryMonth> findSalaryMonthsByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

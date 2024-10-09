@@ -7,6 +7,8 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Date;
+
 @Getter
 @Setter
 @Entity
@@ -25,6 +27,8 @@ public class Feedback {
     @ManyToOne
     @JoinColumn(name = "phoneNumber", nullable = false) // day la foreign key
     private AccountForCustomer customer;
+
+    private Date createdAt;
 
     private boolean isDeleted = false;
 }

@@ -2,6 +2,8 @@ package com.hairsalonbookingapp.hairsalon.repository;
 
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,4 +20,6 @@ public interface SoftwareSupportApplicationRepository extends JpaRepository<Soft
 
     // Lấy tất cả các ứng dụng hỗ trợ phần mềm của Employee với isDeleted = false
     List<SoftwareSupportApplication> findByEmployeeIsNotNullAndIsDeletedFalse();
+
+    Page<SoftwareSupportApplication> findSoftwareSupportApplicationsByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

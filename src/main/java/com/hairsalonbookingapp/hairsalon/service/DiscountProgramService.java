@@ -10,6 +10,8 @@ import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -74,9 +76,16 @@ public class DiscountProgramService {
     }
 
     // show list of DiscountProgram
-    public List<DiscountProgram> getAllDiscountProgram(){
-        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramsByIsDeletedFalse();
-        return discountPrograms;
+    public DiscountProgramListResponse getAllDiscountProgram(int page, int size){
+//        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramsByIsDeletedFalse();
+//        return discountPrograms;
+        Page discountProgramPage = discountProgramRepository.findDiscountProgramsByIsDeletedFalseOrderByEndedDateAsc(PageRequest.of(page, size));
+        DiscountProgramListResponse discountProgramListResponse = new DiscountProgramListResponse();
+        discountProgramListResponse.setTotalPage(discountProgramPage.getTotalPages());
+        discountProgramListResponse.setContent(discountProgramPage.getContent());
+        discountProgramListResponse.setPageNumber(discountProgramPage.getNumber());
+        discountProgramListResponse.setTotalElement(discountProgramPage.getTotalElements());
+        return discountProgramListResponse;
     }
 
 //    public DiscountProgram getCurrentDiscountProgram(){

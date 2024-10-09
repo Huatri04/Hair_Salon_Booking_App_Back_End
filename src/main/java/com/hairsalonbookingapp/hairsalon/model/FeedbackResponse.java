@@ -7,6 +7,8 @@ import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class FeedbackResponse {
 
@@ -18,5 +20,6 @@ public class FeedbackResponse {
 
     private AccountForCustomer customer;
 
+    private Date createdAt;
 
 }

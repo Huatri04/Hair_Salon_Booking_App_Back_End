@@ -5,6 +5,8 @@ import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import jakarta.persistence.*;
 import lombok.Data;
 
+import java.util.Date;
+
 @Data
 public class SoftwareSupportApplicationResponse {
     @Id
@@ -21,6 +23,8 @@ public class SoftwareSupportApplicationResponse {
     private AccountForEmployee employee;
 
     private String description;
+
+    private Date createdAt;
 
     private String img;
 }

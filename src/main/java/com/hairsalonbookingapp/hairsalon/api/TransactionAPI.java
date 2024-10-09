@@ -35,8 +35,8 @@ public class TransactionAPI {
     }
 
     @GetMapping
-    public ResponseEntity getAllTransaction(){
-        List<Transaction> transactions = transactionService.getAllTransaction();
+    public ResponseEntity getAllTransaction(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        TransactionListResponse transactions = transactionService.getAllTransaction(page, size);
         return ResponseEntity.ok(transactions);
     }
 

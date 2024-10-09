@@ -11,6 +11,8 @@ import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -99,9 +101,16 @@ public class DiscountCodeService {
     }
 
     // show list of feedback
-    public List<DiscountCode> getAllDiscountCode(){
-        List<DiscountCode> discountCodes = discountCodeRepository.findDiscountCodesByIsDeletedFalse();
-        return discountCodes;
+    public DiscountCodeListResponse getAllDiscountCode(int page, int size){
+//        List<DiscountCode> discountCodes = discountCodeRepository.findDiscountCodesByIsDeletedFalse();
+//        return discountCodes;
+        Page discountCodePage = discountCodeRepository.findDiscountCodesByIsDeletedFalseOrderByDiscountProgramEndedDateAsc(PageRequest.of(page, size));
+        DiscountCodeListResponse discountCodeListResponse = new DiscountCodeListResponse();
+        discountCodeListResponse.setTotalPage(discountCodePage.getTotalPages());
+        discountCodeListResponse.setContent(discountCodePage.getContent());
+        discountCodeListResponse.setPageNumber(discountCodePage.getNumber());
+        discountCodeListResponse.setTotalElement(discountCodePage.getTotalElements());
+        return discountCodeListResponse;
     }
 
     public UpdateDiscountCodeResponse updatedDiscountCode(RequestUpdateDiscountCode requestUpdateDiscountCode, String id) {

@@ -167,16 +167,16 @@ public class SalaryMonthService {
     }
 
     // show list of SalaryMonth
-    public List<SalaryMonth> getAllSalaryMonth(){
-        List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
-        return salaryMonths;
-//        Page SalaryMonthPage = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse(PageRequest.of(page, size));
-//        SalaryMonthListResponse salaryMonthListResponse = new SalaryMonthListResponse();
-//        salaryMonthListResponse.setTotalPage(salaryMonthPa.getTotalPages());
-//        feedbackListResponse.setContent(feedbackPage.getContent());
-//        feedbackListResponse.setPageNumber(feedbackPage.getNumber());
-//        feedbackListResponse.setTotalElement(feedbackPage.getTotalElements());
-//        return feedbackListResponse;
+    public SalaryMonthListResponse getAllSalaryMonth(int page, int size){
+//        List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
+//        return salaryMonths;
+        Page salaryMonthPage = salaryMonthRepository.findSalaryMonthsByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
+        SalaryMonthListResponse salaryMonthListResponse = new SalaryMonthListResponse();
+        salaryMonthListResponse.setTotalPage(salaryMonthPage.getTotalPages());
+        salaryMonthListResponse.setContent(salaryMonthPage.getContent());
+        salaryMonthListResponse.setPageNumber(salaryMonthPage.getNumber());
+        salaryMonthListResponse.setTotalElement(salaryMonthPage.getTotalElements());
+        return salaryMonthListResponse;
     }
 
     // show list of SalaryMonth chi acc do thay

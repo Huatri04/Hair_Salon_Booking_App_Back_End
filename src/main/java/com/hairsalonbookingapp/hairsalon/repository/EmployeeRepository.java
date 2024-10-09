@@ -18,4 +18,8 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     AccountForEmployee findAccountForEmployeeByEmployeeId(String id);
     AccountForEmployee findAccountForEmployeeByName(String name);
     List<AccountForEmployee> findAccountForEmployeesByIsDeletedFalse();
+
+    boolean existsByEmail(String email);
+    boolean existsByPhoneNumber(String phoneNumber);
+    boolean existsByUsername(String username);
 }

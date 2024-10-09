@@ -11,4 +11,6 @@ public interface AccountForCustomerRepository extends JpaRepository<AccountForCu
     AccountForCustomer findByPhoneNumber(String phoneNumber);
     List<AccountForCustomer> findAccountForCustomersByIsDeletedFalse();
 
+    boolean existsByEmail(String email);
+    boolean existsByPhoneNumber(String phoneNumber);
 }

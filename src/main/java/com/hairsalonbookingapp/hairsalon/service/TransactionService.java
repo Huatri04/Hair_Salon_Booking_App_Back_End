@@ -7,6 +7,8 @@ import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import com.hairsalonbookingapp.hairsalon.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -25,6 +27,7 @@ public class TransactionService {
     // create Transaction
     public TransactionResponse createTransaction(RequestTransaction requestTransaction){
         Transaction transaction = modelMapper.map(requestTransaction, Transaction.class);
+
         try{
 //            String newId = generateId();
 //            feedback.setFeedbackId(newId);
@@ -77,9 +80,16 @@ public class TransactionService {
     }
 
     // show list of Transaction
-    public List<Transaction> getAllTransaction(){
-        List<Transaction> transactions = transactionRepository.findTransactionsByIsDeletedFalse();
-        return transactions;
+    public TransactionListResponse getAllTransaction(int page, int size){
+//        List<Transaction> transactions = transactionRepository.findTransactionsByIsDeletedFalse();
+//        return transactions;
+        Page transactionPage = transactionRepository.findTransactionsByIsDeletedFalseOrderByDateDesc(PageRequest.of(page, size));
+        TransactionListResponse transactionListResponse = new TransactionListResponse();
+        transactionListResponse.setTotalPage(transactionPage.getTotalPages());
+        transactionListResponse.setContent(transactionPage.getContent());
+        transactionListResponse.setPageNumber(transactionPage.getNumber());
+        transactionListResponse.setTotalElement(transactionPage.getTotalElements());
+        return transactionListResponse;
     }
 
     //GET PROFILE SalaryMonth

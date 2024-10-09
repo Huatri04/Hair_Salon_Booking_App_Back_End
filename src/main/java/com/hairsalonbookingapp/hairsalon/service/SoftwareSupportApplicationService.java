@@ -7,8 +7,11 @@ import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.SoftwareSupportApplicationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.Date;
 import java.util.List;
 
 @Service
@@ -35,15 +38,6 @@ public class SoftwareSupportApplicationService {
 
             // Lấy thông tin tài khoản nhân viên hiện tại
             AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
-
-            // Thiết lập customer hoặc employee nếu có
-//            if (accountForCustomer != null) {
-//                softwareSupportApplication.setCustomer(accountForCustomer);
-//            } else if (accountForEmployee != null) { // Chỉ nên kiểm tra một cái thôi
-//                softwareSupportApplication.setEmployee(accountForEmployee);
-//            } else {
-//                throw new Duplicate("At least one of Customer or Employee must be set.");
-//            }
             if (accountForCustomer != null) {
                 // Nếu là khách hàng, thiết lập customer
                 softwareSupportApplication.setCustomer(accountForCustomer);
@@ -61,6 +55,8 @@ public class SoftwareSupportApplicationService {
             if (softwareSupportApplication.getCustomer() == null && softwareSupportApplication.getEmployee() == null) {
                 throw new Duplicate("At least one of Customer or Employee must be set.");
             }
+
+            softwareSupportApplication.setCreatedAt(new Date());
 
             SoftwareSupportApplication newSoftwareSupportApplication = softwareSupportApplicationRepository.save(softwareSupportApplication);
             return modelMapper.map(newSoftwareSupportApplication, SoftwareSupportApplicationResponse.class);
@@ -145,6 +141,13 @@ public class SoftwareSupportApplicationService {
     public List<SoftwareSupportApplication> getAllSoftwareSupportApplicationOfCustomer(){
         List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
         return softwareSupportApplications;
+//        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
+//        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
+//        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
+//        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
+//        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
+//        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
+//        return softwareSupportApplicationListResponse;
     }
 
     //GET PROFILE SoftwareSupportApplication

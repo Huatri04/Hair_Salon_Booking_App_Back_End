@@ -33,8 +33,8 @@ public class DiscountProgramAPI {
     }
 
     @GetMapping
-    public ResponseEntity getAllDiscountProgram(){
-        List<DiscountProgram> discountPrograms = discountProgramService.getAllDiscountProgram();
+    public ResponseEntity getAllDiscountProgram(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        DiscountProgramListResponse discountPrograms = discountProgramService.getAllDiscountProgram(page, size);
         return ResponseEntity.ok(discountPrograms);
     }
 

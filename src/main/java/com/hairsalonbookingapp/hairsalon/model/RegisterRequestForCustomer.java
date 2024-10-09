@@ -14,6 +14,7 @@ import java.util.Date;
 public class RegisterRequestForCustomer {
     @Email(message = "Email invalid!")
     @NotBlank(message = "email must not blank!")
+    @Column(unique = true)
     private String email;
 
     @NotBlank(message = "Name must not blank!")

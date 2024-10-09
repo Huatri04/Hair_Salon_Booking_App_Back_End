@@ -32,8 +32,8 @@ public class DiscountCodeAPI {
     }
 
     @GetMapping
-    public ResponseEntity getAllFeedback(){
-        List<DiscountCode> discountCodes = discountCodeService.getAllDiscountCode();
+    public ResponseEntity getAllFeedback(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        DiscountCodeListResponse discountCodes = discountCodeService.getAllDiscountCode(page, size);
         return ResponseEntity.ok(discountCodes);
     }
 
