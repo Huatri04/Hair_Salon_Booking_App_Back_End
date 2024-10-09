@@ -63,7 +63,8 @@ public class AuthenticationService implements UserDetailsService{
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             AccountForCustomer newAccount = customerRepository.save(account); //lưu xuống database
-            return modelMapper.map(newAccount, AccountResponseForCustomer.class);
+            AccountResponseForCustomer newCustomer =  modelMapper.map(newAccount, AccountResponseForCustomer.class);
+            return newCustomer;
         } catch (Exception e) {
             if (e.getMessage().contains(account.getPhoneNumber())) {
                 throw new DuplicateEntity("DuplicateEntity phone!");

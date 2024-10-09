@@ -46,13 +46,13 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointments);
     }
 
-    @PutMapping("/appointment/approve")
+    @PutMapping("/appointment/approve/{appointmentID}")
     public ResponseEntity approveAppointment(@PathVariable long appointmentID){
         AppointmentResponse appointment = appointmentService.approveAppointment(appointmentID);
         return ResponseEntity.ok(appointment);
     }
 
-    @GetMapping("/appointment/check")
+    @GetMapping("/appointment/check/{appointmentID}")
     public ResponseEntity checkAppointment(@PathVariable long appointmentID){
         AppointmentResponse appointment = appointmentService.checkAppointment(appointmentID);
         return ResponseEntity.ok(appointment);

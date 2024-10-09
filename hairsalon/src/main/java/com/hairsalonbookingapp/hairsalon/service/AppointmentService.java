@@ -165,7 +165,7 @@ public class AppointmentService {
             appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getCustomerName());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
             appointmentResponse.setStatus(newAppointment.getStatus());
@@ -252,7 +252,7 @@ public class AppointmentService {
                 appointmentResponse.setCost(newAppointment.getCost());
                 appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
                 appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
-                appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+                appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getCustomerName());
                 appointmentResponse.setService(newAppointment.getHairSalonService().getName());
                 appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
                 appointmentResponse.setStatus(newAppointment.getStatus());
@@ -286,7 +286,7 @@ public class AppointmentService {
             appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getCustomerName());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
             appointmentResponse.setStatus(newAppointment.getStatus());
@@ -310,7 +310,7 @@ public class AppointmentService {
                 appointmentResponse.setCost(appointment.getCost());
                 appointmentResponse.setDay(appointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
                 appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
-                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getUsername());
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getCustomerName());
                 appointmentResponse.setService(appointment.getHairSalonService().getName());
                 appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getName());
                 appointmentResponse.setStatus(appointment.getStatus());
@@ -341,7 +341,7 @@ public class AppointmentService {
             appointmentResponse.setCost(newAppointment.getCost());
             appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getCustomerName());
             appointmentResponse.setService(newAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
             appointmentResponse.setStatus(newAppointment.getStatus());
@@ -364,7 +364,7 @@ public class AppointmentService {
             appointmentResponse.setCost(oldAppointment.getCost());
             appointmentResponse.setDay(oldAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
             appointmentResponse.setStartHour(oldAppointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(oldAppointment.getAccountForCustomer().getUsername());
+            appointmentResponse.setCustomer(oldAppointment.getAccountForCustomer().getCustomerName());
             appointmentResponse.setService(oldAppointment.getHairSalonService().getName());
             appointmentResponse.setStylist(oldAppointment.getSlot().getShiftEmployee().getName());
             appointmentResponse.setStatus(oldAppointment.getStatus());

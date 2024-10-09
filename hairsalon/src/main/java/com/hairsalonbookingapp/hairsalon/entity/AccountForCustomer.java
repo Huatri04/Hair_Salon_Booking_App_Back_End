@@ -28,7 +28,7 @@ public class AccountForCustomer implements UserDetails {
 
     @NotBlank(message = "Username must not be blank!")
     @Size(min = 3, message = "Username must be more than 3 characters!")
-    private String username;
+    private String customerName;
 
     @Min(value = 0, message = "Score must be at least 0!")
     private long point;

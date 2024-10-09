@@ -13,7 +13,7 @@ import java.util.Date;
 @Data
 public class ProfileCustomer {
     String email;
-    String username;
+    String customerName;
     long point;
     String phoneNumber;
     Date creatAt;

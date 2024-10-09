@@ -18,7 +18,7 @@ public class RegisterRequestForCustomer {
 
     @NotBlank(message = "Username must not be blank!")
     @Size(min = 3, message = "Username must be more than 3 characters!")
-    private String username;
+    private String customerName;
 
     @Pattern(regexp = "(84|0[3|5|7|8|9])+([0-9]{8})\\b", message = "Phone number is invalid!")
     @NotBlank(message = "Phone number must not be blank!")
