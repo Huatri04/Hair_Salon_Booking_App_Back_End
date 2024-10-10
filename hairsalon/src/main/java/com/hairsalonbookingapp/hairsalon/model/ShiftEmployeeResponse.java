@@ -10,10 +10,9 @@ import java.util.List;
 
 @Data
 public class ShiftEmployeeResponse {
-    private long id;
-    private String name;
-    private String dayInWeek;
-    private String employeeId;
-    private boolean isCompleted;
-    private boolean isAvailable;
+    private long id; // ID SHIFT
+    private String dayInWeek;  // THỨ MẤY (THỨ 2,3,4...)
+    private String employeeId; // ID STYLIST
+    private String name; // AI LÀM
+    private boolean isAvailable;  // CÒN KHẢ DỤNG KHÔNG
 }

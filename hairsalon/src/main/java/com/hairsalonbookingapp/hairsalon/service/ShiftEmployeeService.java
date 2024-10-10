@@ -4,13 +4,16 @@ import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
 import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
+import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,11 +41,30 @@ public class ShiftEmployeeService {
     @Autowired
     AppointmentRepository appointmentRepository;
 
-    private final int MAXSHIFT = 2;        // SỐ SHIFT STYLIST CẦN LÀM ĐỂ NHẬN LƯƠNG
+    @Autowired
+    TimeService timeService;
 
-    //tạo shift employee -> STYLIST LÀM
-    public ShiftEmployeeResponse createNewShiftEmployee(String dayOfWeek){
-        ShiftEmployee shift = new ShiftEmployee();
+    //ĐĂNG KÝ SHIFT EMPLOYEE (STYLIST) -> MANAGER LÀM
+    public AccountResponseForEmployee registerShifts(StylistShiftRequest stylistShiftRequest) {
+        // CẬP NHẬT VÀO ACCOUNT FOR EMPLOYEE
+        String days = stylistShiftRequest.getDay1() + "," + stylistShiftRequest.getDay2() + "," + stylistShiftRequest.getDay3();
+        String stylistID = stylistShiftRequest.getStylistID();
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(stylistID);
+
+        if (accountForEmployee != null) {
+            throw new AccountNotFoundException("Stylist not found!");
+        }
+
+        accountForEmployee.setDays(days);
+        AccountForEmployee newAccount = employeeRepository.save(accountForEmployee);
+        // GENERATE RESPONSE
+        AccountResponseForEmployee accountResponseForEmployee = modelMapper.map(newAccount, AccountResponseForEmployee.class);
+        return accountResponseForEmployee;
+    }
+
+
+        /*ShiftEmployee shiftEmployee = new ShiftEmployee();
+
         ShiftInWeek shiftInWeek = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableTrue(dayOfWeek);
         if(shiftInWeek != null){   // CHECK COI ĐẦU VÀO NHẬP ĐÚNG KHÔNG
             shift.setShiftInWeek(shiftInWeek);
@@ -69,7 +91,35 @@ public class ShiftEmployeeService {
         shiftEmployeeResponse.setName(newShift.getName());
 
         return shiftEmployeeResponse;
+    }*/
+
+    // TẠO SHIFT CHO STYLIST
+    public ShiftEmployeeResponse createNewShiftEmployee(AccountForEmployee accountForEmployee){
+        
     }
+
+
+
+    // TẠO SHIFT CHO STYLIST
+    public ShiftEmployeeResponse createAllShiftEmployees(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<AccountForEmployee> accountForEmployeeList = employeeRepository
+                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(accountForEmployeeList != null) {
+            for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+                String days = accountForEmployee.getDays();
+                String[] day = days.split(",");
+
+            }
+        } else {
+            throw new EntityNotFoundException("Can not execute!");
+        }
+    }
+
+
+
+
 
     //xóa shift -> STYLIST LÀM KHI NÓ MUỐN HỦY SHIFT, NHƯNG PHẢI THÔNG BÁO CHO MANAGER TRƯỚC
     // APP TỰ HỦY CÁC SLOT CỦA STYLIST

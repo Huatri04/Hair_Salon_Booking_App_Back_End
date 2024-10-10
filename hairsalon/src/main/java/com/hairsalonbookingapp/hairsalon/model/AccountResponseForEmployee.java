@@ -25,8 +25,5 @@ public class AccountResponseForEmployee {
     double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
     int KPI; // KPI của stylist // [Stylist]
     String token;
-    int completedShift;  // SỐ SHIFT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC TỚI KHI ĐỦ BAO NHIÊU ĐÓ THÌ DỪNG LẠI ĐỂ
-    // TÍNH CÁC THỨ KHÁC RỒI RESET VỀ 0
-
-    int completedSlot;
+    String days;
 }

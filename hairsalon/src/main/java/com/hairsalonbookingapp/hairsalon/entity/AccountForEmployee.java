@@ -74,12 +74,9 @@ public class AccountForEmployee implements UserDetails {
 
     private int KPI; // KPI của stylist // [Stylist]
 
-    boolean isDeleted = false;  // TÀI KHOẢN CÒN KHẢ DỤNG KHÔNG
+    private boolean isDeleted = false;  // TÀI KHOẢN CÒN KHẢ DỤNG KHÔNG
 
-    private int completedShift = 0;  // SỐ SHIFT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC TỚI KHI ĐỦ BAO NHIÊU ĐÓ THÌ DỪNG LẠI ĐỂ
-                                                                        // TÍNH CÁC THỨ KHÁC RỒI RESET VỀ 0
-
-    private int completedSlot = 0;   // SỐ SLOT STYLIST HOÀN THÀNH -> CỘNG DỒN LIÊN TỤC NHƯ TRÊN ĐỂ SO VỚI KPI, CUỐI CÙNG RESET VỀ 0
+    private String days; // NGÀY LÀM VIỆC (THỨ 2,3,4...) -> CÚ PHÁP: MONDAY, TUESDAY,....
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

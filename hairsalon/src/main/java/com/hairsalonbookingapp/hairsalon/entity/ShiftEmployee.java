@@ -14,14 +14,15 @@ public class ShiftEmployee { // DO STYLIST LÀM
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;  // ID CÓ THỂ TỰ GENERATE
 
-    private String name;  // TÊN EMPLOYEE LÀM CA ĐÓ
+    //private String name;  // TÊN EMPLOYEE LÀM CA ĐÓ
 
     private boolean isAvailable = true;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
+                                         // NẾU STYLIST CHỌN KHÔNG LÀM TUẦN NÀY NỮA THÌ MANAGER GHI FALSE
 
-    private boolean isCompleted = false;
+    //private boolean isCompleted = false;
 
     @ManyToOne
-    @JoinColumn(name = "dayInWeek", nullable = true)
+    @JoinColumn(name = "dayInWeek")
     ShiftInWeek shiftInWeek;    // STYLIST CÓ THỂ CÓ NHIỀU CA(THỨ 2,3,4...) TRONG TUẦN
 
     @ManyToOne
