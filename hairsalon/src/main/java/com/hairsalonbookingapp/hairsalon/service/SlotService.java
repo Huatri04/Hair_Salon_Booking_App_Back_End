@@ -46,7 +46,7 @@ public class SlotService {
     TimeService timeService;
 
     //TẠO SLOT
-    public List<Slot> createSlots(SlotRequest slotRequest){
+    public List<Slot> generateSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH
         List<Slot> list = new ArrayList<>();
         List<LocalTime> localTimeList = timeService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration());
@@ -55,6 +55,7 @@ public class SlotService {
                 break;        // DỪNG NẾU TIME = ENDHOUR
             } else {
                 Slot slot = new Slot();
+                slot.setDate(slotRequest.getDate());
                 slot.setStartSlot(time.toString());
                 slot.setShiftEmployee(shiftEmployeeRepository.findShiftEmployeeById(slotRequest.getShiftEmployeeId()));
                 Slot newSlot = slotRepository.save(slot);  // TRƯỚC KHI KẾT THÚC VÒNG LẶP SẼ LƯU XUỐNG DB, SAU ĐÓ THÊM VÀO LIST
@@ -77,7 +78,7 @@ public class SlotService {
         }*/
 
     }
-
+/* COMMENT TẠM THỜI
     // xem slot trong ngày dựa trên shiftEmployeeId -> STYLIST LÀM
     public List<SlotResponse> getAllSlotsInDay(long shiftEmployeeId){
         AccountForEmployee account = authenticationService.getCurrentAccountForEmployee();
@@ -211,7 +212,7 @@ public class SlotService {
     }
 
     // STAFF XEM SLOT CỦA STYLIST ĐỂ XÁC NHẬN COMPLETE
-    /*public SlotResponse viewSlotInfo(String stylistID, String day, String startSlot){
+    *//*public SlotResponse viewSlotInfo(String stylistID, String day, String startSlot){
         Slot slot = slotRepository.findSlotByStartSlotAndShiftEmployee_AccountForEmployee_IdAndShiftEmployee_ShiftInWeek_DayOfWeek(startSlot, stylistID, day);
         if(slot != null){
             SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
@@ -220,7 +221,7 @@ public class SlotService {
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }
-    }*/
+    }*//*
 
     public SlotResponse viewSlotInfo(long appointmentID) {
         Appointment appointment = appointmentRepository.findAppointmentByIdAndIsDeletedFalse(appointmentID);
@@ -255,7 +256,7 @@ public class SlotService {
             slotResponseList.add(slotResponse);
         }
         return slotResponseList;
-    }
+    }*/ // COMMENT TẠM THỜI
 
 
 }

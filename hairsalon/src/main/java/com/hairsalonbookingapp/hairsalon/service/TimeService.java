@@ -14,7 +14,11 @@ import java.util.List;
 public class TimeService {
 
     // GIẢ ĐỊNH NGÀY HIỆN TẠI
-    public final LocalDate today = LocalDate.of(2024, 10, 10);
+    public final LocalDate today = LocalDate.of(2024, 12, 31);
+    // THỜI GIAN BẮT ĐÂÙ VÀ KẾT THÚC CA LÀM VIỆC
+    public final int startHour = 7;
+    public final int endHour = 10;
+    public final long duration = 60;
 
     // DANH SÁCH CÁC NGÀY TRONG NĂM
     public List<LocalDate> getAllDaysInYear(int year) {

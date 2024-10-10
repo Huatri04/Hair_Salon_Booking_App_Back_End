@@ -87,31 +87,6 @@ public class ShiftWeekService {
         return shift;
     }*/
 
-    /*//chia các slot -> HỖ TRỢ HÀM DƯỚI
-    public List<LocalTime> getTimeIntervals(LocalTime startTime, LocalTime endTime, Duration interval) {
-        List<LocalTime> timeIntervals = new ArrayList<>();
-
-        // Bắt đầu từ startTime và thêm vào danh sách các khoảng thời gian đều nhau
-        LocalTime currentTime = startTime;
-        while (!currentTime.isAfter(endTime)) {
-            timeIntervals.add(currentTime);
-            currentTime = currentTime.plus(interval); // Tăng thời gian lên theo khoảng thời gian interval
-        }
-
-        return timeIntervals;
-    }
-
-    // chia slot dựa vào giờ bắt đầu và kết thúc -> HÀM NÀY GIÚP SLOT SERVICE CHIA SLOT
-    public List<LocalTime> getSLots(int startHour, int endHour, long duration){
-        LocalTime startTime = LocalTime.of(startHour, 0);
-        LocalTime endTime = LocalTime.of(endHour, 0);
-
-        Duration interval = Duration.ofMinutes(duration);
-
-        List<LocalTime> intervals = getTimeIntervals(startTime, endTime, interval);
-        return intervals;
-    }*/
-
     //RESTART SHIFT -> MANAGER LÀM
     public ShiftWeekResponse restartShift(String dayOfWeek){
         ShiftInWeek shift = shiftWeekRepository.findShiftInWeekByDayOfWeekAndIsAvailableFalse(dayOfWeek);

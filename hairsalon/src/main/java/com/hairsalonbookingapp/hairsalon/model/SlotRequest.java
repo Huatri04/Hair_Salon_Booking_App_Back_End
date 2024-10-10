@@ -12,4 +12,5 @@ public class SlotRequest {
     int startHour;
     int endHour;
     long duration;
+    String date;
 }

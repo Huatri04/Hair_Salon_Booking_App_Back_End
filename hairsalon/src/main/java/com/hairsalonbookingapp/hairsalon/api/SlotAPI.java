@@ -20,7 +20,7 @@ public class SlotAPI {
     @Autowired
     SlotService slotService;
 
-    @PostMapping("/slot")
+    /*@PostMapping("/slot")
     public ResponseEntity createNewSlot(@Valid @RequestBody SlotRequest slotRequest){
         List<SlotResponse> slots = slotService.createSlots(slotRequest);
         return ResponseEntity.ok(slots);
@@ -66,6 +66,6 @@ public class SlotAPI {
     public ResponseEntity viewAvailableSlot(@PathVariable long shiftEmployeeId){
         List<SlotResponse> slots = slotService.viewAvailableSlots(shiftEmployeeId);
         return ResponseEntity.ok(slots);
-    }
+    }*/
 
 }

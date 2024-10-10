@@ -1,7 +1,10 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
+import com.hairsalonbookingapp.hairsalon.entity.Slot;
+import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
 import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
+import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.service.ShiftEmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -12,14 +15,14 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/shiftEmployee")
 @SecurityRequirement(name = "api")
 public class ShiftEmployeeAPI {
 
     @Autowired
     ShiftEmployeeService shiftEmployeeService;
 
-    // [STYLIST]
+    /*// [STYLIST]
     @PostMapping("/shiftEmployee/{day}")
     public ResponseEntity createShiftEmployee(@PathVariable String day){
         ShiftEmployeeResponse shift = shiftEmployeeService.createNewShiftEmployee(day);
@@ -58,6 +61,30 @@ public class ShiftEmployeeAPI {
     @GetMapping("/availableShiftEmployee/{stylistId}")
     public ResponseEntity getAvailableShiftEmployee(@PathVariable String stylistId){
         List<ShiftEmployeeResponse> shiftEmployeeList = shiftEmployeeService.getAvailableShiftEmployees(stylistId);
+        return ResponseEntity.ok(shiftEmployeeList);
+    }*/
+
+    @PostMapping("/register")
+    public ResponseEntity registerShift(@Valid @RequestBody StylistShiftRequest stylistShiftRequest){
+        AccountResponseForEmployee accountResponseForEmployee = shiftEmployeeService.registerShifts(stylistShiftRequest);
+        return ResponseEntity.ok(accountResponseForEmployee);
+    }
+
+    @PostMapping("/createAll")
+    public ResponseEntity generateAllShift(){
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = shiftEmployeeService.generateAllShiftEmployees();
+        return ResponseEntity.ok(shiftEmployeeResponseList);
+    }
+
+    @GetMapping
+    public ResponseEntity getAllShifts(){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getAllShift();
+        return ResponseEntity.ok(shiftEmployeeList);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity getShift(@PathVariable long id){
+        String shiftEmployeeList = shiftEmployeeService.getShift(id);
         return ResponseEntity.ok(shiftEmployeeList);
     }
 

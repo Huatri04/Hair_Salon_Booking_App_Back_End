@@ -54,7 +54,7 @@ public class AppointmentService {
 
     // CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
 
-
+/*
     public HairSalonService getService(long serviceId) {        // HÀM LẤY SERVICE
         HairSalonService service = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(serviceId);
         if(service != null){
@@ -72,7 +72,7 @@ public class AppointmentService {
 
     //  CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
 
-    public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
+    /*public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
         String status = "Workday";
         AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistId, status);
         if(account != null){
@@ -80,7 +80,7 @@ public class AppointmentService {
         } else {
             throw new EntityNotFoundException("Stylist not found!");
         }
-    }
+    }*/
 
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
     // CHỨC NĂNG getAvailableShiftEmployees(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST
@@ -104,29 +104,29 @@ public class AppointmentService {
 
 
 
-    public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
+    /*public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
         Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
         if(slot != null){
-            /*slot.setAvailable(false);
-            Slot newSlot = slotRepository.save(slot);*/
+            *//*slot.setAvailable(false);
+            Slot newSlot = slotRepository.save(slot);*//*
             return slot;
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }
-    }
+    }*/
 
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
-    public DiscountCode getDiscountCode(String DiscountCodeId) {    // HÀM LẤY MÃ GIẢM GIÁ -> CẦN COI LẠI
+    /*public DiscountCode getDiscountCode(String DiscountCodeId) {    // HÀM LẤY MÃ GIẢM GIÁ -> CẦN COI LẠI
         DiscountCode discountCode = discountCodeRepository.findDiscountCodeById(DiscountCodeId);
         if(discountCode != null){
             return discountCode;
         } else {
             throw new EntityNotFoundException("Invalid code");
         }
-    }
+    }*/
 
     //HỆ THỐNG CHỐT
-    public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
+    /*public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {
             double bonusDiscountCode = 0;    // PHÍ GIẢM GIÁ CỦA MÃ (NẾU CÓ)
             double bonusEmployee = 0;   // PHÍ TRẢ THÊM CHO STYLIST DỰA TRÊN CẤP ĐỘ
@@ -156,10 +156,10 @@ public class AppointmentService {
 
             //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
             AppointmentResponse appointmentResponse = new AppointmentResponse();
-            /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+            *//*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*//*
 
             appointmentResponse.setId(newAppointment.getId());
             appointmentResponse.setCost(newAppointment.getCost());
@@ -241,10 +241,10 @@ public class AppointmentService {
                 Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
                 //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
-                /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+                *//*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
                 appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
                 appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-                appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+                appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*//*
 
                 AppointmentResponse appointmentResponse = new AppointmentResponse();
 
@@ -275,10 +275,10 @@ public class AppointmentService {
             oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
-            /*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+            *//*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*/
+            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*//*
 
             AppointmentResponse appointmentResponse = new AppointmentResponse();
 
@@ -373,7 +373,7 @@ public class AppointmentService {
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
-    }
+    }*/
 
 
 }

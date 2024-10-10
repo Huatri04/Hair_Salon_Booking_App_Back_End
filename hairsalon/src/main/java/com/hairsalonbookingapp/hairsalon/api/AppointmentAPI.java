@@ -22,7 +22,7 @@ public class AppointmentAPI {
     @Autowired
     AppointmentService appointmentService;
 
-    @PostMapping("/appointment")
+    /*@PostMapping("/appointment")
     public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
         AppointmentResponse appointment = appointmentService.createNewAppointment(appointmentRequest);
         return ResponseEntity.ok(appointment);
@@ -57,6 +57,6 @@ public class AppointmentAPI {
         AppointmentResponse appointment = appointmentService.checkAppointment(appointmentID);
         return ResponseEntity.ok(appointment);
     }
-
+*/
 
 }

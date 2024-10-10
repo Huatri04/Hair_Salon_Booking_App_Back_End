@@ -6,6 +6,7 @@ import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
 import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
+import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
@@ -45,6 +46,10 @@ public class ShiftEmployeeService {
     @Autowired
     TimeService timeService;
 
+    @Autowired
+    SlotService slotService;
+
+
     //ĐĂNG KÝ SHIFT EMPLOYEE (STYLIST) -> MANAGER LÀM
     public AccountResponseForEmployee registerShifts(StylistShiftRequest stylistShiftRequest) {
         // CẬP NHẬT VÀO ACCOUNT FOR EMPLOYEE
@@ -52,7 +57,7 @@ public class ShiftEmployeeService {
         String stylistID = stylistShiftRequest.getStylistID();
         AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(stylistID);
 
-        if (accountForEmployee != null) {
+        if (accountForEmployee == null) {
             throw new AccountNotFoundException("Stylist not found!");
         }
 
@@ -95,7 +100,7 @@ public class ShiftEmployeeService {
     }*/
 
     // TẠO SHIFT CHO STYLIST -> DÙNG CHO HÀM DƯỚI
-    public List<ShiftEmployeeResponse> createNewShiftEmployee(AccountForEmployee accountForEmployee){
+    public List<ShiftEmployeeResponse> generateShiftEmployee(AccountForEmployee accountForEmployee){
         String days = accountForEmployee.getDays(); // LẤY CÁC NGÀY STYLIST CHỌN
         String[] daysOfWeek = days.split(","); // LIST CÁC NGÀY STYLIST CHỌN
         List<LocalDate> nextWeekDays = timeService.getNextWeekDays(timeService.today); // LIST CÁC NGÀY TUẦN SAU
@@ -115,18 +120,27 @@ public class ShiftEmployeeService {
                     break;
                 }
             }
-            // TẠO CÁC SLOT
-
             // SAVE VÀO DB
             ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
+            // TẠO CÁC SLOT
+            SlotRequest slotRequest = new SlotRequest();
+            slotRequest.setDate(newShiftEmployee.getDate());
+            slotRequest.setShiftEmployeeId(newShiftEmployee.getId());
+            slotRequest.setStartHour(timeService.startHour);
+            slotRequest.setEndHour(timeService.endHour);
+            slotRequest.setDuration(timeService.duration);
+            List<Slot> slotList = slotService.generateSlots(slotRequest);
+            newShiftEmployee.setSlots(slotList);
+            // SAVE LẠI VÀO DB
+            ShiftEmployee savedShift = shiftEmployeeRepository.save(newShiftEmployee);
             // GENERATE RESPONSE
             ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
-            shiftEmployeeResponse.setId(newShiftEmployee.getId());
-            shiftEmployeeResponse.setAvailable(newShiftEmployee.isAvailable());
-            shiftEmployeeResponse.setEmployeeId(newShiftEmployee.getAccountForEmployee().getId());
-            shiftEmployeeResponse.setName(newShiftEmployee.getAccountForEmployee().getName());
-            shiftEmployeeResponse.setDayInWeek(newShiftEmployee.getShiftInWeek().getDayOfWeek());
-            shiftEmployeeResponse.setDate(newShiftEmployee.getDate());
+            shiftEmployeeResponse.setId(savedShift.getId());
+            shiftEmployeeResponse.setAvailable(savedShift.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(savedShift.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(savedShift.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(savedShift.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(savedShift.getDate());
 
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
@@ -135,8 +149,8 @@ public class ShiftEmployeeService {
 
 
 
-    // TẠO ALL SHIFTS CHO ALL STYLISTS
-    public List<ShiftEmployeeResponse> createAllShiftEmployees(){
+    // TẠO ALL SHIFTS CHO ALL STYLISTS -> MANAGER LÀM
+    public List<ShiftEmployeeResponse> generateAllShiftEmployees(){
         String role = "Stylist";
         String status = "Workday";
         List<ShiftEmployeeResponse> allShiftEmployeeResponseList = new ArrayList<>();
@@ -144,17 +158,33 @@ public class ShiftEmployeeService {
                 .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
         if(accountForEmployeeList != null) {
             for(AccountForEmployee accountForEmployee : accountForEmployeeList){
-                List<ShiftEmployeeResponse> shiftEmployeeResponseList = createNewShiftEmployee(accountForEmployee);
+                List<ShiftEmployeeResponse> shiftEmployeeResponseList = generateShiftEmployee(accountForEmployee);
                 allShiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
             }
+            return allShiftEmployeeResponseList;
         } else {
             throw new EntityNotFoundException("Can not execute!");
         }
     }
 
+    public List<ShiftEmployee> getAllShift(){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll();
+        return shiftEmployeeList;
+    }
+
+    public String getShift(long id){
+        ShiftEmployee shiftEmployee = shiftEmployeeRepository.findShiftEmployeeById(id);
+        if(shiftEmployee.getSlots() != null){
+            Slot slot = shiftEmployee.getSlots().get(0);
+            String a = slot.getStartSlot();
+            return a;
+        }
+        return null;
+    }
 
 
 
+/* => COMMENT TẠM THỜI
 
     //xóa shift -> STYLIST LÀM KHI NÓ MUỐN HỦY SHIFT, NHƯNG PHẢI THÔNG BÁO CHO MANAGER TRƯỚC
     // APP TỰ HỦY CÁC SLOT CỦA STYLIST
@@ -189,10 +219,10 @@ public class ShiftEmployeeService {
                 appointment.add("NO APPOINTMENT FOUND");
             }
             // GENERATE RESPONSE
-            /*ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
+            *//*ShiftEmployeeResponse shiftEmployeeResponse = modelMapper.map(shiftEmployee, ShiftEmployeeResponse.class);
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
-            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());*/
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());*//*
 
             return appointment;  // TRẢ VỀ THÔNG BÁO XÓA THÀNH CÔNG VÀ DANH SÁCH CÁC APPOINTMENT (NẾU CÓ)
         } else {
@@ -308,7 +338,7 @@ public class ShiftEmployeeService {
     }
 
 
-    /*//HÀM NÀY TRẢ VỀ DANH SÁCH CÁC THỨ TRONG TUẦN
+    //*//*/HÀM NÀY TRẢ VỀ DANH SÁCH CÁC THỨ TRONG TUẦN
     public List<String> getAllDaysInWeek(){
         List<String> days = new ArrayList<>();
         days.add("MONDAY");
@@ -318,9 +348,9 @@ public class ShiftEmployeeService {
         days.add("FRIDAY");
         days.add("SATURDAY");
         return days;
-    }*/
+    }
 
-    /*// CHECK XEM DAY CỦA STYLIST LÀ Ỏ THỨ TỰ NÀO TRÊN LIST
+    // CHECK XEM DAY CỦA STYLIST LÀ Ỏ THỨ TỰ NÀO TRÊN LIST
     public int checkDay(String day){
         int number = 0; // STT
         List<String> days = getAllDaysInWeek();
@@ -331,7 +361,7 @@ public class ShiftEmployeeService {
             }
         }
         return number;
-    }*/
+    }*//*
 
     //HÀM NÀY LẤY RA TOÀN BỘ DANH SÁCH CA LÀM VIỆC CỦA STYLIST, TOÀN BỘ CA TRONG TUẦN MÀ KHÔNG QUAN TÂM HIỆN TẠI LÀ THỨ MẤY
     //KHÁCH HÀNG TỰ HIỂU QUY TẮC LÀ KHÔNG ĐƯỢC CHỌN TRONG NGÀY VÀ TRƯỚC NGÀY
@@ -352,5 +382,5 @@ public class ShiftEmployeeService {
         }
         return shiftEmployeeResponseList;
     }
-
+    */ //=> COMMENT TẠM THỜI
 }

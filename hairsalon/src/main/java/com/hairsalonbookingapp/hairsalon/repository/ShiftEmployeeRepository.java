@@ -7,9 +7,9 @@ import java.util.List;
 
 public interface ShiftEmployeeRepository extends JpaRepository<ShiftEmployee, Long> {
     ShiftEmployee findShiftEmployeeById(long id);
-    List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_IdAndIsAvailableTrue(String employeeId);
+    /*List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_IdAndIsAvailableTrue(String employeeId);
     List<ShiftEmployee> findShiftEmployeesByAccountForEmployee_Id(String employeeId);
     List<ShiftEmployee> findShiftEmployeesByShiftInWeek_DayOfWeekAndIsAvailableTrue(String dayOfWeek);
     ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndNameAndIsAvailableTrue(String dayOfWeek, String name);
-    ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndName(String dayOfWeek, String name);
+    ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndName(String dayOfWeek, String name);*/
 }
