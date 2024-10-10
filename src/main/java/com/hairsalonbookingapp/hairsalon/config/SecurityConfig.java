@@ -1,15 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.config;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
-import com.hairsalonbookingapp.hairsalon.model.RequestEditProfileCustomer;
-import com.hairsalonbookingapp.hairsalon.model.RequestEditProfileEmployee;
-import com.hairsalonbookingapp.hairsalon.model.RequestSoftwareSupportApplication;
 import com.hairsalonbookingapp.hairsalon.service.AuthenticationService;
 import org.modelmapper.ModelMapper;
-import org.modelmapper.TypeMap;
-import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;

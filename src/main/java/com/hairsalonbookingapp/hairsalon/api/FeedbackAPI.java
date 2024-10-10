@@ -1,20 +1,14 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramInfoResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackListResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
+import com.hairsalonbookingapp.hairsalon.model.response.FeedbackListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.FeedbackResponse;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/feedback")

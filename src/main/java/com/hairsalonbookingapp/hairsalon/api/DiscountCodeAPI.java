@@ -1,16 +1,17 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.model.*;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountCode;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountCode;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeInfResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateDiscountCodeResponse;
 import com.hairsalonbookingapp.hairsalon.service.DiscountCodeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/discountCode")

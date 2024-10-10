@@ -78,6 +78,10 @@ public class AccountForEmployee implements UserDetails {
 
     private Date createdAt;
 
+    @OneToMany(mappedBy = "accountForEmployee")
+    @JsonIgnore
+    private List<ShiftEmployee> shiftEmployees;
+
     @NotBlank(message = "Password can not blank!", groups = CreatedBy.class)
     @Size(min = 6, message = "Password must be more than 6 characters")
     private String password;

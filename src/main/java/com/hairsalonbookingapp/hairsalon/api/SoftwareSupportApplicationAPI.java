@@ -1,17 +1,16 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.entity.SoftwareSupportApplication;
-import com.hairsalonbookingapp.hairsalon.model.*;
-import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestSoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateSoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.response.SoftwareSupportApplicationListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.SoftwareSupportApplicationResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateSoftwareSupportApplicationResponse;
 import com.hairsalonbookingapp.hairsalon.service.SoftwareSupportApplicationService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/softwareSupportApplication")
@@ -35,14 +34,14 @@ public class SoftwareSupportApplicationAPI {
     }
 
     @GetMapping("/customers")
-    public ResponseEntity getAllSoftwareSupportApplicationOfCustomer(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfCustomer();
+    public ResponseEntity getAllSoftwareSupportApplicationOfCustomer(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SoftwareSupportApplicationListResponse softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfCustomer(page, size);
         return ResponseEntity.ok(softwareSupportApplications);
     }
 
     @GetMapping("/employees")
-    public ResponseEntity getAllSoftwareSupportApplicationOfEmployee(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfEmployee();
+    public ResponseEntity getAllSoftwareSupportApplicationOfEmployee(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SoftwareSupportApplicationListResponse softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfEmployee(page, size);
         return ResponseEntity.ok(softwareSupportApplications);
     }
 

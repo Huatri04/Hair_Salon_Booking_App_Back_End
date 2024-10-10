@@ -1,13 +1,14 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,13 +17,19 @@ import java.util.Date;
 public class ShiftInWeek {
     @Id
     @Column(unique = true, nullable = false)
-    private Date dayOfWeek;
+    private String dayOfWeek;
 
+    @NotBlank(message = "Start hour must not be blank!")
+    @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Invalid time!")
     private Date startHour;
 
-    private String shiftEmployee;
+    @OneToMany(mappedBy = "shiftInWeek")
+    @JsonIgnore
+    private List<ShiftEmployee> shiftEmployees;
 
+    @NotBlank(message = "End hour must not be blank!")
+    @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Invalid time!")
     private Date endHour;
 
-    private Date dateOfRequest;
+    private boolean isAvailable = true;
 }

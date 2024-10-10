@@ -1,23 +1,22 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
-import com.hairsalonbookingapp.hairsalon.model.*;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountprogram;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountProgram;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramInfoResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateDiscountProgramResponse;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 @Service

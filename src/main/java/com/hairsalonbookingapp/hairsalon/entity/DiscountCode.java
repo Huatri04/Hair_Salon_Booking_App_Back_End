@@ -21,7 +21,8 @@ public class DiscountCode {
     @JoinColumn(name = "phoneNumber", nullable = true) // day la foreign key
     private AccountForCustomer customer;
 
-    private  String appointmentId;
+    @OneToOne(mappedBy = "discountCode")
+    private Appointment appointment;
 
     private boolean isDeleted = false;
 }

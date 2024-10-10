@@ -1,17 +1,17 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.model.*;
-import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountprogram;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountProgram;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramInfoResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountProgramResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateDiscountProgramResponse;
 import com.hairsalonbookingapp.hairsalon.service.DiscountProgramService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/discountProgram")

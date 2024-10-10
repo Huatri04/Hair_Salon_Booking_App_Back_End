@@ -1,14 +1,11 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramInfoResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackListResponse;
-import com.hairsalonbookingapp.hairsalon.model.FeedbackResponse;
-import com.hairsalonbookingapp.hairsalon.model.RequestFeedback;
+import com.hairsalonbookingapp.hairsalon.model.response.FeedbackListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.FeedbackResponse;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestFeedback;
 import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,9 +14,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class FeedbackService {

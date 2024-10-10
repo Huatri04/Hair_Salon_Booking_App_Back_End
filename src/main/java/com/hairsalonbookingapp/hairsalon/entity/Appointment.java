@@ -1,9 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,20 +12,34 @@ import java.util.Date;
 @Table(name = "Appointment")
 public class Appointment {
     @Id
-    @Column(unique = true, nullable = false)
-    private String appointmentId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long appointmentId;
 
-    private Date date;
+    private double cost;
 
-    private int slot;
+    private String status = "Appointment sent!";
 
-    private String status;
-
-    private String serviceStylistSupport;
+    private boolean isCompleted = false;
 
     private boolean isDeleted = false;
 
-    private String discountCode;
+    private Date date;
 
-    private String Customer;
+    @OneToOne
+    @JoinColumn(name = "slotId")
+    private Slot slot;
+
+    @ManyToOne
+    @JoinColumn(name = "CustomerId")
+    private AccountForCustomer accountForCustomer;
+
+    @ManyToOne
+    @JoinColumn(name = "ServiceId")
+    private HairSalonService hairSalonService;
+
+    @OneToOne
+    @JoinColumn(name = "discountCodeId")     // MÃ GIẢM GIÁ
+    private DiscountCode discountCode;
+
+
 }

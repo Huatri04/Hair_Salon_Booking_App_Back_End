@@ -16,10 +16,12 @@ public interface SoftwareSupportApplicationRepository extends JpaRepository<Soft
     List<SoftwareSupportApplication> findSoftwareSupportApplicationsByIsDeletedFalse();
 
     // Lấy tất cả các ứng dụng hỗ trợ phần mềm của Customer với isDeleted = false
-    List<SoftwareSupportApplication> findByCustomerIsNotNullAndIsDeletedFalse();
+//    List<SoftwareSupportApplication> findByCustomerIsNotNullAndIsDeletedFalse();
+    Page<SoftwareSupportApplication> findSoftwareSupportApplicationsByCustomerIsNotNullAndIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     // Lấy tất cả các ứng dụng hỗ trợ phần mềm của Employee với isDeleted = false
     List<SoftwareSupportApplication> findByEmployeeIsNotNullAndIsDeletedFalse();
+    Page<SoftwareSupportApplication> findSoftwareSupportApplicationsByEmployeeIsNotNullAndIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 
     Page<SoftwareSupportApplication> findSoftwareSupportApplicationsByIsDeletedFalseOrderByCreatedAtDesc(Pageable pageable);
 }

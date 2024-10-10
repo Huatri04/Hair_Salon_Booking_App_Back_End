@@ -2,8 +2,9 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.model.*;
-import com.hairsalonbookingapp.hairsalon.repository.FeedbackRepository;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestTransaction;
+import com.hairsalonbookingapp.hairsalon.model.response.TransactionListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.TransactionResponse;
 import com.hairsalonbookingapp.hairsalon.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +13,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class TransactionService {

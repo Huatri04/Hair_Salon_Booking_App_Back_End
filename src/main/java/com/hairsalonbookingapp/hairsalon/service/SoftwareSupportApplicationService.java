@@ -3,7 +3,11 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
-import com.hairsalonbookingapp.hairsalon.model.*;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestSoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateSoftwareSupportApplication;
+import com.hairsalonbookingapp.hairsalon.model.response.SoftwareSupportApplicationListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.SoftwareSupportApplicationResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateSoftwareSupportApplicationResponse;
 import com.hairsalonbookingapp.hairsalon.repository.SoftwareSupportApplicationRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +16,6 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
-import java.util.List;
 
 @Service
 public class SoftwareSupportApplicationService {
@@ -138,16 +141,16 @@ public class SoftwareSupportApplicationService {
     }
 
     // show list of SoftwareSupportApplication cua customer
-    public List<SoftwareSupportApplication> getAllSoftwareSupportApplicationOfCustomer(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
-        return softwareSupportApplications;
-//        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
-//        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
-//        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
-//        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
-//        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
-//        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
-//        return softwareSupportApplicationListResponse;
+    public SoftwareSupportApplicationListResponse getAllSoftwareSupportApplicationOfCustomer(int page, int size){
+//        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
+//        return softwareSupportApplications;
+        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByCustomerIsNotNullAndIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
+        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
+        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
+        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
+        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
+        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
+        return softwareSupportApplicationListResponse;
     }
 
     //GET PROFILE SoftwareSupportApplication
@@ -157,9 +160,16 @@ public class SoftwareSupportApplicationService {
     }
 
     // show list of SoftwareSupportApplication cua employee
-    public List<SoftwareSupportApplication> getAllSoftwareSupportApplicationOfEmployee(){
-        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByEmployeeIsNotNullAndIsDeletedFalse();
-        return softwareSupportApplications;
+    public SoftwareSupportApplicationListResponse getAllSoftwareSupportApplicationOfEmployee(int page, int size){
+//        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByEmployeeIsNotNullAndIsDeletedFalse();
+//        return softwareSupportApplications;
+        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findSoftwareSupportApplicationsByEmployeeIsNotNullAndIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
+        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
+        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
+        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
+        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
+        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
+        return softwareSupportApplicationListResponse;
     }
 
 }

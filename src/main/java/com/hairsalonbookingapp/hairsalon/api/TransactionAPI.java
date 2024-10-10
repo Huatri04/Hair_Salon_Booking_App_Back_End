@@ -1,17 +1,14 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
-import com.hairsalonbookingapp.hairsalon.entity.Transaction;
-import com.hairsalonbookingapp.hairsalon.model.*;
-import com.hairsalonbookingapp.hairsalon.service.FeedbackService;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestTransaction;
+import com.hairsalonbookingapp.hairsalon.model.response.TransactionListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.TransactionResponse;
 import com.hairsalonbookingapp.hairsalon.service.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/transaction")

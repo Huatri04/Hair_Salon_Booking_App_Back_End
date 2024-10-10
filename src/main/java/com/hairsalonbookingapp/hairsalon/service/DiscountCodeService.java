@@ -3,10 +3,14 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
-import com.hairsalonbookingapp.hairsalon.entity.Feedback;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
-import com.hairsalonbookingapp.hairsalon.model.*;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountCode;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountCode;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeInfResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeListResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.UpdateDiscountCodeResponse;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
@@ -15,7 +19,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
 import java.util.Optional;
 
 @Service
