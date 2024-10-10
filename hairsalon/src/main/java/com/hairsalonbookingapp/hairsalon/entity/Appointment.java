@@ -21,7 +21,7 @@ public class Appointment {
 
     private boolean isDeleted = false;  // CHỈ CUSTOMER ĐƯỢC PHÉP HỦY ĐƠN
 
-    private boolean isCompleted = false;  //
+    private boolean isCompleted = false;  // ĐƠN CHƯA HOÀN THÀNH
 
     @OneToOne
     @JoinColumn(name = "slotId")            // THỜI GIAN + STYLIST

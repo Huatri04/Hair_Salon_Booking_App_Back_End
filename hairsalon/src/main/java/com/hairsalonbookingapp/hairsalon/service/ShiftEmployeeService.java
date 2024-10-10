@@ -4,10 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
-import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
-import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
-import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
-import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -167,6 +164,7 @@ public class ShiftEmployeeService {
         }
     }
 
+    // MẤY HÀM DƯỚI TEST CHO VUI
     public List<ShiftEmployee> getAllShift(){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll();
         return shiftEmployeeList;
@@ -180,6 +178,27 @@ public class ShiftEmployeeService {
             return a;
         }
         return null;
+    }
+
+    // HÀM LẤY DANH SÁCH CÁC STYLIST VÀ THỜI GIAN KHẢ DỤNG
+    public List<AvailableSlot> getAllAvailableSlots(String date){
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository
+                .findShiftEmployeesByDateAndIsAvailableTrue(date);
+        List<AvailableSlot> availableSlotList = new ArrayList<>();
+        for (ShiftEmployee shiftEmployee : shiftEmployeeList) {
+            List<Slot> slotList = shiftEmployee.getSlots();
+            for (Slot slot : slotList) {
+                if(slot.isAvailable()) {
+                    // GENERATE RESPONSE
+                    AvailableSlot availableSlot = new AvailableSlot();
+                    availableSlot.setStylistName(slot.getShiftEmployee().getAccountForEmployee().getName());
+                    availableSlot.setStylistLevel(slot.getShiftEmployee().getAccountForEmployee().getStylistLevel());
+                    availableSlot.setStartHour(slot.getStartSlot());
+                    availableSlotList.add(availableSlot);
+                }
+            }
+        }
+        return availableSlotList;
     }
 
 
