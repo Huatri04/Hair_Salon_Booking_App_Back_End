@@ -15,4 +15,5 @@ public class ShiftEmployeeResponse {
     private String employeeId; // ID STYLIST
     private String name; // AI LÀM
     private boolean isAvailable;  // CÒN KHẢ DỤNG KHÔNG
+    private String date; // NGÀY NÀO
 }

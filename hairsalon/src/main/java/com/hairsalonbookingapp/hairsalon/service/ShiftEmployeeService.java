@@ -13,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -93,24 +94,47 @@ public class ShiftEmployeeService {
         return shiftEmployeeResponse;
     }*/
 
-    // TẠO SHIFT CHO STYLIST
-    public ShiftEmployeeResponse createNewShiftEmployee(AccountForEmployee accountForEmployee){
-        
+    // TẠO SHIFT CHO STYLIST -> DÙNG CHO HÀM DƯỚI
+    public List<ShiftEmployeeResponse> createNewShiftEmployee(AccountForEmployee accountForEmployee){
+        String days = accountForEmployee.getDays();
+        String[] daysOfWeek = days.split(","); // LIST CÁC NGÀY STYLIST CHỌN
+        List<LocalDate> nextWeekDays = timeService.getNextWeekDays(timeService.today); // LIST CÁC NGÀY TUẦN SAU
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(String day : daysOfWeek){
+            ShiftEmployee shiftEmployee = new ShiftEmployee();
+            ShiftInWeek shiftInWeek = shiftWeekRepository
+                    .findShiftInWeekByDayOfWeekAndIsAvailableTrue(day);
+            shiftEmployee.setShiftInWeek(shiftInWeek);
+            shiftEmployee.setAccountForEmployee(accountForEmployee);
+
+            DayOfWeek dayOfWeek = DayOfWeek.valueOf(day);
+            shiftEmployee.setDate(dayOfWeek);
+            ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
+            // GENERATE RESPONSE
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(newShiftEmployee.getId());
+            shiftEmployeeResponse.setAvailable(newShiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(newShiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(newShiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(newShiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+        return shiftEmployeeResponseList;
     }
 
 
 
-    // TẠO SHIFT CHO STYLIST
-    public ShiftEmployeeResponse createAllShiftEmployees(){
+    // TẠO ALL SHIFTS CHO ALL STYLISTS
+    public List<ShiftEmployeeResponse> createAllShiftEmployees(){
         String role = "Stylist";
         String status = "Workday";
+        List<ShiftEmployeeResponse> AllshiftEmployeeResponseList = new ArrayList<>();
         List<AccountForEmployee> accountForEmployeeList = employeeRepository
                 .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
         if(accountForEmployeeList != null) {
             for(AccountForEmployee accountForEmployee : accountForEmployeeList){
-                String days = accountForEmployee.getDays();
-                String[] day = days.split(",");
-
+                List<ShiftEmployeeResponse> shiftEmployeeResponseList = createNewShiftEmployee(accountForEmployee);
+                AllshiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
             }
         } else {
             throw new EntityNotFoundException("Can not execute!");

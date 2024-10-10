@@ -20,6 +20,7 @@ public class ShiftEmployee { // DO STYLIST LÀM
                                          // NẾU STYLIST CHỌN KHÔNG LÀM TUẦN NÀY NỮA THÌ MANAGER GHI FALSE
 
     //private boolean isCompleted = false;
+    private String date; // NGÀY THEO ĐỊNH DẠNG Y/M/D
 
     @ManyToOne
     @JoinColumn(name = "dayInWeek")

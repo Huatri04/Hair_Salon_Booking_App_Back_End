@@ -42,32 +42,6 @@ public class SlotService {
     @Autowired
     AppointmentRepository appointmentRepository;
 
-    /*try{
-                //Chia khung thời gian thành các khoảng nhỏ
-                ShiftEmployee shiftEmployee = shiftEmployeeRepository.findShiftEmployeeById(shiftEmployee_Id); // lấy shift employee
-                ShiftInWeek shiftInWeek = shiftEmployee.getShiftInWeek(); // lấy shift week
-                String startHour = shiftInWeek.getStartHour(); // lấy start hour   // 08:00
-                String endHour = shiftInWeek.getEndHour(); // lấy end hour    // 12:00
-                String partOfStartHour = startHour.substring(0,2); // lấy 08
-                String partOfEndHour = endHour.substring(0,2); // lấy 12
-                int startTime = Integer.parseInt(partOfStartHour); // chuyển sang int
-                int endTime = Integer.parseInt(partOfEndHour); // chuyển sang int
-                int duration = 60; // thời gian 1 slot
-                List<LocalTime> intervals = shiftWeekService.getTimes(startTime, endTime, duration);
-
-                for(long i = 1; i <= intervals.size(); i++){
-                    long slot_id = i;
-                    boolean status = true;
-                    Slot slot = modelMapper.map(status, Slot.class);
-                    slot.setShiftEmployee(shiftEmployee);
-                }
-                return slotRepository.save(slot);
-            } catch (Exception e) {
-                throw new DuplicateEntity("");
-            }*/
-
-
-
     //tạo slot -> STYLIST LÀM
     public List<SlotResponse> createSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH

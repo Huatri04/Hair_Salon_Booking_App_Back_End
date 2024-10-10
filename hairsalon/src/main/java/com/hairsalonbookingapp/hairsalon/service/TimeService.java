@@ -2,7 +2,9 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import org.springframework.stereotype.Service;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +53,35 @@ public class TimeService {
     // HÀM LẤY THỜI GIAN HIỆN TẠI (NGÀY, THÁNG, NĂM)
     public LocalDate getToday(){
         return LocalDate.now();
+    }
+
+    // HÀM LẤY NGÀY THÁNG CỦA TUẦN TIẾP THEO TÍNH TỪ NGÀY HIỆN TẠI
+    public List<LocalDate> getNextWeekDays(LocalDate date) {
+        List<LocalDate> daysOfWeek = new ArrayList<>();
+
+        // Tìm thứ 2 của tuần tiếp theo
+        LocalDate nextMonday = date.with(TemporalAdjusters.next(DayOfWeek.MONDAY));
+
+        // Thêm từng ngày từ thứ 2 đến chủ nhật vào danh sách
+        for (int i = 0; i < 7; i++) {
+            daysOfWeek.add(nextMonday.plusDays(i));
+        }
+
+        return daysOfWeek;
+    }
+
+    // HÀM LỌC NGÀY
+    public static List<LocalDate> filterDays(List<LocalDate> dates, ) {
+        List<LocalDate> result = new ArrayList<>();
+
+        for (LocalDate date : dates) {
+            // Nếu là thứ 2 hoặc thứ 6, thêm vào danh sách kết quả
+            if (date.getDayOfWeek() == DayOfWeek.MONDAY || date.getDayOfWeek() == DayOfWeek.FRIDAY) {
+                result.add(date);
+            }
+        }
+
+        return result;
     }
 
 
