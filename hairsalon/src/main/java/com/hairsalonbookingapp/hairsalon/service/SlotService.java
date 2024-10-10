@@ -42,11 +42,14 @@ public class SlotService {
     @Autowired
     AppointmentRepository appointmentRepository;
 
-    //tạo slot -> STYLIST LÀM
-    public List<SlotResponse> createSlots(SlotRequest slotRequest){
+    @Autowired
+    TimeService timeService;
+
+    //TẠO SLOT
+    public List<Slot> createSlots(SlotRequest slotRequest){
         //   MỖI CA(SHIFT) CỦA 1 STYLIST NHẤT ĐỊNH SẼ CÓ SỐ SLOT NHẤT ĐỊNH
         List<Slot> list = new ArrayList<>();
-        List<LocalTime> localTimeList = shiftWeekService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration());
+        List<LocalTime> localTimeList = timeService.getSLots(slotRequest.getStartHour(), slotRequest.getEndHour(), slotRequest.getDuration());
         for(LocalTime time : localTimeList){
             if(time.equals(localTimeList.get(localTimeList.size() - 1))){
                 break;        // DỪNG NẾU TIME = ENDHOUR
@@ -58,20 +61,21 @@ public class SlotService {
                 list.add(newSlot);
             }
         }
-        //GENERATE LIST RESPONSE
+
+        return list;
+        /*//GENERATE LIST RESPONSE
         List<SlotResponse> responseList = new ArrayList<>();
         for(Slot slot : list){
-            //SlotResponse slotResponse = modelMapper.map(slot, SlotResponse.class);
             SlotResponse slotResponse = new SlotResponse();
             slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
             slotResponse.setId(slot.getId());
             slotResponse.setStartSlot(slot.getStartSlot());
-            slotResponse.setCompleted(slot.isCompleted());
+            slotResponse.setDate(slot.);
             slotResponse.setAvailable(slot.isAvailable());
 
             responseList.add(slotResponse);
-        }
-        return responseList;
+        }*/
+
     }
 
     // xem slot trong ngày dựa trên shiftEmployeeId -> STYLIST LÀM

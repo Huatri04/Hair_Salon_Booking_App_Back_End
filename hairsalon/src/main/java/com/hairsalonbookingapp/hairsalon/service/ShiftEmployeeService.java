@@ -96,19 +96,28 @@ public class ShiftEmployeeService {
 
     // TẠO SHIFT CHO STYLIST -> DÙNG CHO HÀM DƯỚI
     public List<ShiftEmployeeResponse> createNewShiftEmployee(AccountForEmployee accountForEmployee){
-        String days = accountForEmployee.getDays();
+        String days = accountForEmployee.getDays(); // LẤY CÁC NGÀY STYLIST CHỌN
         String[] daysOfWeek = days.split(","); // LIST CÁC NGÀY STYLIST CHỌN
         List<LocalDate> nextWeekDays = timeService.getNextWeekDays(timeService.today); // LIST CÁC NGÀY TUẦN SAU
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
         for(String day : daysOfWeek){
+            // TẠO MỚI SHIFT EMPLOYEE
             ShiftEmployee shiftEmployee = new ShiftEmployee();
             ShiftInWeek shiftInWeek = shiftWeekRepository
                     .findShiftInWeekByDayOfWeekAndIsAvailableTrue(day);
             shiftEmployee.setShiftInWeek(shiftInWeek);
             shiftEmployee.setAccountForEmployee(accountForEmployee);
-
+            // SET DAY
             DayOfWeek dayOfWeek = DayOfWeek.valueOf(day);
-            shiftEmployee.setDate(dayOfWeek);
+            for(LocalDate date : nextWeekDays){
+                if(date.getDayOfWeek() == dayOfWeek){
+                    shiftEmployee.setDate(date.toString());
+                    break;
+                }
+            }
+            // TẠO CÁC SLOT
+
+            // SAVE VÀO DB
             ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
             // GENERATE RESPONSE
             ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
@@ -117,6 +126,8 @@ public class ShiftEmployeeService {
             shiftEmployeeResponse.setEmployeeId(newShiftEmployee.getAccountForEmployee().getId());
             shiftEmployeeResponse.setName(newShiftEmployee.getAccountForEmployee().getName());
             shiftEmployeeResponse.setDayInWeek(newShiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(newShiftEmployee.getDate());
+
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
         return shiftEmployeeResponseList;
@@ -128,13 +139,13 @@ public class ShiftEmployeeService {
     public List<ShiftEmployeeResponse> createAllShiftEmployees(){
         String role = "Stylist";
         String status = "Workday";
-        List<ShiftEmployeeResponse> AllshiftEmployeeResponseList = new ArrayList<>();
+        List<ShiftEmployeeResponse> allShiftEmployeeResponseList = new ArrayList<>();
         List<AccountForEmployee> accountForEmployeeList = employeeRepository
                 .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
         if(accountForEmployeeList != null) {
             for(AccountForEmployee accountForEmployee : accountForEmployeeList){
                 List<ShiftEmployeeResponse> shiftEmployeeResponseList = createNewShiftEmployee(accountForEmployee);
-                AllshiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
+                allShiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
             }
         } else {
             throw new EntityNotFoundException("Can not execute!");

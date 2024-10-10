@@ -87,7 +87,7 @@ public class ShiftWeekService {
         return shift;
     }*/
 
-    //chia các slot -> HỖ TRỢ HÀM DƯỚI
+    /*//chia các slot -> HỖ TRỢ HÀM DƯỚI
     public List<LocalTime> getTimeIntervals(LocalTime startTime, LocalTime endTime, Duration interval) {
         List<LocalTime> timeIntervals = new ArrayList<>();
 
@@ -110,7 +110,7 @@ public class ShiftWeekService {
 
         List<LocalTime> intervals = getTimeIntervals(startTime, endTime, interval);
         return intervals;
-    }
+    }*/
 
     //RESTART SHIFT -> MANAGER LÀM
     public ShiftWeekResponse restartShift(String dayOfWeek){

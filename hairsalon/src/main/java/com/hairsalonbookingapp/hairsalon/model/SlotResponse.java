@@ -11,5 +11,5 @@ public class SlotResponse {
     private String startSlot;
     private boolean isAvailable;
     private long shiftEmployeeId;
-    private boolean isCompleted;
+    private String date;
 }

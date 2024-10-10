@@ -3,7 +3,9 @@ package com.hairsalonbookingapp.hairsalon.service;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
@@ -70,7 +72,7 @@ public class TimeService {
         return daysOfWeek;
     }
 
-    // HÀM LỌC NGÀY
+    /*// HÀM LỌC NGÀY
     public static List<LocalDate> filterDays(List<LocalDate> dates, ) {
         List<LocalDate> result = new ArrayList<>();
 
@@ -82,6 +84,31 @@ public class TimeService {
         }
 
         return result;
+    }*/
+
+    //chia các slot -> HỖ TRỢ HÀM DƯỚI
+    public List<LocalTime> getTimeIntervals(LocalTime startTime, LocalTime endTime, Duration interval) {
+        List<LocalTime> timeIntervals = new ArrayList<>();
+
+        // Bắt đầu từ startTime và thêm vào danh sách các khoảng thời gian đều nhau
+        LocalTime currentTime = startTime;
+        while (!currentTime.isAfter(endTime)) {
+            timeIntervals.add(currentTime);
+            currentTime = currentTime.plus(interval); // Tăng thời gian lên theo khoảng thời gian interval
+        }
+
+        return timeIntervals;
+    }
+
+    // chia slot dựa vào giờ bắt đầu và kết thúc
+    public List<LocalTime> getSLots(int startHour, int endHour, long duration){
+        LocalTime startTime = LocalTime.of(startHour, 0);
+        LocalTime endTime = LocalTime.of(endHour, 0);
+
+        Duration interval = Duration.ofMinutes(duration);
+
+        List<LocalTime> intervals = getTimeIntervals(startTime, endTime, interval);
+        return intervals;
     }
 
 
