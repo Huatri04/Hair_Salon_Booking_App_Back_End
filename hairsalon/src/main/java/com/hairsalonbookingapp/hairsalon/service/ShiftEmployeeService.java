@@ -198,7 +198,7 @@ public class ShiftEmployeeService {
         for (ShiftEmployee shiftEmployee : shiftEmployeeList) {
             List<Slot> slotList = shiftEmployee.getSlots();
             for (Slot slot : slotList) {
-                if(slot.isAvailable()) {
+                if(slot.isAvailable()) {   // SLOT CÒN TRỐNG
                     // GENERATE RESPONSE
                     AvailableSlot availableSlot = new AvailableSlot();
                     availableSlot.setSlotId(slot.getId());
@@ -211,7 +211,6 @@ public class ShiftEmployeeService {
         }
         return availableSlotList;
     }
-
 
 
 /* => COMMENT TẠM THỜI
