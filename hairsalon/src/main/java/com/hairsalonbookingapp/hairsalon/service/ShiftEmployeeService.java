@@ -101,6 +101,7 @@ public class ShiftEmployeeService {
         String days = accountForEmployee.getDays(); // LẤY CÁC NGÀY STYLIST CHỌN
         String[] daysOfWeek = days.split(","); // LIST CÁC NGÀY STYLIST CHỌN
         List<LocalDate> nextWeekDays = timeService.getNextWeekDays(timeService.today); // LIST CÁC NGÀY TUẦN SAU
+        List<ShiftEmployee> shiftEmployeeList = new ArrayList<>();
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
         for(String day : daysOfWeek){
             // TẠO MỚI SHIFT EMPLOYEE
@@ -130,6 +131,10 @@ public class ShiftEmployeeService {
             newShiftEmployee.setSlots(slotList);
             // SAVE LẠI VÀO DB
             ShiftEmployee savedShift = shiftEmployeeRepository.save(newShiftEmployee);
+
+            //ADD TO ACCOUNT FOR EMPLOYEE => MỘT STYLIST CÓ NHIỀU SHIFTS
+            shiftEmployeeList.add(savedShift);
+
             // GENERATE RESPONSE
             ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
             shiftEmployeeResponse.setId(savedShift.getId());
@@ -141,6 +146,11 @@ public class ShiftEmployeeService {
 
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
+
+        // LƯU LẠI ACCOUNT FOR EMPLOYEE
+        accountForEmployee.setShiftEmployees(shiftEmployeeList);
+        AccountForEmployee savedAccount = employeeRepository.save(accountForEmployee);
+
         return shiftEmployeeResponseList;
     }
 
