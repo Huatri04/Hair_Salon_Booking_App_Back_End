@@ -115,5 +115,13 @@ public class TimeService {
         return intervals;
     }
 
+    // HÀM TRẢ VỀ NGÀY HÔM NAY VÀ NGÀY MAI
+    public List<LocalDate> getTodayAndNextDay(){
+        List<LocalDate> list = new ArrayList<>();
+        list.add(today);
+        list.add(today.plusDays(1));
+        return list;
+    }
+
 
 }

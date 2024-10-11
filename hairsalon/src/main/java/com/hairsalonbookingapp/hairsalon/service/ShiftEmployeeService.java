@@ -164,7 +164,7 @@ public class ShiftEmployeeService {
         }
     }
 
-    // MẤY HÀM DƯỚI TEST CHO VUI
+    // 2 HÀM DƯỚI TEST CHO VUI
     public List<ShiftEmployee> getAllShift(){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll();
         return shiftEmployeeList;
@@ -180,7 +180,7 @@ public class ShiftEmployeeService {
         return null;
     }
 
-    // HÀM LẤY DANH SÁCH CÁC STYLIST VÀ THỜI GIAN KHẢ DỤNG
+    // HÀM LẤY DANH SÁCH CÁC STYLIST VÀ THỜI GIAN KHẢ DỤNG DỰA TRÊN NGÀY
     public List<AvailableSlot> getAllAvailableSlots(String date){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository
                 .findShiftEmployeesByDateAndIsAvailableTrue(date);
