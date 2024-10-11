@@ -54,16 +54,6 @@ public class AppointmentService {
 
     // CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
 
-/*
-    public HairSalonService getService(long serviceId) {        // HÀM LẤY SERVICE
-        HairSalonService service = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(serviceId);
-        if(service != null){
-            return service;
-        } else {
-            throw new EntityNotFoundException("Service not found!");
-        }
-    }
-
     //CUSTOMER XEM VÀ CHỌN STYLIST
     /*public List<StylistInfo> getAllStylistInFo() {
         List<StylistInfo> list = authenticationService.getAllStylist();
@@ -72,19 +62,8 @@ public class AppointmentService {
 
     //  CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
 
-    /*public AccountForEmployee getStylist(String stylistId) {// HÀM LẤY STYLIST
-        String status = "Workday";
-        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistId, status);
-        if(account != null){
-            return account;
-        } else {
-            throw new EntityNotFoundException("Stylist not found!");
-        }
-    }*/
-
     //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
     // CHỨC NĂNG getAvailableShiftEmployees(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST
-
 
     //HÀM DƯỚI LÀ TÍNH CHÍNH XÁC THEO THỜI GIAN THỰC ĐỂ XEM KHÁCH CÒN NHỮNG NGÀY KHẢ DỤNG NÀO, NHƯNG SẼ KHÓ TEST NÊN TẠM THỜI KHÔNG LÀM
     /*public List<String> getAvailableShiftEmployee(String stylistId){
@@ -103,18 +82,6 @@ public class AppointmentService {
     // CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
 
 
-
-    /*public Slot getAvailableSlot(long slotId) {   // HÀM LẤY SLOT
-        Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
-        if(slot != null){
-            *//*slot.setAvailable(false);
-            Slot newSlot = slotRepository.save(slot);*//*
-            return slot;
-        } else {
-            throw new EntityNotFoundException("Slot not found!");
-        }
-    }*/
-
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
     /*public DiscountCode getDiscountCode(String DiscountCodeId) {    // HÀM LẤY MÃ GIẢM GIÁ -> CẦN COI LẠI
         DiscountCode discountCode = discountCodeRepository.findDiscountCodeById(DiscountCodeId);
@@ -124,7 +91,7 @@ public class AppointmentService {
             throw new EntityNotFoundException("Invalid code");
         }
     }*/
-
+/*
     //HỆ THỐNG CHỐT
     /*public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {

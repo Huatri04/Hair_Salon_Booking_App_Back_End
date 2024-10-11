@@ -191,6 +191,7 @@ public class ShiftEmployeeService {
                 if(slot.isAvailable()) {
                     // GENERATE RESPONSE
                     AvailableSlot availableSlot = new AvailableSlot();
+                    availableSlot.setSlotId(slot.getId());
                     availableSlot.setStylistName(slot.getShiftEmployee().getAccountForEmployee().getName());
                     availableSlot.setStylistLevel(slot.getShiftEmployee().getAccountForEmployee().getStylistLevel());
                     availableSlot.setStartHour(slot.getStartSlot());

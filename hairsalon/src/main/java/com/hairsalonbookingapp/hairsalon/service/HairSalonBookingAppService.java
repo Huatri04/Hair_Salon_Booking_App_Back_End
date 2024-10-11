@@ -121,4 +121,15 @@ public class HairSalonBookingAppService {
     }
 
 
+    // HÀM LẤY SERVICE
+    public HairSalonService getService(long serviceId) {
+        HairSalonService service = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(serviceId);
+        if(service != null){
+            return service;
+        } else {
+            throw new EntityNotFoundException("Service not found!");
+        }
+    }
+
+
 }

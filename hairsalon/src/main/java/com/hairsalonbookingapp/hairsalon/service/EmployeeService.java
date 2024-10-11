@@ -68,6 +68,18 @@ public class EmployeeService {
         }
     }
 
+    // HÀM LẤY STYLIST
+    public AccountForEmployee getStylist(String stylistId) {
+        String status = "Workday";
+        AccountForEmployee account = employeeRepository
+                .findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistId, status);
+        if(account != null){
+            return account;
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
+        }
+    }
+
 
 
 

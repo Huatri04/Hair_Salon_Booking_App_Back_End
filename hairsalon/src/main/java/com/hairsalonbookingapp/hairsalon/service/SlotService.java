@@ -258,5 +258,15 @@ public class SlotService {
         return slotResponseList;
     }*/ // COMMENT TẠM THỜI
 
+    // HÀM LẤY SLOT
+    public Slot getAvailableSlot(long slotId) {
+        Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
+        if(slot != null){
+            return slot;
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
+    }
+
 
 }
