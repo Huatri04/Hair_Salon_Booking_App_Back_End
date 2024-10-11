@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
@@ -23,6 +24,9 @@ public class DiscountService {
 
     @Autowired
     DiscountProgramRepository discountProgramRepository;
+
+    @Autowired
+    AuthenticationService authenticationService;
 
     @Autowired
     DiscountCodeRepository discountCodeRepository;
@@ -55,8 +59,9 @@ public class DiscountService {
     //tạo mới discount program -> MANAGER LÀM
     public DiscountProgramResponse createNewProgram(DiscountProgramRequest discountProgramRequest){
         try{
-            DiscountProgram newProgram = discountProgramRepository.save(modelMapper.map(discountProgramRequest, DiscountProgram.class));
-            return modelMapper.map(newProgram, DiscountProgramResponse.class);
+            DiscountProgram newProgram = modelMapper.map(discountProgramRequest, DiscountProgram.class);
+            DiscountProgram savedProgram = discountProgramRepository.save(newProgram);
+            return modelMapper.map(savedProgram, DiscountProgramResponse.class);
         } catch (Exception e){
             throw new DuplicateEntity("Duplicate name!");
         }
@@ -87,8 +92,8 @@ public class DiscountService {
                     oldProgram.setPercentage(discountProgramUpdate.getPercentage());
                 }
 
-                if(discountProgramUpdate.getAmount() > 0){
-                    oldProgram.setAmount(discountProgramUpdate.getAmount());
+                if(discountProgramUpdate.getPointRequest() > 0){
+                    oldProgram.setPointRequest(discountProgramUpdate.getPointRequest());
                 }
 
                 DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
@@ -103,9 +108,9 @@ public class DiscountService {
 
     //Start program -> MANAGER LÀM
     public DiscountProgramResponse startProgram(long id){
-        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "NotStart");
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "Not Start");
         if(oldProgram != null){
-            oldProgram.setStatus("In process");
+            oldProgram.setStatus("In Process");
             DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
             return modelMapper.map(newProgram, DiscountProgramResponse.class);
         } else {
@@ -115,7 +120,7 @@ public class DiscountService {
 
     //End program -> MANAGER LÀM
     public DiscountProgramResponse endProgram(long id){
-        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "In process");
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByIdAndStatus(id, "In Process");
         if(oldProgram != null){
             oldProgram.setStatus("Ended");
             DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
@@ -163,6 +168,46 @@ public class DiscountService {
             throw new DuplicateEntity("Duplicate code!");
         }
     }*/
+
+    // CUSTOMER ĐỔI ĐIỂM LẤY CODE
+    // numberOfTrade LÀ SỐ CODE MUỐN ĐỔI, VD: AN CÓ 1000 ĐIỂM, 1 CODE GIÁ 200, AN NHẬP 4 ĐỂ ĐỔI 800 LẤY 4 CODE
+    public List<DiscountCodeResponse> getDiscountCodes(int numberOfTrade, long programId){
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramById(programId);
+        double percentage = discountProgram.getPercentage();
+        long pointRequest = discountProgram.getPointRequest();
+
+        long pointToTrade = pointRequest * numberOfTrade;
+        while (pointToTrade > accountForCustomer.getPoint()) {
+            pointToTrade -= pointRequest;
+            numberOfTrade -= 1;
+        }
+
+        List<DiscountCode> discountCodeList = new ArrayList<>();
+        for(int i = 1; i <= numberOfTrade; i++){
+            DiscountCode discountCode = new DiscountCode();
+            discountCode.setAccountForCustomer(accountForCustomer);
+            discountCode.setDiscountCode(generateRandomCode());
+            discountCode.setDiscountProgram(discountProgram);
+            DiscountCode savedCode = discountCodeRepository.save(discountCode);
+            discountCodeList.add(savedCode);
+        }
+
+        // GENERATE RESPONSE
+        List<DiscountCodeResponse> discountCodeResponseList = new ArrayList<>();
+        for(DiscountCode code : discountCodeList){
+            DiscountCodeResponse discountCodeResponse = new DiscountCodeResponse();
+            discountCodeResponse.setId(code.getId());
+            discountCodeResponse.setCustomerName(code.getAccountForCustomer().getCustomerName());
+            discountCodeResponse.setDiscountCode(code.getDiscountCode());
+            discountCodeResponse.setPercentage(code.getDiscountProgram().getPercentage());
+            discountCodeResponse.setProgramName(code.getDiscountProgram().getName());
+
+            discountCodeResponseList.add(discountCodeResponse);
+        }
+
+        return discountCodeResponseList;
+    }
 
 
 

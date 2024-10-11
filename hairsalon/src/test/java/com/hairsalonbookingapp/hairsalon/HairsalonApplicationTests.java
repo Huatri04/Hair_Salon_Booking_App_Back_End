@@ -10,4 +10,5 @@ class HairsalonApplicationTests {
 	void contextLoads() {
 	}
 
+
 }

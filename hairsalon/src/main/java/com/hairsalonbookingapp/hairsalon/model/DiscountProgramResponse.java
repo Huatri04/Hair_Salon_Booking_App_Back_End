@@ -15,5 +15,5 @@ public class DiscountProgramResponse {
     private String endDate;
     private String status;
     private double percentage;
-    private int amount;
+    private long pointRequest;
 }

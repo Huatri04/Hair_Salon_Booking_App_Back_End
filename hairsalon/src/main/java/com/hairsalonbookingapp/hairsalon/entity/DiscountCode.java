@@ -8,16 +8,11 @@ import lombok.NoArgsConstructor;
 @Entity
 @NoArgsConstructor
 public class DiscountCode {
-    /*@Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long id;*/
-
     @Id
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private long id;
 
-    //private String discountCode;
-
-    //private boolean isAvailable = true;
+    private String discountCode;
 
     @ManyToOne
     @JoinColumn(name = "discountProgramId")

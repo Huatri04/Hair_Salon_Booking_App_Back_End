@@ -8,7 +8,9 @@ import lombok.Data;
 
 @Data
 public class DiscountCodeResponse {
-    private String id;
-    private long discountProgramId;
-    private String customerId; //PHONE NUMBER
+    private long id;
+    private String discountCode;
+    private double percentage;
+    private String programName;
+    private String customerName;
 }

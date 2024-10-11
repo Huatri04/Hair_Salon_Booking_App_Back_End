@@ -22,9 +22,8 @@ public class DiscountProgramUpdate {
     private String status;*/
 
     @Min(value = 0, message = "Percentage must be at least 0")
-    @Max(value = 100, message = "Percentage must be at most 100")
+    @Max(value = 100, message = "Percentage maximum is 100")
     private double percentage;
 
-    @Min(value = 0, message = "Invalid amount!")
-    private int amount;
+    private long pointRequest;
 }
