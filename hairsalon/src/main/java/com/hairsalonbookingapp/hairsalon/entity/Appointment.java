@@ -6,6 +6,8 @@ import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @Entity
 @NoArgsConstructor
@@ -31,9 +33,13 @@ public class Appointment {
     @JoinColumn(name = "CustomerId")        // KHÁCH ĐẶT
     AccountForCustomer accountForCustomer;
 
-    @ManyToOne
-    @JoinColumn(name = "ServiceId")         // DỊCH VỤ
-    HairSalonService hairSalonService;
+    @ManyToMany
+    @JoinTable(
+            name = "service_appointment", // Tên bảng trung gian
+            joinColumns = @JoinColumn(name = "appointment_id"), // Khóa ngoại từ bảng Appointment
+            inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại từ bảng Service
+    )
+    List<HairSalonService> hairSalonServices;
 
     @OneToOne
     @JoinColumn(name = "discountCodeId")     // MÃ GIẢM GIÁ
