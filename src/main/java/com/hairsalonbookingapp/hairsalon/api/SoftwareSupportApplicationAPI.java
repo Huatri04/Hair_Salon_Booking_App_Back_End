@@ -39,9 +39,21 @@ public class SoftwareSupportApplicationAPI {
         return ResponseEntity.ok(softwareSupportApplications);
     }
 
+    @GetMapping("/customer")
+    public ResponseEntity getAllSoftwareSupportApplicationOfAnCustomer(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SoftwareSupportApplicationListResponse softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfAnCustomer(page, size);
+        return ResponseEntity.ok(softwareSupportApplications);
+    }
+
     @GetMapping("/employees")
     public ResponseEntity getAllSoftwareSupportApplicationOfEmployee(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
         SoftwareSupportApplicationListResponse softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfEmployee(page, size);
+        return ResponseEntity.ok(softwareSupportApplications);
+    }
+
+    @GetMapping("/employee")
+    public ResponseEntity getAllSoftwareSupportApplicationOfAnEmployee(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SoftwareSupportApplicationListResponse softwareSupportApplications = softwareSupportApplicationService.getAllSoftwareSupportApplicationOfAnEmployee(page, size);
         return ResponseEntity.ok(softwareSupportApplications);
     }
 

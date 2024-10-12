@@ -54,6 +54,8 @@ public class SoftwareSupportApplicationService {
                 }
             }
 
+
+
             // Kiểm tra nếu cả customer và employee đều không được thiết lập
             if (softwareSupportApplication.getCustomer() == null && softwareSupportApplication.getEmployee() == null) {
                 throw new Duplicate("At least one of Customer or Employee must be set.");
@@ -153,6 +155,22 @@ public class SoftwareSupportApplicationService {
         return softwareSupportApplicationListResponse;
     }
 
+    // show list of SoftwareSupportApplication cua rieng 1 customer
+    public SoftwareSupportApplicationListResponse getAllSoftwareSupportApplicationOfAnCustomer(int page, int size){
+//        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
+//        return softwareSupportApplications;
+
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+
+        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findByCustomerAndIsDeletedFalseOrderByCreatedAtDesc(accountForCustomer, PageRequest.of(page, size));
+        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
+        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
+        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
+        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
+        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
+        return softwareSupportApplicationListResponse;
+    }
+
     //GET PROFILE SoftwareSupportApplication
     public SoftwareSupportApplicationResponse getInfoSoftwareSupportApplication(int id){
         SoftwareSupportApplication softwareSupportApplication = softwareSupportApplicationRepository.findSoftwareSupportApplicationBySoftwareSupportApplicationId(id);
@@ -172,4 +190,19 @@ public class SoftwareSupportApplicationService {
         return softwareSupportApplicationListResponse;
     }
 
+    // show list of SoftwareSupportApplication cua rieng 1 customer
+    public SoftwareSupportApplicationListResponse getAllSoftwareSupportApplicationOfAnEmployee(int page, int size){
+//        List<SoftwareSupportApplication> softwareSupportApplications = softwareSupportApplicationRepository.findByCustomerIsNotNullAndIsDeletedFalse();
+//        return softwareSupportApplications;
+
+        AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+
+        Page softwareSupportApplicationPage = softwareSupportApplicationRepository.findByEmployeeAndIsDeletedFalseOrderByCreatedAtDesc(accountForEmployee, PageRequest.of(page, size));
+        SoftwareSupportApplicationListResponse softwareSupportApplicationListResponse = new SoftwareSupportApplicationListResponse();
+        softwareSupportApplicationListResponse.setTotalPage(softwareSupportApplicationPage.getTotalPages());
+        softwareSupportApplicationListResponse.setContent(softwareSupportApplicationPage.getContent());
+        softwareSupportApplicationListResponse.setPageNumber(softwareSupportApplicationPage.getNumber());
+        softwareSupportApplicationListResponse.setTotalElement(softwareSupportApplicationPage.getTotalElements());
+        return softwareSupportApplicationListResponse;
+    }
 }

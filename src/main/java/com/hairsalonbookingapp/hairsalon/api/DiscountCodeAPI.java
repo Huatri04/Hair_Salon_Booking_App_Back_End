@@ -21,8 +21,8 @@ public class DiscountCodeAPI {
     @Autowired
     DiscountCodeService discountCodeService;
     @PostMapping("{id}")
-    public ResponseEntity createDiscountCode(@Valid @RequestBody RequestDiscountCode requestDiscountCode, @PathVariable int id){
-        DiscountCodeResponse discountCodeResponse = discountCodeService.createDiscountCode(requestDiscountCode, id);
+    public ResponseEntity createDiscountCode(@PathVariable int id){
+        DiscountCodeResponse discountCodeResponse = discountCodeService.createDiscountCode(id);
         return ResponseEntity.ok(discountCodeResponse);
     }
 

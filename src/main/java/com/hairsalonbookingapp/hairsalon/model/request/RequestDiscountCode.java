@@ -6,10 +6,7 @@ import lombok.Data;
 
 @Data
 public class RequestDiscountCode {
-    @Id
-    @Column(unique = true, nullable = false)
-    private String discountCodeId;
 
-    private  String appointmentId;
+
 
 }

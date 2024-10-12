@@ -12,11 +12,11 @@ public class RequestUpdateDiscountProgram {
 
     private String description;
 
+    private long pointChange; // so diem can doi cua chuong trinh
+
     private Date startedDate;
 
     private Date endedDate;
-
-    private long amount;
 
     private String status;
 

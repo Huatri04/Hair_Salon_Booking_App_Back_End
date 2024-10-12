@@ -93,7 +93,7 @@ public class Filter extends OncePerRequestFilter {
                 );
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
-            } else {
+            } else if(accountForEmployee != null){
                 UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(
                         accountForEmployee,
                         token,
@@ -101,6 +101,9 @@ public class Filter extends OncePerRequestFilter {
                 );
                 authenticationToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+            } else {
+                resolver.resolveException(request, response, null, new AuthException("Invalid token!"));
+                return;
             }
             //token ok, cho vào
             filterChain.doFilter(request, response);

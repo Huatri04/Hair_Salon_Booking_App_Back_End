@@ -26,9 +26,9 @@ public class DiscountProgram {
 
     private Date endedDate;
 
-    private long amount;
-
     private String img;
+
+    private long pointChange; // so diem can doi cua chuong trinh
 
     private String status;
 

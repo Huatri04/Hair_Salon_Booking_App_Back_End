@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
+import com.hairsalonbookingapp.hairsalon.exception.CreateException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountprogram;
@@ -33,14 +34,18 @@ public class DiscountProgramService {
         try{
 //            String newId = generateId();
 //            discountProgram.setDiscountProgramId(newId);
+            if (discountProgram.getPointChange() < 0) {
+                throw new CreateException("Point change must be large than 0!");
+            }
             DiscountProgram newDiscountProgram = discountProgramRepository.save(discountProgram);
             return modelMapper.map(newDiscountProgram, DiscountProgramResponse.class);
         } catch (Exception e) {
 //            if(e.getMessage().contains(discountProgram.getDiscountProgramId())){
 //                throw new Duplicate("duplicate discount program id! ");
 //            }
+            throw new Duplicate(e + "");
         }
-        return null;
+//        return null;
     }
 
 //    public String generateId() {
@@ -139,8 +144,8 @@ public class DiscountProgramService {
                     oldDiscountProgram.setPercentage(discountProgram.getPercentage());
                 }
 
-                if (discountProgram.getAmount() != 0) {
-                    oldDiscountProgram.setAmount(discountProgram.getAmount());
+                if (discountProgram.getPointChange() >= 0) {
+                    oldDiscountProgram.setPointChange(discountProgram.getPointChange());
                 }
 
                 // Lưu cập nhật vào cơ sở dữ liệu

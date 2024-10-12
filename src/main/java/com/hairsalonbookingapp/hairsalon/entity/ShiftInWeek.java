@@ -17,6 +17,7 @@ import java.util.List;
 public class ShiftInWeek {
     @Id
     @Column(unique = true, nullable = false)
+
     private String dayOfWeek;
 
     @NotBlank(message = "Start hour must not be blank!")
@@ -30,6 +31,8 @@ public class ShiftInWeek {
     @NotBlank(message = "End hour must not be blank!")
     @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Invalid time!")
     private Date endHour;
+
+    private Date DateApply;
 
     private boolean isAvailable = true;
 }
