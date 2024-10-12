@@ -337,4 +337,29 @@ public class AppointmentService {
     }
 
 
+    //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT
+    public String completeAppointment(CompleteAppointmentRequest completeAppointmentRequest){
+        Slot slot = slotRepository
+                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_IdAndDate(
+                        completeAppointmentRequest.getStartSlot(),
+                        completeAppointmentRequest.getStylistId(),
+                        completeAppointmentRequest.getDate()
+                );
+        if(slot != null){
+            Appointment appointment = slot.getAppointments();
+            appointment.setCompleted(true);
+            appointmentRepository.save(appointment);
+
+            slot.setAppointments(null);
+            slot.setAvailable(true);
+            slotRepository.save(slot);
+
+            String message = "Complete successfully!!!";
+            return message;
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
+    }
+
+
 }

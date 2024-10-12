@@ -16,7 +16,7 @@ public class Slot {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long id;  // ID CÓ THỂ GENERATE
 
-    private String startSlot;  // SLOT BẮT ĐẦU LÚC MẤY GIỜ
+    private String startSlot;  // SLOT BẮT ĐẦU LÚC MẤY GIỜ VD 08:00, 09:00
 
     /*@NotBlank(message = "Date must not be blank!")
     @Pattern(regexp = "^\\d{4}-\\d{2}-\\d{2}$\n", message = "Invalid date!")*/

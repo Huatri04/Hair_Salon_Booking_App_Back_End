@@ -15,7 +15,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/appointment")
 @SecurityRequirement(name = "api")
 public class AppointmentAPI {
 
@@ -28,42 +28,35 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointment);
     }*/
 
-/*
-    @PostMapping("/appointment")
+
+    @PostMapping
     public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
         AppointmentResponse appointment = appointmentService.createNewAppointment(appointmentRequest);
         return ResponseEntity.ok(appointment);
     }
 
-    @PutMapping("/appointment/id")
-    public ResponseEntity updateNewAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long id){
-        AppointmentResponse appointment = appointmentService.updateAppointment(appointmentUpdate, id);
-        return ResponseEntity.ok(appointment);
+    @PutMapping("/delete")
+    public ResponseEntity deleteAppointment(@Valid @RequestBody DeleteAppointmentRequest deleteAppointmentRequest){
+        String message = appointmentService.deleteAppointment(deleteAppointmentRequest);
+        return ResponseEntity.ok(message);
     }
 
-    @DeleteMapping("/appointment/id")
-    public ResponseEntity deleteAppointment(@PathVariable long id){
-        AppointmentResponse appointment = appointmentService.deleteAppointment(id);
-        return ResponseEntity.ok(appointment);
+    @PutMapping("/deleteAll")
+    public ResponseEntity daleteAllAppointments(@Valid @RequestBody DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
+        String message = appointmentService.deleteAppointmentsOfStylist(deleteAllAppointmentsRequest);
+        return ResponseEntity.ok(message);
     }
 
-    @GetMapping("/availableAppointment")
-    public ResponseEntity getAvailableAppointment(){
-        List<AppointmentResponse> appointments = appointmentService.viewAllAvailableAppointment();
+    @GetMapping
+    public ResponseEntity getAppointmentHistory(){
+        List<AppointmentResponse> appointments = appointmentService.checkAppointmentHistory();
         return ResponseEntity.ok(appointments);
     }
 
-    @PutMapping("/appointment/approve/{appointmentID}")
-    public ResponseEntity approveAppointment(@PathVariable long appointmentID){
-        AppointmentResponse appointment = appointmentService.approveAppointment(appointmentID);
-        return ResponseEntity.ok(appointment);
+    @PutMapping("/complete")
+    public ResponseEntity completeAppointment(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
+        String message = appointmentService.completeAppointment(completeAppointmentRequest);
+        return ResponseEntity.ok(message);
     }
-
-    @GetMapping("/appointment/check/{appointmentID}")
-    public ResponseEntity checkAppointment(@PathVariable long appointmentID){
-        AppointmentResponse appointment = appointmentService.checkAppointment(appointmentID);
-        return ResponseEntity.ok(appointment);
-    }
-*/
 
 }
