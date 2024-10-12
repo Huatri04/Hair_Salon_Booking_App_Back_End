@@ -4,15 +4,14 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.util.List;
+
 @Data
 @NoArgsConstructor
 public class AppointmentRequest {
-    @NotBlank(message = "StylistId must not be blank!")
-    String stylistId;
-
+    /*@NotBlank(message = "StylistId must not be blank!")
+    String stylistId;*/
     long slotId;
-
-    long serviceId;
-
-    String discountCodeId;
+    List<Long> serviceIdList;
+    String discountCode;
 }

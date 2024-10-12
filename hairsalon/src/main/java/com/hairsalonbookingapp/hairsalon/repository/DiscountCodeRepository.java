@@ -5,4 +5,5 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface DiscountCodeRepository extends JpaRepository<DiscountCode, Long> {
     DiscountCode findDiscountCodeById(long id);
+    DiscountCode findDiscountCodeByDiscountCode(String discountCode);
 }

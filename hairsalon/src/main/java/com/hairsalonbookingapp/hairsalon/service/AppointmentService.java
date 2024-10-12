@@ -47,57 +47,37 @@ public class AppointmentService {
     DiscountCodeRepository discountCodeRepository;
 
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
-    /*public List<HairSalonServiceResponse> getServiceList() {            // LẤY RA DANH SÁCH DỊCH VỤ KHẢ DỤNG
-        List<HairSalonServiceResponse> list = hairSalonBookingAppService.getAllAvailableService();
-        return list;
-    }*/
-
-    // CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
+    //- CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
 
     //CUSTOMER XEM VÀ CHỌN STYLIST
-    /*public List<StylistInfo> getAllStylistInFo() {
-        List<StylistInfo> list = authenticationService.getAllStylist();
-        return list;
-    }*/
+    //- CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
 
-    //  CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
-
-    //CUSTOMER CHỌN CA LÀM VIỆC (THỨ 2, 3,...) VÀ SLOT PHÙ HỢP
-    // CHỨC NĂNG getAvailableShiftEmployees(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST
-
-    //HÀM DƯỚI LÀ TÍNH CHÍNH XÁC THEO THỜI GIAN THỰC ĐỂ XEM KHÁCH CÒN NHỮNG NGÀY KHẢ DỤNG NÀO, NHƯNG SẼ KHÓ TEST NÊN TẠM THỜI KHÔNG LÀM
-    /*public List<String> getAvailableShiftEmployee(String stylistId){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getShiftsOfEmployee(stylistId);
-        List<String> daysOfWeek = new ArrayList<>();
-        for(ShiftEmployee shiftEmployee : shiftEmployeeList){
-            String dayOfWeek = shiftEmployee.getShiftInWeek().getDayOfWeek();
-            daysOfWeek.add(dayOfWeek);
-        }
-        LocalDate currentDate = LocalDate.now();
-        DayOfWeek dayInWeek = currentDate.getDayOfWeek();
-
-    }*/
+    //CUSTOMER XEM NGÀY HÔM NAY VÀ NGÀY TIẾP THEO CÓ CÁC CA LÀM VIỆC CỦA AI
+    //- CHỨC NĂNG getAllAvailableSlots(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST VÀ LỰA CHỌN
 
     // CUSTOMER CHỌN CÁC SLOT KHẢ DỤNG CỦA CA:
-    // CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
-
+    //- CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
 
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
-    /*public DiscountCode getDiscountCode(String DiscountCodeId) {    // HÀM LẤY MÃ GIẢM GIÁ -> CẦN COI LẠI
-        DiscountCode discountCode = discountCodeRepository.findDiscountCodeById(DiscountCodeId);
-        if(discountCode != null){
+    public DiscountCode getDiscountCode(String code) {    // HÀM LẤY MÃ GIẢM GIÁ
+        DiscountCode discountCode = discountCodeRepository.findDiscountCodeByDiscountCode(code);
+        if(discountCode != null && discountCode.getAppointment() == null){
             return discountCode;
         } else {
-            throw new EntityNotFoundException("Invalid code");
+            throw new EntityNotFoundException("Code not available!");
         }
-    }*/
-/*
+    }
+
     //HỆ THỐNG CHỐT
-    /*public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
+    public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {
+            List<Long> serviceIdList = new ArrayList<>();  // NGƯỜI DÙNG CHỌN NHIỀU LOẠI DỊCH VỤ
             double bonusDiscountCode = 0;    // PHÍ GIẢM GIÁ CỦA MÃ (NẾU CÓ)
             double bonusEmployee = 0;   // PHÍ TRẢ THÊM CHO STYLIST DỰA TRÊN CẤP ĐỘ
-            double serviceFee = serviceRepository.findHairSalonServiceByIdAndIsAvailableTrue(appointmentRequest.getServiceId()).getCost();  // PHÍ GỐC CỦA SERVICE
+            double serviceFee = serviceRepository
+                    .findHairSalonServiceByIdAndIsAvailableTrue(
+                            appointmentRequest.getServiceId()
+                    ).getCost();  // PHÍ GỐC CỦA SERVICE
             Appointment appointment = new Appointment();
             appointment.setSlot(getAvailableSlot(appointmentRequest.getSlotId()));
             appointment.setAccountForCustomer(authenticationService.getCurrentAccountForCustomer());
@@ -142,7 +122,7 @@ public class AppointmentService {
             throw new EntityNotFoundException("Can not create appointment: " + e.getMessage());
         }
     }
-    //CẬP NHẬT APPOINTMENT -> CUSTOMER LÀM
+/*    //CẬP NHẬT APPOINTMENT -> CUSTOMER LÀM
     // CẬP NHẬT APPOINTMENT CÓ 2 TRƯỜNG HỢP:
     //1. CUSTOMER CHƯA GỬI ĐƠN : TRƯỜNG HỢP NÀY KHÔNG VẤN ĐỀ GÌ, CUSTOMER CÓ THỂ THAO TÁC LẠI CÁC HÀM Ở TRÊN ĐỂ LỰA CHỌN LẠI
     // SAU ĐÓ CHỈNH SỬA ĐẦU VÀO CỦA createNewAppointment LÀ XONG
