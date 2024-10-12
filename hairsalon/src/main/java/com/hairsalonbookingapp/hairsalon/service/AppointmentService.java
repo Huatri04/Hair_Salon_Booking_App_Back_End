@@ -59,7 +59,7 @@ public class AppointmentService {
     //- CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
 
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
-    public DiscountCode getDiscountCode(String code) {    // HÀM LẤY MÃ GIẢM GIÁ
+    /*public DiscountCode getDiscountCode(String code) {    // HÀM LẤY MÃ GIẢM GIÁ
         DiscountCode discountCode = discountCodeRepository.findDiscountCodeByDiscountCode(code);
         if(discountCode != null && discountCode.getAppointment() == null){
             return discountCode;
@@ -103,7 +103,7 @@ public class AppointmentService {
 
             //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
             AppointmentResponse appointmentResponse = new AppointmentResponse();
-            *//*appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
+            //appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
             appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
             appointmentResponse.setSlotId(newAppointment.getSlot().getId());
             appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*//*

@@ -8,7 +8,6 @@ import lombok.Data;
 
 @Data
 public class DiscountCodeResponse {
-    private long id;
     private String discountCode;
     private double percentage;
     private String programName;

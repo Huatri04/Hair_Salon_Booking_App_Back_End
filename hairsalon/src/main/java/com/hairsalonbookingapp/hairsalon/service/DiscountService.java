@@ -186,8 +186,8 @@ public class DiscountService {
         List<DiscountCode> discountCodeList = new ArrayList<>();
         for(int i = 1; i <= numberOfTrade; i++){
             DiscountCode discountCode = new DiscountCode();
+            discountCode.setId(generateRandomCode()); // GENERATE CODE
             discountCode.setAccountForCustomer(accountForCustomer);
-            discountCode.setDiscountCode(generateRandomCode());
             discountCode.setDiscountProgram(discountProgram);
             DiscountCode savedCode = discountCodeRepository.save(discountCode);
             discountCodeList.add(savedCode);
@@ -197,9 +197,8 @@ public class DiscountService {
         List<DiscountCodeResponse> discountCodeResponseList = new ArrayList<>();
         for(DiscountCode code : discountCodeList){
             DiscountCodeResponse discountCodeResponse = new DiscountCodeResponse();
-            discountCodeResponse.setId(code.getId());
             discountCodeResponse.setCustomerName(code.getAccountForCustomer().getCustomerName());
-            discountCodeResponse.setDiscountCode(code.getDiscountCode());
+            discountCodeResponse.setDiscountCode(code.getId());
             discountCodeResponse.setPercentage(code.getDiscountProgram().getPercentage());
             discountCodeResponse.setProgramName(code.getDiscountProgram().getName());
 
