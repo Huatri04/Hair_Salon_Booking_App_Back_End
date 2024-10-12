@@ -24,6 +24,13 @@ public class AppointmentAPI {
 
     /*@PostMapping("/appointment")
     public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
+        long appointment = appointmentService.getAppoint(appointmentRequest);
+        return ResponseEntity.ok(appointment);
+    }*/
+
+/*
+    @PostMapping("/appointment")
+    public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
         AppointmentResponse appointment = appointmentService.createNewAppointment(appointmentRequest);
         return ResponseEntity.ok(appointment);
     }

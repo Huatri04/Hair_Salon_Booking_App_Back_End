@@ -18,7 +18,7 @@ public class Appointment {
 
     private double cost;        // GIÁ TIỀN
 
-    private String status = "Appointment sent!";  // HIỂN THỊ TRẠNG THÁI ĐƠN HIỆN TẠI
+    //private String status = "Appointment sent!";  // HIỂN THỊ TRẠNG THÁI ĐƠN HIỆN TẠI
     // KHÁCH ĐẶT ĐƠN VÀ STAFF NHẬN ĐƠN THÔNG QUA GET TRÊN DB
 
     private boolean isDeleted = false;  // CHỈ CUSTOMER ĐƯỢC PHÉP HỦY ĐƠN

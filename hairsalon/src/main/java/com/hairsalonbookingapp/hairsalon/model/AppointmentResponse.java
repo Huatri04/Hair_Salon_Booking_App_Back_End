@@ -9,15 +9,16 @@ import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Pattern;
 import lombok.Data;
 
+import java.util.List;
+
 @Data
 public class AppointmentResponse {
     private long id;
     private double cost;
-    private String status;
     private String day;
     private String startHour;
     private String customer;  // USERNAME
-    private String service;
+    private List<String> service;
     private String stylist;
 
 

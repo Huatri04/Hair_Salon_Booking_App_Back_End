@@ -41,6 +41,9 @@ public class AppointmentService {
     EmployeeRepository employeeRepository;
 
     @Autowired
+    CustomerRepository customerRepository;
+
+    @Autowired
     SlotRepository slotRepository;
 
     @Autowired
@@ -49,18 +52,13 @@ public class AppointmentService {
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
     //- CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
 
-    //CUSTOMER XEM VÀ CHỌN STYLIST
-    //- CHỨC NĂNG getAllAvailableStylist(); BÊN EMPLOYEE SERVICE : CUSTOMER CHỌN CÁC STYLIST KHẢ DỤNG
-
     //CUSTOMER XEM NGÀY HÔM NAY VÀ NGÀY TIẾP THEO CÓ CÁC CA LÀM VIỆC CỦA AI
     //- CHỨC NĂNG getAllAvailableSlots(); BÊN SHIFT EMPLOYEE SERVICE: CUSTOMER XEM CA LÀM VIỆC CỦA STYLIST VÀ LỰA CHỌN
 
-    // CUSTOMER CHỌN CÁC SLOT KHẢ DỤNG CỦA CA:
-    //- CHỨC NĂNG viewAvailableSlots(); BÊN SLOT SERVICE HỖ TRỢ
 
     //CUSTOMER NHẬP MÃ GIẢM GIÁ (TÙY CHỌN)
-    /*public DiscountCode getDiscountCode(String code) {    // HÀM LẤY MÃ GIẢM GIÁ
-        DiscountCode discountCode = discountCodeRepository.findDiscountCodeByDiscountCode(code);
+    public DiscountCode getDiscountCode(String code) {    // HÀM LẤY MÃ GIẢM GIÁ
+        DiscountCode discountCode = discountCodeRepository.findDiscountCodeById(code);
         if(discountCode != null && discountCode.getAppointment() == null){
             return discountCode;
         } else {
@@ -68,54 +66,88 @@ public class AppointmentService {
         }
     }
 
+    //TEST CHO VUI
+    /*public long getAppoint(AppointmentRequest appointmentRequest){
+        return appointmentRequest.getServiceIdList().get(0);
+    }*/
+
     //HỆ THỐNG CHỐT
     public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {
-            List<Long> serviceIdList = new ArrayList<>();  // NGƯỜI DÙNG CHỌN NHIỀU LOẠI DỊCH VỤ
+            List<String> serviceNameList = new ArrayList<>();
+            List<Long> serviceIdList = appointmentRequest.getServiceIdList();  // NGƯỜI DÙNG CHỌN NHIỀU LOẠI DỊCH VỤ
+            List<HairSalonService> hairSalonServiceList = new ArrayList<>();
             double bonusDiscountCode = 0;    // PHÍ GIẢM GIÁ CỦA MÃ (NẾU CÓ)
             double bonusEmployee = 0;   // PHÍ TRẢ THÊM CHO STYLIST DỰA TRÊN CẤP ĐỘ
-            double serviceFee = serviceRepository
-                    .findHairSalonServiceByIdAndIsAvailableTrue(
-                            appointmentRequest.getServiceId()
-                    ).getCost();  // PHÍ GỐC CỦA SERVICE
+            double serviceFee = 0;
+            for(long serviceId : serviceIdList){
+                HairSalonService service = serviceRepository.findHairSalonServiceById(serviceId);
+                hairSalonServiceList.add(service);
+                serviceNameList.add(service.getName());
+                serviceFee += service.getCost();  // PHÍ GỐC CỦA SERVICE
+            }
+            //TẠO APPOINTMENT
             Appointment appointment = new Appointment();
-            appointment.setSlot(getAvailableSlot(appointmentRequest.getSlotId()));
-            appointment.setAccountForCustomer(authenticationService.getCurrentAccountForCustomer());
-            appointment.setHairSalonService(getService(appointmentRequest.getServiceId()));
 
-            if (appointmentRequest.getDiscountCodeId().isEmpty()) {
-                appointment.setDiscountCode(null);
-            } else {
-                DiscountCode discountCode = getDiscountCode(appointmentRequest.getDiscountCodeId());
+            // SLOT
+            Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
+            appointment.setSlot(slot);
+
+            //ACCOUNT FOR CUSTOMER
+            AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+            appointment.setAccountForCustomer(accountForCustomer);
+
+            //HAIR SALON SERVICE
+            appointment.setHairSalonServices(hairSalonServiceList);
+
+            //DISCOUNT CODE
+            if (!appointmentRequest.getDiscountCode().isEmpty()) {
+                DiscountCode discountCode = getDiscountCode(appointmentRequest.getDiscountCode());
                 appointment.setDiscountCode(discountCode);
                 bonusDiscountCode += (discountCode.getDiscountProgram().getPercentage()) / 100;
             }
 
-            AccountForEmployee accountForEmployee = getStylist(appointmentRequest.getStylistId());
+            AccountForEmployee accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
             if (accountForEmployee.getExpertStylistBonus() != 0) {
                 bonusEmployee += (accountForEmployee.getExpertStylistBonus()) / 100;
             }
 
-            double cost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
-            appointment.setCost(cost);
+            double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
+            appointment.setCost(totalCost);
 
             Appointment newAppointment = appointmentRepository.save(appointment);
 
-            //AppointmentResponse appointmentResponse = modelMapper.map(newAppointment, AppointmentResponse.class);
+            //SET OBJ APPOINTMENT VÀO CÁC OBJ KHÁC
+            slot.setAppointments(newAppointment);
+            slotRepository.save(slot);
+
+            List<Appointment> appointmentList = accountForCustomer.getAppointments();
+            appointmentList.add(newAppointment);
+            accountForCustomer.setAppointments(appointmentList);
+            customerRepository.save(accountForCustomer);
+
+            for(HairSalonService hairSalonService : hairSalonServiceList){
+                List<Appointment> appointments = hairSalonService.getAppointments();
+                appointments.add(newAppointment);
+                hairSalonService.setAppointments(appointments);
+                serviceRepository.save(hairSalonService);
+            }
+
+            if (!appointmentRequest.getDiscountCode().isEmpty()) {
+                DiscountCode discountCode = getDiscountCode(appointmentRequest.getDiscountCode());
+                discountCode.setAppointment(newAppointment);
+                discountCodeRepository.save(discountCode);
+            }
+
             AppointmentResponse appointmentResponse = new AppointmentResponse();
-            //appointmentResponse.setServiceId(newAppointment.getHairSalonService().getId());
-            appointmentResponse.setCustomerId(newAppointment.getAccountForCustomer().getPhoneNumber());
-            appointmentResponse.setSlotId(newAppointment.getSlot().getId());
-            appointmentResponse.setDiscountCodeId(newAppointment.getDiscountCode().getId());*//*
 
             appointmentResponse.setId(newAppointment.getId());
             appointmentResponse.setCost(newAppointment.getCost());
-            appointmentResponse.setDay(newAppointment.getSlot().getShiftEmployee().getShiftInWeek().getDayOfWeek());
+            appointmentResponse.setDay(newAppointment.getSlot().getDate());
             appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(newAppointment.getAccountForCustomer().getCustomerName());
-            appointmentResponse.setService(newAppointment.getHairSalonService().getName());
-            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getName());
-            appointmentResponse.setStatus(newAppointment.getStatus());
+            appointmentResponse.setCustomer(accountForCustomer.getCustomerName());
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
 
             return appointmentResponse;
         } catch (Exception e) {
