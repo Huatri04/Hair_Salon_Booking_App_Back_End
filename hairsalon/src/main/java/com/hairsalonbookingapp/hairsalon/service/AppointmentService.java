@@ -30,6 +30,9 @@ public class AppointmentService {
     ModelMapper modelMapper;
 
     @Autowired
+    EmployeeService employeeService;
+
+    @Autowired
     HairSalonBookingAppService hairSalonBookingAppService;
 
     @Autowired
@@ -46,6 +49,9 @@ public class AppointmentService {
 
     @Autowired
     SlotRepository slotRepository;
+
+    @Autowired
+    TimeService timeService;
 
     @Autowired
     DiscountCodeRepository discountCodeRepository;
@@ -388,6 +394,58 @@ public class AppointmentService {
             return message;
         } else {
             throw new EntityNotFoundException("Slot not found!");
+        }
+    }
+
+    // DANH SÁCH CÁC STYLIST KHẢ DỤNG
+    public List<AccountForEmployee> getAllStylistList(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(list != null){
+            return list;
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
+        }
+    }
+
+    //TÍNH SỐ APPOINTMENT 1 STYLIST LÀM TRONG 1 NGÀY
+    public
+
+    // TÍNH SỐ LỊCH STYLIST NHẬN ĐỂ SO SÁNH KPI
+    public void compareKPI(String firstDayOfMonth, String lastDayOfMonth){
+        List<KPITotal> kpiTotalList = new ArrayList<>();
+        int total = 0;
+        LocalDate firstDay = LocalDate.parse(firstDayOfMonth);
+        LocalDate lastDay = LocalDate.parse(lastDayOfMonth);
+        List<LocalDate> daysInMonth = timeService.getDaysBetween(firstDay, lastDay);
+        for(LocalDate localDate : daysInMonth){
+            String date = localDate.toString();
+            for(AccountForEmployee account : getAllStylistList()){
+                List<Appointment> appointmentList = appointmentRepository
+                        .findAppointmentsBySlot_ShiftEmployee_AccountForEmployeeAndSlot_DateAndIsCompletedTrue(account, date);
+                KPITotal kpiTotal = new KPITotal();
+                kpiTotal.setStylistId(account.getId());
+                kpiTotal.setKPI(account.getKPI());
+                
+                total += appointmentList.size();
+                kpiTotal.setTotal(total);
+            }
+
+        }
+
+
+
+        String role = "Stylist";
+        String status = "Workday";
+        List<AccountForEmployee> accountForEmployeeList = employeeRepository
+                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(accountForEmployeeList != null){
+            for(AccountForEmployee account : accountForEmployeeList){
+                account.getShiftEmployees().
+            }
+        } else {
+            throw new EntityNotFoundException("Stylist not found!");
         }
     }
 
