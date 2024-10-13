@@ -247,15 +247,43 @@ public class AppointmentService {
         }
     }*/
 
-    // XÓA APPOINTMENT  -> CUSTOMER LÀM, STAFF LÀM KHI STYLIST CÓ VIỆC BẬN TRONG SLOT ĐÓ
-    public String deleteAppointment(DeleteAppointmentRequest deleteAppointmentRequest){
-        String phoneNumber = deleteAppointmentRequest.getPhonenumber();
-        AccountForCustomer accountForCustomer = customerRepository.findAccountForCustomerByPhoneNumber(phoneNumber);
-        if(accountForCustomer == null){
-            throw new AccountNotFoundException("Account not found!!!");
-        }
+    // XÓA APPOINTMENT  -> STAFF LÀM KHI STYLIST CÓ VIỆC BẬN TRONG SLOT ĐÓ
+    public String deleteAppointmentByStaff(long slotId){
         Appointment oldAppointment = appointmentRepository
-                .findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(deleteAppointmentRequest.getId(), accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
+                .findAppointmentBySlot_IdAndIsDeletedFalse(slotId);  //TÌM LẠI APPOINTMENT CŨ
+        if(oldAppointment != null){
+            oldAppointment.setDeleted(true);
+            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
+
+            //SLOT
+            Slot slot = newAppointment.getSlot();
+            slot.setAppointments(null);
+            slot.setAvailable(false);
+            slotRepository.save(slot);
+
+            //DISCOUNT CODE
+            DiscountCode discountCode = newAppointment.getDiscountCode();
+            if(discountCode != null){
+                discountCode.setAppointment(null);
+                discountCodeRepository.save(discountCode);
+            }
+
+            String phoneNumber = newAppointment.getAccountForCustomer().getPhoneNumber();
+            String email = newAppointment.getAccountForCustomer().getEmail();
+
+            String message = "Delete successfully: " + "Phone = " + phoneNumber + "; Email = " + email;
+            return message;
+
+        } else {
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+    }
+
+    // XÓA APPOINTMENT -> CUSTOMER LÀM
+    public String deleteAppointmentByCustomer(long slotId){
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentBySlot_IdAndAccountForCustomerAndIsDeletedFalse(slotId, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
@@ -280,26 +308,27 @@ public class AppointmentService {
             throw new EntityNotFoundException("Appointment not found!");
         }
     }
+    // CÓ 2 TÌNH HUỐNG KHI XÓA:
+    //- CUSTOMER XÓA TRƯỚC , STAFF XÓA SAU -> KO VẤN ĐỀ VÌ STATUS STAFF CHÈN LÊN CUSTOMER
+    //- STAFF XÓA TRƯỚC , SLOT ĐÓ COI NHƯ KO KHẢ DỤNG -> CUSTOMER CHẮC CHẮN KO CHỌN -> OK
 
     // NẾU CÓ VẤN ĐỀ ĐỘT XUẤT, STAFF GỬI EMAIL ĐẾN CUSTOMER
     // STAFF XÓA CÁC APPOINMENTS NẾU STYLIST NHẬN APPOINTMENT ĐÓ BẬN TRONG NGÀY
-    public String deleteAppointmentsOfStylist(DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
+    public List<String> deleteAppointmentsOfStylist(DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
         List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlots(deleteAllAppointmentsRequest.getDate()); // TÌM CÁC SLOT TRONG NGÀY
+        List<String> messages = new ArrayList<>();
         if(availableSlotList != null){
             for(AvailableSlot availableSlot : availableSlotList) {
                 Slot slot = slotRepository.findSlotByIdAndIsAvailableFalse(availableSlot.getSlotId());  // TÌM SLOT KO KHẢ DỤNG
                 if(slot != null){
                     if(slot.getShiftEmployee().getAccountForEmployee().getId().equals(deleteAllAppointmentsRequest.getStylistId())){
-                        DeleteAppointmentRequest deleteAppointmentRequest = new DeleteAppointmentRequest();
-                        deleteAppointmentRequest.setId(slot.getAppointments().getId());
-                        deleteAppointmentRequest.setPhonenumber(slot.getAppointments().getAccountForCustomer().getPhoneNumber());
-
-                        deleteAppointment(deleteAppointmentRequest);
+                        String message = deleteAppointmentByStaff(slot.getId());
+                        messages.add(message);
                     }
                 }
             }
-            String message = "Delete all successfully!!!";
-            return message;
+
+            return messages;
         } else {
             throw new EntityNotFoundException("Slots not found!");
         }
@@ -361,6 +390,8 @@ public class AppointmentService {
             throw new EntityNotFoundException("Slot not found!");
         }
     }
+
+
 
 
 }

@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
+import com.hairsalonbookingapp.hairsalon.model.ViewAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.service.SlotService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -19,6 +20,12 @@ public class SlotAPI {
 
     @Autowired
     SlotService slotService;
+
+    @PostMapping("/viewSlots")
+    public ResponseEntity viewSlotsOfStylist(@Valid @RequestBody ViewAppointmentRequest viewAppointmentRequest){
+        List<SlotResponse> slotResponseList = slotService.viewSlotsOfStylist(viewAppointmentRequest);
+        return ResponseEntity.ok(slotResponseList);
+    }
 
     /*@PostMapping("/slot")
     public ResponseEntity createNewSlot(@Valid @RequestBody SlotRequest slotRequest){

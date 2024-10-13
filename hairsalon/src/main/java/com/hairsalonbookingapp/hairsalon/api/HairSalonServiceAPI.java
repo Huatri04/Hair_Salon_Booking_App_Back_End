@@ -27,19 +27,19 @@ public class HairSalonServiceAPI {
         return ResponseEntity.ok(hairSalonService);
     }
 
-    @PutMapping("/service/id")
+    @PutMapping("/service/{id}")
     public ResponseEntity updateHairSalonService(@Valid @RequestBody HairSalonServiceUpdate hairSalonServiceUpdate, @PathVariable long id){
         HairSalonServiceResponse hairSalonService = hairSalonBookingAppService.updateService(hairSalonServiceUpdate,id);
         return ResponseEntity.ok(hairSalonService);
     }
 
-    @DeleteMapping("/service/id")
+    @DeleteMapping("/service/{id}")
     public ResponseEntity deleteHairSalonService(@PathVariable long id){
         HairSalonServiceResponse hairSalonService = hairSalonBookingAppService.deleteService(id);
         return ResponseEntity.ok(hairSalonService);
     }
 
-    @PutMapping("/service/restart/id")
+    @PutMapping("/service/restart/{id}")
     public ResponseEntity restartHairSalonService(@PathVariable long id){
         HairSalonServiceResponse hairSalonService = hairSalonBookingAppService.startService(id);
         return ResponseEntity.ok(hairSalonService);

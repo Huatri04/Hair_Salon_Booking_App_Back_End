@@ -5,7 +5,7 @@ import lombok.NoArgsConstructor;
 
 @Data
 @NoArgsConstructor
-public class DeleteAppointmentRequest {
-    long id;
-    String phonenumber;
+public class ViewAppointmentRequest {
+    String stylistId;
+    String date;
 }

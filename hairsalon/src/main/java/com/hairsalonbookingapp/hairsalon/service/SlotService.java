@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
+import com.hairsalonbookingapp.hairsalon.model.ViewAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
@@ -263,6 +264,32 @@ public class SlotService {
         Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(slotId);
         if(slot != null){
             return slot;
+        } else {
+            throw new EntityNotFoundException("Slot not found!");
+        }
+    }
+
+
+    // STAFF TÌM KIẾM THÔNG TIN SLOT CỦA STYLIST
+    public List<SlotResponse> viewSlotsOfStylist(ViewAppointmentRequest viewAppointmentRequest){
+        List<Slot> slotList = slotRepository
+                .findSlotsByShiftEmployee_AccountForEmployee_IdAndDate(
+                        viewAppointmentRequest.getStylistId(),
+                        viewAppointmentRequest.getDate()
+                );
+        if(slotList != null){
+            List<SlotResponse> slotResponseList = new ArrayList<>();
+            for(Slot slot : slotList){
+                SlotResponse slotResponse = new SlotResponse();
+                slotResponse.setId(slot.getId());
+                slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+                slotResponse.setDate(slot.getDate());
+                slotResponse.setStartSlot(slot.getStartSlot());
+                slotResponse.setAvailable(slot.isAvailable());
+
+                slotResponseList.add(slotResponse);
+            }
+            return slotResponseList;
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }

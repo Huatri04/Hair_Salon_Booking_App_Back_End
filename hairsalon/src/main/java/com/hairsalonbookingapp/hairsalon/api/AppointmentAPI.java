@@ -35,16 +35,22 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointment);
     }
 
-    @PutMapping("/delete")
-    public ResponseEntity deleteAppointment(@Valid @RequestBody DeleteAppointmentRequest deleteAppointmentRequest){
-        String message = appointmentService.deleteAppointment(deleteAppointmentRequest);
+    @PutMapping("/staffDelete/{slotId}")
+    public ResponseEntity deleteAppointmentByStaff(@PathVariable long slotId){
+        String message = appointmentService.deleteAppointmentByStaff(slotId);
+        return ResponseEntity.ok(message);
+    }
+
+    @PutMapping("/customerDelete")
+    public ResponseEntity deleteAppointmentByCus(@Valid @RequestBody long slotId){
+        String message = appointmentService.deleteAppointmentByCustomer(slotId);
         return ResponseEntity.ok(message);
     }
 
     @PutMapping("/deleteAll")
     public ResponseEntity daleteAllAppointments(@Valid @RequestBody DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
-        String message = appointmentService.deleteAppointmentsOfStylist(deleteAllAppointmentsRequest);
-        return ResponseEntity.ok(message);
+        List<String> messages = appointmentService.deleteAppointmentsOfStylist(deleteAllAppointmentsRequest);
+        return ResponseEntity.ok(messages);
     }
 
     @GetMapping
@@ -58,5 +64,7 @@ public class AppointmentAPI {
         String message = appointmentService.completeAppointment(completeAppointmentRequest);
         return ResponseEntity.ok(message);
     }
+
+
 
 }
