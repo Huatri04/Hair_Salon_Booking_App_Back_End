@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.SalaryMonth;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonth;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonthForAnEmployee;
 import com.hairsalonbookingapp.hairsalon.model.response.SalaryMonthListResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.SalaryMonthResponse;
 import com.hairsalonbookingapp.hairsalon.service.SalaryMonthService;
@@ -24,8 +25,8 @@ public class SalaryMonthAPI {
 
     @PostMapping("{id}")
 //    @PreAuthorize("hasAuthority('customer')")
-    public ResponseEntity createSalaryMonth(@Valid @RequestBody RequestSalaryMonth requestSalaryMonth, @PathVariable String id){
-        SalaryMonthResponse salaryMonthResponse = salaryMonthService.createSalaryMonthForAnEmployee(requestSalaryMonth, id);
+    public ResponseEntity createSalaryMonth(@Valid @RequestBody RequestSalaryMonthForAnEmployee requestSalaryMonthForAnEmployee){
+        SalaryMonthResponse salaryMonthResponse = salaryMonthService.createSalaryMonthForAnEmployee(requestSalaryMonthForAnEmployee);
         return ResponseEntity.ok(salaryMonthResponse);
     }
 

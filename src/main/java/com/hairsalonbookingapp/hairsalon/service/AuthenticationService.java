@@ -1,14 +1,12 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
-import com.hairsalonbookingapp.hairsalon.exception.AccountBlockedException;
-import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
-import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
-import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
+import com.hairsalonbookingapp.hairsalon.exception.*;
 import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.model.request.*;
 import com.hairsalonbookingapp.hairsalon.model.response.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
+import jakarta.validation.ConstraintViolation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.data.annotation.CreatedBy;
@@ -27,10 +25,8 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.annotation.Validated;
 import org.modelmapper.ModelMapper;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Optional;
+
+import java.util.*;
 
 @Service
 @Transactional
@@ -55,12 +51,24 @@ public class AuthenticationService implements UserDetailsService {
     EmailService emailService;
 
 
+
     @Autowired
     TokenService tokenService;
     @Validated(CreatedBy.class)// phan vao nhom created
     // logic dang ki tk cho guest
     public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer){
         AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
+
+        // Kiểm tra định dạng email
+        if (!isValidEmail(registerRequestForCustomer.getEmail())) {
+            throw new Duplicate("Email invalid!");
+        }
+
+        // Kiểm tra định dạng số điện thoại
+        if (!isValidPhoneNumber(registerRequestForCustomer.getPhoneNumber())) {
+            throw new Duplicate("Phone number is invalid!");
+        }
+
         List<String> errors = new ArrayList<>();
         if (accountForCustomerRepository.existsByEmail(account.getEmail())) {
             errors.add("Email exist!");
@@ -102,6 +110,16 @@ public class AuthenticationService implements UserDetailsService {
         return null;
     }
 
+    private boolean isValidEmail(String email) {
+        String emailRegex = "^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$";
+        return email != null && email.matches(emailRegex);
+    }
+
+    private boolean isValidPhoneNumber(String phoneNumber) {
+        String phoneRegex = "(84|0[3|5|7|8|9])+([0-9]{8})\\b";
+        return phoneNumber != null && phoneNumber.matches(phoneRegex);
+    }
+
     // update profile cho customer
 
     public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer, String phone){
@@ -112,47 +130,6 @@ public class AuthenticationService implements UserDetailsService {
         } else {
 
             try{
-//                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
-//                    oldAccount.setEmail(account.getEmail());
-//                }
-//
-//                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-////                String originPassword = account.getPassword();
-////                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-////                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
-////                }
-//
-//                // Kiểm tra và cập nhật tên
-//                if (account.getName() != null && !account.getName().isEmpty()) {
-//                    oldAccount.setName(account.getName());
-//                }
-//
-//                // Xử lý đổi mật khẩu
-//                String oldPassword = requestEditProfileCustomer.getOldPassword();
-//                String newPassword = requestEditProfileCustomer.getNewPassword();
-//
-//                if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
-//                    // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
-//                    if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
-//                        throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
-//                    }
-//
-//                    // Kiểm tra mật khẩu cũ
-//                    if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
-//                        throw new UpdatedException("Mật khẩu cũ không chính xác.");
-//                    }
-//
-//                    // Kiểm tra độ dài mật khẩu mới (đã được kiểm tra qua annotation @Size)
-//                    // Mã hóa mật khẩu mới và cập nhật
-//                    String encodedNewPassword = passwordEncoder.encode(newPassword);
-//                    oldAccount.setPassword(encodedNewPassword);
-//                }
-//
-//                // Lưu cập nhật vào cơ sở dữ liệu
-//                AccountForCustomer updatedAccount = accountForCustomerRepository.save(oldAccount);
-//                return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
-
-
 // vi model mapper ko nhan biet dc old vs new password nen lam ntn
                 // Cập nhật email
                 if (requestEditProfileCustomer.getEmail() != null && !requestEditProfileCustomer.getEmail().isEmpty()) {
@@ -285,9 +262,9 @@ public class AuthenticationService implements UserDetailsService {
                     oldAccount.setStylistLevel(account.getStylistLevel());
                 }
 
-                if (account.getKPI() != null) {
-                    if(account.getKPI() < 0 ){
-                        throw new UpdatedException("KPI must be at least 0");
+                if (account.getTargetKPI() != null) {
+                    if(account.getTargetKPI() < 0 ){
+                        throw new UpdatedException("Target KPI must be at least 0");
                     }
                     oldAccount.setKPI(account.getKPI());
                 }
@@ -380,122 +357,6 @@ public class AuthenticationService implements UserDetailsService {
         }
     }
 
-
-
-//    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
-//        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
-//            AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
-//            if (oldAccount == null) {
-//                throw new Duplicate("Account not found!");// cho dung luon
-//            } else {
-//                // Kiểm tra email hợp lệ
-//                if (account.getEmail() != null && !account.getEmail().isEmpty()) {
-//                    if (!account.getEmail().matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+$")) {
-//                        throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email invalid!");
-//                    }
-//                    oldAccount.setEmail(account.getEmail());
-//                }
-//
-//                // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
-//                if (account.getPhoneNumber() != null && !account.getPhoneNumber().isEmpty()) {
-//                    if (!account.getPhoneNumber().matches("^[0-9]{10}$")) {
-//                        throw new UpdatedException("phone number invalid!");
-//                    }
-//                    oldAccount.setPhoneNumber(account.getPhoneNumber());
-//                }
-//
-//                // Kiểm tra mật khẩu phải lớn hơn 6 ký tự
-//                String originPassword = account.getPassword();
-//                if (account.getPassword() != null && !account.getPassword().isEmpty()) {
-//                    if (account.getPassword().length() <= 6) {
-//                        throw new UpdatedException("Password must be at least 6 characters");
-//                    }
-//                    oldAccount.setPassword(passwordEncoder.encode(originPassword));
-//                }
-//
-//                // Kiểm tra và cập nhật tên
-//                if (account.getName() != null && !account.getName().isEmpty()) {
-//                    oldAccount.setName(account.getName());
-//                }
-//
-//                // Kiểm tra và cập nhật ảnh
-//                if (account.getImg() != null && !account.getImg().isEmpty()) {
-//                    oldAccount.setImg(account.getImg());
-//                }
-//
-//                // Lưu cập nhật vào cơ sở dữ liệu
-//                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
-//                return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
-//            }
-//    }
-
-//    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id){
-//        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
-//
-//            AccountForEmployee oldAccount = employeeRepository.findEmployeeById(id);
-//            if(oldAccount == null){
-//                throw new Duplicate("Account not found!");
-//            }else{
-//                //account ton tai
-//                if(account.getEmail() != null){
-//                    try{
-//                        oldAccount.setEmail(account.getEmail());
-//                    } catch (Exception e) {
-//                        if(e.getMessage().contains(account.getEmail())){
-//                            throw new Duplicate("duplicate email!");
-//                        }
-//                    }
-//                }else{
-//                    oldAccount.setEmail(oldAccount.getEmail());
-//                }
-//                if(account.getPhoneNumber() != null){
-//                    try{
-//                        oldAccount.setPhoneNumber(account.getPhoneNumber());
-//                    } catch (Exception e) {
-//                        if(e.getMessage().contains(account.getPhoneNumber())){
-//                            throw new Duplicate("duplicate phone number!");
-//                        }
-//                    }
-//                }else{
-//                    oldAccount.setPhoneNumber(oldAccount.getPhoneNumber());
-//                }
-//                if(account.getPassword() != null){
-//                    try{
-//                        oldAccount.setPassword(account.getPassword());
-//                    } catch (Exception e) {
-//                        if(e.getMessage().contains(account.getPassword())){
-//                            throw new Duplicate("duplicate pasword!");
-//                        }
-//                    }
-//                }else{
-//                    oldAccount.setPassword(oldAccount.getPassword());
-//                }
-//                if(account.getName() != null){
-//                    try{
-//                        oldAccount.setName(account.getName());
-//                    } catch (Exception e) {
-//                        if(e.getMessage().contains(account.getName())){
-//                            throw new Duplicate("duplicate name!");
-//                        }
-//                    }
-//                }else{
-//                    oldAccount.setName(oldAccount.getName());
-//                }
-//                if(account.getImg() != null){
-//                    oldAccount.setImg(account.getImg());
-//                }else{
-//                    oldAccount.setImg(oldAccount.getImg());
-//                }
-//
-//                AccountForEmployee oldAccount1 = employeeRepository.save(oldAccount);
-//                return modelMapper.map(oldAccount1, EditProfileEmployeeResponse.class);
-//            }
-//    }
-
-
-
-
-
     // logic dang ki tk cho employee
     @Validated(CreatedBy.class)// phan vao nhom created
     public AccountForEmployeeResponse register(RegisterRequestForEmloyee registerRequestForEmloyee) {
@@ -546,16 +407,6 @@ public class AuthenticationService implements UserDetailsService {
         }
         return null;
     }
-
-//    private String generateNewId() {
-//        Optional<AccountForEmployee> lastAccount = employeeRepository.findTopByOrderByIdDesc();
-//        if (lastAccount.isPresent()) {
-//            String lastId = lastAccount.get().getId();
-//            int idNum = Integer.parseInt(lastId.substring(1)) + 1; // Tăng giá trị số lên 1
-//            return String.format("E%06d", idNum); // Tạo ID mới
-//        }
-//        return "E000001"; // Nếu chưa có bản ghi nào, bắt đầu từ E000001
-//    }
 
 
     public String generateIdBasedOnRole(String role) {
@@ -646,29 +497,6 @@ public class AuthenticationService implements UserDetailsService {
 
     }
 
-//    //LOGIN EMPLOYEE
-//    public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
-//        try{
-//            Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
-//                    loginRequestForEmployee.getUsername(),
-//                    loginRequestForEmployee.getPassword()
-//            ));
-//
-//            //=> tài khoản có tồn tại
-//            AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
-//            if(account.isDeleted()){
-//                throw new AccountBlockedException("Your account is blocked!");
-//            } else {
-//                AccountForEmployeeResponse accountResponseForEmployee = modelMapper.map(account, AccountForEmployeeResponse.class);
-//                accountResponseForEmployee.setToken(tokenService.generateTokenEmployee(account));
-//                return accountResponseForEmployee;
-//            }
-//        } catch (BadCredentialsException e) { //lỗi này xuất hiện khi xác thực thất bại
-//            throw new AccountNotFoundException("Username or password invalid!");
-//        }
-//
-//    }
-
     //delete Acc customer
     public AccountForCustomerResponse deleteAccountForCustomer(String phoneNumber){
         // tim toi id ma FE cung cap
@@ -707,6 +535,49 @@ public class AuthenticationService implements UserDetailsService {
         return accountForEmployees;
     }
 
+    public List<EmployeeInfo> getEmployeeByRole(FindEmployeeRequest findEmployeeRequest){
+        String status = "Workday";
+        List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
+        if(findEmployeeRequest.getRole().equals("Stylist")){
+            if(findEmployeeRequest.getStylistLevel().equals("Normal")){
+                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Normal", status);
+            } else if(findEmployeeRequest.getStylistLevel().equals("Expert")){
+                accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Expert", status);
+            } else {
+                throw new EntityNotFoundException("Stylist not found!");
+            }
+        } else {
+            accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(findEmployeeRequest.getRole(), status);
+        }
+
+        if(accountForEmployeeList != null){
+            List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+            for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+                EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+                employeeInfoList.add(employeeInfo);
+            }
+
+            return employeeInfoList;
+        } else {
+            throw new EntityNotFoundException("Employee not found!");
+        }
+    }
+
+    //GET PROFILE CUSTOMER
+    public ProfileCustomer getProfileCustomer(){
+        AccountForCustomer accountForCustomer = getCurrentAccountForCustomer();
+        return modelMapper.map(accountForCustomer, ProfileCustomer.class);
+    }
+
+    //GET PROFILE EMPLOYEE
+    public ProfileEmployee getProfileEmployee(){
+        AccountForEmployee accountForEmployee = getCurrentAccountForEmployee();
+        return modelMapper.map(accountForEmployee, ProfileEmployee.class);
+    }
+
+
+
+
 
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
@@ -721,7 +592,7 @@ public class AuthenticationService implements UserDetailsService {
         if(accountForCustomerRepository.findByPhoneNumber(phoneNumber)!=null){
             return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
         } else {
-            throw new AccountNotFoundException("Phonenumber or password invalid!");
+            throw new AccountNotFoundException("Phone number or password invalid!");
         }
     }
 
@@ -772,19 +643,5 @@ public class AuthenticationService implements UserDetailsService {
 //            throw new ClassCastException("Current user is not an employee.");
         }
     }
-
-//    public AccountForEmployee getCurrentAccountForEmployee() {
-//        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-//
-//        // Kiểm tra nếu principal là kiểu UserDetails và lấy thông tin
-//        if (principal instanceof UserDetails) {
-//            UserDetails userDetails = (UserDetails) principal;
-//            // Trích xuất thông tin từ UserDetails (username, employee ID, etc.)
-//            String employeeId = userDetails.getUsername();  // hoặc dùng getEmployeeId nếu có
-//            return employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
-//        } else {
-//            throw new ClassCastException("Current user is not a valid employee.");
-//        }
-//    }
 
 }

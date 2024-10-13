@@ -1,8 +1,11 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
 import jakarta.persistence.*;
+import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.util.UUID;
 
 @Getter
 @Setter

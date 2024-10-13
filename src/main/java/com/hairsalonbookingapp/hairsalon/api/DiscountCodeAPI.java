@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
+import com.hairsalonbookingapp.hairsalon.model.request.CreateCodeRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountCode;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountCode;
 import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeInfResponse;
@@ -13,6 +14,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/discountCode")
 @CrossOrigin("*")
@@ -20,9 +24,9 @@ import org.springframework.web.bind.annotation.*;
 public class DiscountCodeAPI {
     @Autowired
     DiscountCodeService discountCodeService;
-    @PostMapping("{id}")
-    public ResponseEntity createDiscountCode(@PathVariable int id){
-        DiscountCodeResponse discountCodeResponse = discountCodeService.createDiscountCode(id);
+    @PostMapping
+    public ResponseEntity createDiscountCode(@Valid @RequestBody CreateCodeRequest createCodeRequest){
+        List<DiscountCodeResponse> discountCodeResponse = discountCodeService.createDiscountCode(createCodeRequest);
         return ResponseEntity.ok(discountCodeResponse);
     }
 

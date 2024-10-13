@@ -31,7 +31,7 @@ public class HairSalonService {
 
     private boolean isAvailable = true;   //SERVICE CÓ KHẢ DỤNG KHÔNG
 
-    @OneToMany(mappedBy = "hairSalonService")
+    @ManyToMany(mappedBy = "hairSalonServices")
     @JsonIgnore
     private List<Appointment> appointments;
 }

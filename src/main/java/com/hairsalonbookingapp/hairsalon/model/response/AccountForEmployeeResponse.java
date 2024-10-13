@@ -16,9 +16,10 @@ public class AccountForEmployeeResponse {
     private String token;
     private String stylistLevel;
     private long stylistSelectionFee;
+    private int targetKPI;
     private int KPI;
     private Date createdAt;
     private String Status;
     private boolean isDeleted;
-
+    private String days;
 }

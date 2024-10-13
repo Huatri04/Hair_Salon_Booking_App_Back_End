@@ -15,11 +15,9 @@ public class ShiftEmployee { // DO STYLIST LÀM
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private long shiftEmployeeId;  // ID CÓ THỂ TỰ GENERATE
 
-    private String name;  // TÊN EMPLOYEE LÀM CA ĐÓ
-
     private boolean isAvailable = true;  // CHECK XEM CA NÀY CÒN KHẢ DỤNG VỚI STYLIST HAY KO
 
-    private boolean isCompleted = false;
+    private String date; // NGÀY THEO ĐỊNH DẠNG Y-M-D
 
     @ManyToOne
     @JoinColumn(name = "dayInWeek", nullable = true)

@@ -4,6 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.NoContentException;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonth;
+import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonthForAnEmployee;
 import com.hairsalonbookingapp.hairsalon.model.response.SalaryMonthListResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.SalaryMonthResponse;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
@@ -34,13 +35,13 @@ public class SalaryMonthService {
     @Autowired
     ModelMapper modelMapper;
     // create feedback
-    public SalaryMonthResponse createSalaryMonthForAnEmployee(RequestSalaryMonth requestSalaryMonth, String employeeId){
-        SalaryMonth salaryMonth = modelMapper.map(requestSalaryMonth, SalaryMonth.class);
+    public SalaryMonthResponse createSalaryMonthForAnEmployee(RequestSalaryMonthForAnEmployee requestSalaryMonthForAnEmployee){
+        SalaryMonth salaryMonth = modelMapper.map(requestSalaryMonthForAnEmployee.getRequestSalaryMonth(), SalaryMonth.class);
         try{
 //            String newId = generateId();
 //            feedback.setFeedbackId(newId);
             // Tìm nhân viên theo ID
-            AccountForEmployee employee = employeeRepository.findAccountForEmployeeByEmployeeId(employeeId);
+            AccountForEmployee employee = employeeRepository.findAccountForEmployeeByEmployeeId(requestSalaryMonthForAnEmployee.getEmployeeId());
             if (employee == null) {
                 System.out.println("employee empty");
                 throw new Duplicate("Employee not found");
@@ -112,8 +113,8 @@ public class SalaryMonthService {
                     fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
                 }
 
-                salaryMonth.setCommessionOveratedFromKPI(employee.getKPI() * commessionOverratedFromKPI);
-                salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * fineUnderatedFromKPI);
+                salaryMonth.setCommessionOveratedFromKPI((employee.getKPI() - employee.getTargetKPI()) * commessionOverratedFromKPI);
+                salaryMonth.setFineUnderatedFromKPI((employee.getKPI() - employee.getTargetKPI())  * fineUnderatedFromKPI);
                 salaryMonth.setSumSalary(employee.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
 
                 // Lưu SalaryMonth vào cơ sở dữ liệu

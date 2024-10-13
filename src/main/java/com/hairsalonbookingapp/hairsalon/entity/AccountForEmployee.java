@@ -36,6 +36,8 @@ public class AccountForEmployee implements UserDetails {
 
     private String img;
 
+    private String days;
+
     @Email(message = "Email invalid!")
     @NotBlank(message = "email must not blank!", groups = CreatedBy.class)
     private String email;
@@ -65,6 +67,8 @@ public class AccountForEmployee implements UserDetails {
 
     private Integer KPI = 0;
 
+    private Integer targetKPI = 0;
+
     private Long stylistSelectionFee;
 
     @Min(value = 0, message = "Basic Salary must at least 0")
@@ -90,7 +94,7 @@ public class AccountForEmployee implements UserDetails {
     @Pattern(regexp = "Manager|Stylist|Staff|Admin", message = "role invalid")
     private String role;
 
-    private String Status;
+    private String status;
 
     private boolean isDeleted = false;
 

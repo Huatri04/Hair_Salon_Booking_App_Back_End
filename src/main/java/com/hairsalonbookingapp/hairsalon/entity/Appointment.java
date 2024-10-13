@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -16,8 +17,6 @@ public class Appointment {
     private long appointmentId;
 
     private double cost;
-
-    private String status = "Appointment sent!";
 
     private boolean isCompleted = false;
 
@@ -33,9 +32,13 @@ public class Appointment {
     @JoinColumn(name = "CustomerId")
     private AccountForCustomer accountForCustomer;
 
-    @ManyToOne
-    @JoinColumn(name = "ServiceId")
-    private HairSalonService hairSalonService;
+    @ManyToMany
+    @JoinTable(
+            name = "service_appointment", // Tên bảng trung gian
+            joinColumns = @JoinColumn(name = "appointment_id"), // Khóa ngoại từ bảng Appointment
+            inverseJoinColumns = @JoinColumn(name = "service_id") // Khóa ngoại từ bảng Service
+    )
+    private List<HairSalonService> hairSalonServices;
 
     @OneToOne
     @JoinColumn(name = "discountCodeId")     // MÃ GIẢM GIÁ

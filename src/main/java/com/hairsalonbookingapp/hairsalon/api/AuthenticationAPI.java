@@ -93,4 +93,16 @@ public class AuthenticationAPI {
         AccountForEmployeeResponse accountForEmployeeResponse = authenticationService.deleteAccountForEmployee(id);
         return ResponseEntity.ok(accountForEmployeeResponse);
     }
+
+    @GetMapping("/ProfileCustomer")
+    public ResponseEntity getProfileCustomer(){
+        ProfileCustomer profileCustomer = authenticationService.getProfileCustomer();
+        return ResponseEntity.ok(profileCustomer);
+    }
+
+    @GetMapping("/ProfileEmployee")
+    public ResponseEntity getProfileEmployee(){
+        ProfileEmployee profileEmployee = authenticationService.getProfileEmployee();
+        return ResponseEntity.ok(profileEmployee);
+    }
 }

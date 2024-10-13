@@ -17,4 +17,5 @@ public interface DiscountProgramRepository extends JpaRepository<DiscountProgram
     List<DiscountProgram> findDiscountProgramsByIsDeletedFalse();
     Optional<DiscountProgram> findFirstByStartedDateBeforeAndEndedDateAfterAndIsDeletedFalse(LocalDateTime startedDate, LocalDateTime endedDate);
     Page<DiscountProgram> findDiscountProgramsByIsDeletedFalseOrderByEndedDateAsc(Pageable pageable);
+    DiscountProgram findDiscountProgramByDiscountProgramIdAndStatus(int id, String status);
 }

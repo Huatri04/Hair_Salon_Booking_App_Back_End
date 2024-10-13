@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.exception.CreateException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountprogram;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountProgram;
@@ -65,6 +66,30 @@ public class DiscountProgramService {
 //        return String.format("%s%06d", prefix, newIdNumber); // Tạo ID mới với format
 //    }
 
+    //Start program -> MANAGER LÀM
+    public DiscountProgramResponse startProgram(int id){
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByDiscountProgramIdAndStatus(id, "Not Start");
+        if(oldProgram != null){
+            oldProgram.setStatus("In Process");
+            DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
+            return modelMapper.map(newProgram, DiscountProgramResponse.class);
+        } else {
+            throw new EntityNotFoundException("Program not found!");
+        }
+    }
+
+    //End program -> MANAGER LÀM
+    public DiscountProgramResponse endProgram(int id){
+        DiscountProgram oldProgram = discountProgramRepository.findDiscountProgramByDiscountProgramIdAndStatus(id, "In Process");
+        if(oldProgram != null){
+            oldProgram.setStatus("Ended");
+            DiscountProgram newProgram = discountProgramRepository.save(oldProgram);
+            return modelMapper.map(newProgram, DiscountProgramResponse.class);
+        } else {
+            throw new EntityNotFoundException("Program not found!");
+        }
+    }
+
 
     //delete feedback
     public DiscountProgramResponse deleteDiscountProgram(int discountProgramId){
@@ -96,21 +121,7 @@ public class DiscountProgramService {
 //        DiscountProgram discountProgram = (DiscountProgram) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
 //        return discountProgramRepository.findDiscountProgramByDiscountProgramId(discountProgram.getDiscountProgramId());
 //    }
-    public DiscountProgram getCurrentDiscountProgram() {
-        LocalDateTime now = LocalDateTime.now(); // Lấy thời gian hiện tại
 
-        // Tìm chương trình khuyến mãi đang hoạt động
-        Optional<DiscountProgram> currentProgram = discountProgramRepository
-                .findFirstByStartedDateBeforeAndEndedDateAfterAndIsDeletedFalse(now, now);
-
-        // Kiểm tra xem có tìm thấy chương trình khuyến mãi không
-        if (currentProgram.isPresent()) {
-            return currentProgram.get(); // Nếu có, trả về chương trình khuyến mãi
-        } else {
-            // Nếu không tìm thấy, ném ra ngoại lệ với thông điệp rõ ràng
-            throw new Duplicate("No active discount program found.");
-        }
-    }
 
     public UpdateDiscountProgramResponse updatedDiscountProgram(RequestUpdateDiscountProgram requestUpdateDiscountProgram, int id) {
         DiscountProgram discountProgram = modelMapper.map(requestUpdateDiscountProgram, DiscountProgram.class);

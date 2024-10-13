@@ -16,13 +16,12 @@ import java.util.List;
 @Table(name = "ShiftInWeek")
 public class ShiftInWeek {
     @Id
-    @Column(unique = true, nullable = false)
-
+    @Column(unique = true)
     private String dayOfWeek;
 
     @NotBlank(message = "Start hour must not be blank!")
     @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Invalid time!")
-    private Date startHour;
+    private String startHour;
 
     @OneToMany(mappedBy = "shiftInWeek")
     @JsonIgnore
@@ -30,9 +29,7 @@ public class ShiftInWeek {
 
     @NotBlank(message = "End hour must not be blank!")
     @Pattern(regexp = "^([01]\\d|2[0-3]):([0-5]\\d)$", message = "Invalid time!")
-    private Date endHour;
-
-    private Date DateApply;
+    private String endHour;
 
     private boolean isAvailable = true;
 }

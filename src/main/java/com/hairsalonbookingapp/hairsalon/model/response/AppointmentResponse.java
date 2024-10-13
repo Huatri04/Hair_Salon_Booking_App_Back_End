@@ -2,19 +2,21 @@ package com.hairsalonbookingapp.hairsalon.model.response;
 
 import lombok.Data;
 
-import java.util.Date;
+import java.util.List;
 
 @Data
 public class AppointmentResponse {
-    private String appointmentId;
+    private long id;
+    private double cost;
+    private String day;
+    private String startHour;
+    private String customer;  // USERNAME
+    private List<String> service;
+    private String stylist;
 
-    private Date date;
 
-    private int slot;
-
-    private String status;
-
-    private String serviceStylistSupport;
-
-    private boolean isDeleted;
+    /*private long slotId;
+    private String CustomerId;
+    private long ServiceId;
+    private String discountCodeId;*/
 }

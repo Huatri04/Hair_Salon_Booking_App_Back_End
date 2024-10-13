@@ -4,14 +4,17 @@ import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
+import com.hairsalonbookingapp.hairsalon.exception.CreateException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.UpdatedException;
+import com.hairsalonbookingapp.hairsalon.model.request.CreateCodeRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestDiscountCode;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestUpdateDiscountCode;
 import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeInfResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeListResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.DiscountCodeResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.UpdateDiscountCodeResponse;
+import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
@@ -20,7 +23,11 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class DiscountCodeService {
@@ -35,74 +42,75 @@ public class DiscountCodeService {
     @Autowired
     DiscountProgramRepository discountProgramRepository;
 
-    // create feedback
-    public DiscountCodeResponse createDiscountCode(int id){
-        DiscountCode discountCode = new DiscountCode();
+    @Autowired
+    AccountForCustomerRepository accountForCustomerRepository;
 
-        DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
+    // create feedback
+    public List<DiscountCodeResponse> createDiscountCode(CreateCodeRequest createCodeRequest) {
+        DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(createCodeRequest.getProgramId());
         if(discountProgram == null){
             System.out.println("No current Discount program found.");
             throw new Duplicate("No current Discount program found.");
         }
-        discountCode.setDiscountProgram(discountProgram);
-
 
         AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         if(accountForCustomer == null){
-            throw new AccountNotFoundException("account not found!");
-        }else{
+            throw new AccountNotFoundException("Account not found!");
+        }
+
+        long pointToTrade = discountProgram.getPointChange() * createCodeRequest.getNumberOfTrade();
+
+        if(pointToTrade > accountForCustomer.getPoint()){
+            throw new CreateException("You do not have enough points to change!");
+        }
+
+        List<DiscountCode> discountCodeList = new ArrayList<>();
+        for(int i = 0; i < createCodeRequest.getNumberOfTrade(); i++){
+            DiscountCode discountCode = new DiscountCode(); // Tạo mới đối tượng
+            discountCode.setDiscountCodeId(generateRandomCode()); // GENERATE CODE
             discountCode.setCustomer(accountForCustomer);
+            discountCode.setDiscountProgram(discountProgram);
+            DiscountCode savedCode = discountCodeRepository.save(discountCode);
+            discountCodeList.add(savedCode);
         }
 
-        try{
-            String newId = generateId(discountProgram);
-            discountCode.setDiscountCodeId(newId);
-//            DiscountProgram discountProgram = discountProgramService.getCurrentDiscountProgram();
-//            if(discountProgram == null){
-//                throw new Duplicate("No current Discount program found.");
-//            }
-//            discountCode.setDiscountProgram(discountProgram);
+        // Trừ điểm của khách hàng
+        accountForCustomer.setPoint(accountForCustomer.getPoint() - pointToTrade);
+        accountForCustomerRepository.save(accountForCustomer);
 
-            accountForCustomer.setPoint(accountForCustomer.getPoint() - discountProgram.getPointChange());
+        // GENERATE RESPONSE
+        List<DiscountCodeResponse> discountCodeResponseList = new ArrayList<>();
+        for(DiscountCode code : discountCodeList){
+            DiscountCodeResponse discountCodeResponse = new DiscountCodeResponse();
+            discountCodeResponse.setDiscountCodeId(code.getDiscountCodeId());
+            discountCodeResponse.setCustomerName(code.getCustomer().getName());
+            discountCodeResponse.setPercentage(code.getDiscountProgram().getPercentage());
+            discountCodeResponse.setProgramName(code.getDiscountProgram().getName());
 
-
-
-
-            DiscountCode newDiscountCode = discountCodeRepository.save(discountCode);
-            return modelMapper.map(newDiscountCode, DiscountCodeResponse.class);
-        } catch (Exception e) {
-            if(e.getMessage().contains(discountCode.getDiscountCodeId())){
-                throw new Duplicate("duplicate start! ");
-            }
-            System.out.println(e.getMessage());
+            discountCodeResponseList.add(discountCodeResponse);
         }
-        return null;
+
+        return discountCodeResponseList;
     }
 
-    public String generateId(DiscountProgram discountProgram) {
-        // Tìm ID cuối cùng theo vai trò
-        Optional<DiscountCode> lastDiscountCode = discountCodeRepository.findTopByOrderByDiscountCodeIdDesc();
-        int newIdNumber = 1; // Mặc định bắt đầu từ 1
+    //HÀM GENERATE DISCOUNT CODE NGẪU NHIÊN GỒM 5 KÝ TỰ BAO GỒM CÁC SỐ , KÝ TỰ THƯỜNG, HOA VÀ ĐẶC BIỆT
+    private final String CHARACTERS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+            + "abcdefghijklmnopqrstuvwxyz"
+            + "0123456789"
+            + "!@#$%^&*()-_+=<>?";
 
-        // Nếu có tài khoản cuối cùng, lấy ID
-        if (lastDiscountCode.isPresent()) {
-            String lastId = lastDiscountCode.get().getDiscountCodeId();
-            newIdNumber = Integer.parseInt(lastId.replaceAll("\\D+", "")) + 1; // Tăng số lên 1
+    private final int CODE_LENGTH = 5;
+
+    public String generateRandomCode() {
+        SecureRandom random = new SecureRandom();
+        StringBuilder code = new StringBuilder(CODE_LENGTH);
+
+        for (int i = 0; i < CODE_LENGTH; i++) {
+            int randomIndex = random.nextInt(CHARACTERS.length());
+            code.append(CHARACTERS.charAt(randomIndex));
         }
 
-        // Tách tên thành các từ dựa trên khoảng trắng
-        String[] words = discountProgram.getName().split(" "); // ["Summer", "Sale"]
-
-        // Tạo tiền tố từ chữ cái đầu tiên của mỗi từ
-        String prefix = "";
-        for (String word : words) {
-            if (word.length() > 0) { // Kiểm tra từ không trống
-                char firstChar = Character.toUpperCase(word.charAt(0)); // Lấy chữ cái đầu tiên và chuyển thành hoa
-                prefix += firstChar; // Thêm vào tiền tố
-            }
-        }
-
-        return String.format("%s%06d", prefix, newIdNumber); // Tạo ID mới với format
+        return code.toString();
     }
 
 

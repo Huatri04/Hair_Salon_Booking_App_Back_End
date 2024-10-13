@@ -22,4 +22,8 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
     boolean existsByUsername(String username);
+
+    List<AccountForEmployee> findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse(String role, String stylistLevel, String status);
+    List<AccountForEmployee> findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(String role, String status);
+    AccountForEmployee findAccountForEmployeeByEmployeeIdAndStatusAndIsDeletedFalse(String id, String status);
 }

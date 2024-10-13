@@ -30,7 +30,7 @@ public class DiscountProgram {
 
     private long pointChange; // so diem can doi cua chuong trinh
 
-    private String status;
+    private String status = "Not Start";
 
     private double percentage;
 
