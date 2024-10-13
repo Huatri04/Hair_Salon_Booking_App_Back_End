@@ -65,6 +65,10 @@ public class AppointmentAPI {
         return ResponseEntity.ok(message);
     }
 
-
+    @GetMapping("/KPI")
+    public ResponseEntity viewKPI(){
+        List<KPITotal> kpiTotalList = appointmentService.getAllKPI();
+        return ResponseEntity.ok(kpiTotalList);
+    }
 
 }

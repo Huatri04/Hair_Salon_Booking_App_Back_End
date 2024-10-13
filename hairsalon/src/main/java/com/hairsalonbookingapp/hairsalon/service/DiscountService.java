@@ -5,10 +5,7 @@ import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
-import com.hairsalonbookingapp.hairsalon.model.DiscountCodeResponse;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramRequest;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramResponse;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramUpdate;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountCodeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.DiscountProgramRepository;
 import org.modelmapper.ModelMapper;
@@ -171,7 +168,9 @@ public class DiscountService {
 
     // CUSTOMER ĐỔI ĐIỂM LẤY CODE
     // numberOfTrade LÀ SỐ CODE MUỐN ĐỔI, VD: AN CÓ 1000 ĐIỂM, 1 CODE GIÁ 200, AN NHẬP 4 ĐỂ ĐỔI 800 LẤY 4 CODE
-    public List<DiscountCodeResponse> getDiscountCodes(int numberOfTrade, long programId){
+    public List<DiscountCodeResponse> getDiscountCodes(CreateCodeRequest createCodeRequest){
+        long programId = createCodeRequest.getProgramId();
+        int numberOfTrade = createCodeRequest.getNumberOfTrade();
         AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         DiscountProgram discountProgram = discountProgramRepository.findDiscountProgramById(programId);
         double percentage = discountProgram.getPercentage();

@@ -78,6 +78,8 @@ public class AccountForEmployee implements UserDetails {
 
     private String days; // NGÀY LÀM VIỆC (THỨ 2,3,4...) -> CÚ PHÁP: MONDAY, TUESDAY,....
 
+    private int completedSlot = 0; // SỐ SLOT HOÀN THÀNH
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return List.of();

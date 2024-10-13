@@ -386,6 +386,10 @@ public class AppointmentService {
             appointment.setCompleted(true);
             appointmentRepository.save(appointment);
 
+            AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+            account.setCompletedSlot(account.getCompletedSlot() + 1);
+            employeeRepository.save(account);
+
             /*slot.setAppointments(null);
             slot.setAvailable(true);
             slotRepository.save(slot);*/ // KHI TÍNH CHECK COMPLETE SLOT CÓ NGHĨA SLOT ĐÓ ĐÃ QUA RỒI, KO CÒN DÙNG NỮA
@@ -397,7 +401,7 @@ public class AppointmentService {
         }
     }
 
-    // DANH SÁCH CÁC STYLIST KHẢ DỤNG
+    // DANH SÁCH CÁC STYLIST KHẢ DỤNG -> HỖ TRỢ HÀM DƯỚI
     public List<AccountForEmployee> getAllStylistList(){
         String role = "Stylist";
         String status = "Workday";
@@ -409,44 +413,20 @@ public class AppointmentService {
         }
     }
 
-    //TÍNH SỐ APPOINTMENT 1 STYLIST LÀM TRONG 1 NGÀY
-    public
-
-    // TÍNH SỐ LỊCH STYLIST NHẬN ĐỂ SO SÁNH KPI
-    public void compareKPI(String firstDayOfMonth, String lastDayOfMonth){
+    // HÀM TRẢ VỀ DANH SÁCH CÁC STYLIST VÀ KPI
+    public List<KPITotal> getAllKPI(){
         List<KPITotal> kpiTotalList = new ArrayList<>();
-        int total = 0;
-        LocalDate firstDay = LocalDate.parse(firstDayOfMonth);
-        LocalDate lastDay = LocalDate.parse(lastDayOfMonth);
-        List<LocalDate> daysInMonth = timeService.getDaysBetween(firstDay, lastDay);
-        for(LocalDate localDate : daysInMonth){
-            String date = localDate.toString();
-            for(AccountForEmployee account : getAllStylistList()){
-                List<Appointment> appointmentList = appointmentRepository
-                        .findAppointmentsBySlot_ShiftEmployee_AccountForEmployeeAndSlot_DateAndIsCompletedTrue(account, date);
-                KPITotal kpiTotal = new KPITotal();
-                kpiTotal.setStylistId(account.getId());
-                kpiTotal.setKPI(account.getKPI());
-                
-                total += appointmentList.size();
-                kpiTotal.setTotal(total);
-            }
+        for(AccountForEmployee account : getAllStylistList()){
+            KPITotal kpiTotal = new KPITotal();
+            kpiTotal.setStylistId(account.getId());
+            kpiTotal.setKPI(account.getKPI());
+            kpiTotal.setTotal(account.getCompletedSlot());
 
+            kpiTotalList.add(kpiTotal);
+            account.setCompletedSlot(0);
+            employeeRepository.save(account);
         }
-
-
-
-        String role = "Stylist";
-        String status = "Workday";
-        List<AccountForEmployee> accountForEmployeeList = employeeRepository
-                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
-        if(accountForEmployeeList != null){
-            for(AccountForEmployee account : accountForEmployeeList){
-                account.getShiftEmployees().
-            }
-        } else {
-            throw new EntityNotFoundException("Stylist not found!");
-        }
+        return kpiTotalList;
     }
 
 

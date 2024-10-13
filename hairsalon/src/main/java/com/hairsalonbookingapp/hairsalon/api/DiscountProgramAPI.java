@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.DiscountCode;
 import com.hairsalonbookingapp.hairsalon.entity.DiscountProgram;
-import com.hairsalonbookingapp.hairsalon.model.DiscountCodeResponse;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramRequest;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramResponse;
-import com.hairsalonbookingapp.hairsalon.model.DiscountProgramUpdate;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.DiscountService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -29,21 +26,21 @@ public class DiscountProgramAPI {
         return ResponseEntity.ok(discountProgram);
     }
 
-    /*@PutMapping("/discountProgram/id")
+    @PutMapping("/discountProgram/{id}")
     public ResponseEntity updateDiscountProgram(@Valid @RequestBody DiscountProgramUpdate discountProgramUpdate, @PathVariable long id){
         DiscountProgramResponse discountProgram = discountService.updateProgram(discountProgramUpdate, id);
         return ResponseEntity.ok(discountProgram);
     }
 
-    @PutMapping("/start-discountProgram")
+    @PutMapping("/discountProgram/start")
     public ResponseEntity startDiscountProgram(@PathVariable long id){
         DiscountProgramResponse discountProgram = discountService.startProgram(id);
         return ResponseEntity.ok(discountProgram);
     }
 
-    @DeleteMapping("/end-discountProgram")
+    @DeleteMapping("/discountProgram/end")
     public ResponseEntity endDiscountProgram(@PathVariable long id){
-        DiscountProgramResponse discountProgram = discountService.deleteProgram(id);
+        DiscountProgramResponse discountProgram = discountService.endProgram(id);
         return ResponseEntity.ok(discountProgram);
     }
 
@@ -54,9 +51,9 @@ public class DiscountProgramAPI {
     }
 
     @PostMapping("/discountCode")
-    public ResponseEntity createNewDiscountCode(@RequestBody String code, @PathVariable long programId){
-        DiscountCodeResponse discountCode = discountService.createNewCode(code, programId);
-        return ResponseEntity.ok(discountCode);
-    }*/
+    public ResponseEntity createNewDiscountCode(@Valid @RequestBody CreateCodeRequest createCodeRequest){
+        List<DiscountCodeResponse> discountCodeResponseList = discountService.getDiscountCodes(createCodeRequest);
+        return ResponseEntity.ok(discountCodeResponseList);
+    }
 
 }
