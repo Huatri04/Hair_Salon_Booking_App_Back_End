@@ -249,8 +249,9 @@ public class AppointmentService {
 
     // XÓA APPOINTMENT  -> CUSTOMER LÀM, STAFF LÀM KHI STYLIST CÓ VIỆC BẬN TRONG SLOT ĐÓ
     public String deleteAppointment(DeleteAppointmentRequest deleteAppointmentRequest){
-        AccountForCustomer accountForCustomer = customerRepository.findAccountForCustomerByPhoneNumber(deleteAppointmentRequest.getPhonenumber());
-        if(accountForCustomer != null){
+        String phoneNumber = deleteAppointmentRequest.getPhonenumber();
+        AccountForCustomer accountForCustomer = customerRepository.findAccountForCustomerByPhoneNumber(phoneNumber);
+        if(accountForCustomer == null){
             throw new AccountNotFoundException("Account not found!!!");
         }
         Appointment oldAppointment = appointmentRepository
@@ -350,9 +351,9 @@ public class AppointmentService {
             appointment.setCompleted(true);
             appointmentRepository.save(appointment);
 
-            slot.setAppointments(null);
+            /*slot.setAppointments(null);
             slot.setAvailable(true);
-            slotRepository.save(slot);
+            slotRepository.save(slot);*/ // KHI TÍNH CHECK COMPLETE SLOT CÓ NGHĨA SLOT ĐÓ ĐÃ QUA RỒI, KO CÒN DÙNG NỮA
 
             String message = "Complete successfully!!!";
             return message;

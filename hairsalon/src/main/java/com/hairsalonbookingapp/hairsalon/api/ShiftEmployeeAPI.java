@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
 import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
+import com.hairsalonbookingapp.hairsalon.model.AvailableSlot;
 import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
 import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.service.ShiftEmployeeService;
@@ -86,6 +87,12 @@ public class ShiftEmployeeAPI {
     public ResponseEntity getShift(@PathVariable long id){
         String shiftEmployeeList = shiftEmployeeService.getShift(id);
         return ResponseEntity.ok(shiftEmployeeList);
+    }
+
+    @PostMapping("/available")
+    public ResponseEntity getAvailableShifts(@RequestBody String date){
+        List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlots(date);
+        return ResponseEntity.ok(availableSlotList);
     }
 
 
