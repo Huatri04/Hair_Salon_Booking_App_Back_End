@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
+import com.hairsalonbookingapp.hairsalon.exception.AccountBlockedException;
+import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.AccountResponseForCustomer;
 import com.hairsalonbookingapp.hairsalon.model.LoginRequestForCustomer;
 import com.hairsalonbookingapp.hairsalon.repository.CustomerRepository;
@@ -22,6 +24,7 @@ import org.testng.Assert;
 import org.testng.annotations.BeforeClass;
 import org.testng.annotations.Test;
 
+import static org.mockito.ArgumentMatchers.any;
 import static org.testng.Assert.*;
 
 @SpringBootTest
@@ -56,51 +59,9 @@ public class AuthenticationServiceTest {
         MockitoAnnotations.openMocks(this); // Khởi tạo các mock
     }
 
-    @Test
-    public void testLoginForCustomer1() {
-        String phonenumber = "0328337294";
-        String password = "String1";
-        String token = "asdjfjfjfsfs";
-
-        LoginRequestForCustomer loginRequestForCustomer = new LoginRequestForCustomer();
-        loginRequestForCustomer.setPhoneNumber(phonenumber);
-        loginRequestForCustomer.setPassword(password);
-
-        AccountForCustomer mockAccount = new AccountForCustomer();
-        mockAccount.setCustomerName("Anh");
-        mockAccount.setEmail("phuc@gmail.com");
-        mockAccount.setPoint(0);
-
-        AccountResponseForCustomer accountResponseForCustomer = new AccountResponseForCustomer();
-        accountResponseForCustomer.setCustomerName("Anh");
-        accountResponseForCustomer.setEmail("phuc@gmail.com");
-        accountResponseForCustomer.setToken("asdjfjfjfsfs");
-
-        Authentication mockAuthentication = Mockito.mock(Authentication.class);
-        Mockito.when(mockAuthentication.getPrincipal()).thenReturn(mockAccount);
-
-        Mockito.when(customerRepository.findAccountForCustomerByPhoneNumber(phonenumber)).thenReturn(mockAccount);
-        Mockito.when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
-                .thenReturn(mockAuthentication);
-
-        Mockito.when(modelMapper.map(mockAccount, AccountResponseForCustomer.class)).thenReturn(accountResponseForCustomer);
-
-        Mockito.when(tokenService.generateTokenCustomer(mockAccount)).thenReturn(token);
-
-        AccountResponseForCustomer account = authenticationService.loginForCustomer(loginRequestForCustomer);
-        ResponseEntity response = ResponseEntity.ok(account);
-
-        Assert.assertEquals(response.getStatusCode(), HttpStatus.OK); // KIỂM THỬ STATUS
-
-        AccountResponseForCustomer responseBody = (AccountResponseForCustomer) response.getBody();
-
-        Assert.assertEquals(responseBody.getCustomerName(), "Anh");
-
-        Assert.assertEquals(responseBody.getEmail(), "phuc@gmail.com");
-    }
 
     @Test
-    public void testLoginForCustomer() {
+    public void testLoginForCustomer_Success() {
         String phonenumber = "0328337294";
         String password = "String1";
         String token = "asdjfjfjfsfs";
@@ -114,7 +75,8 @@ public class AuthenticationServiceTest {
         mockAccount.setCustomerName("Anh");
         mockAccount.setEmail("phuc@gmail.com");
         mockAccount.setPoint(0);
-        mockAccount.setPhoneNumber(phonenumber); // Thêm số điện thoại vào mockAccount
+        mockAccount.setPhoneNumber(phonenumber);
+        mockAccount.setDeleted(false);
 
         // Mock AccountResponseForCustomer
         AccountResponseForCustomer accountResponseForCustomer = new AccountResponseForCustomer();
@@ -128,7 +90,7 @@ public class AuthenticationServiceTest {
 
         // Giả lập repository và các service
         Mockito.when(customerRepository.findAccountForCustomerByPhoneNumber(phonenumber)).thenReturn(mockAccount);
-        Mockito.when(authenticationManager.authenticate(Mockito.any(UsernamePasswordAuthenticationToken.class)))
+        Mockito.when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
                 .thenReturn(mockAuthentication);
 
         Mockito.when(modelMapper.map(mockAccount, AccountResponseForCustomer.class)).thenReturn(accountResponseForCustomer);
@@ -142,6 +104,58 @@ public class AuthenticationServiceTest {
         Assert.assertEquals(responseBody.getCustomerName(), "Anh");
         Assert.assertEquals(responseBody.getEmail(), "phuc@gmail.com");
         Assert.assertEquals(responseBody.getToken(), token); // Kiểm tra token
+    }
+
+
+    @Test(expectedExceptions = AccountNotFoundException.class)
+    public void testLoginForCustomer_Fail_WrongPassword() {
+        String phonenumber = "0327344923";
+        String password = "String";
+
+        LoginRequestForCustomer loginRequestForCustomer = new LoginRequestForCustomer();
+        loginRequestForCustomer.setPhoneNumber(phonenumber);
+        loginRequestForCustomer.setPassword(password);
+
+        // Mock AccountForCustomer
+        AccountForCustomer mockAccount = new AccountForCustomer();
+        mockAccount.setCustomerName("Anh");
+        mockAccount.setEmail("phuc@gmail.com");
+        mockAccount.setPoint(0);
+        mockAccount.setPhoneNumber(phonenumber);
+        mockAccount.setDeleted(false);
+
+
+        // Giả lập repository và các service
+        //Mockito.when(customerRepository.findAccountForCustomerByPhoneNumber(phonenumber)).thenReturn(mockAccount);
+        Mockito.when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class)))
+                .thenThrow(new AccountNotFoundException("Phonenumber or password invalid!"));
+
+        // Gọi phương thức kiểm thử
+        authenticationService.loginForCustomer(loginRequestForCustomer);
+
+        // Kiểm tra thông tin trả về
+        //Assert.assertEquals(response.getStatusCode(), HttpStatus.UNAUTHORIZED);
+    }
+
+
+    @Test(expectedExceptions = AccountBlockedException.class)
+    public void testLoginForCustomer_AccountBlocked() {
+        // Tạo dữ liệu giả lập
+        LoginRequestForCustomer loginRequest = new LoginRequestForCustomer();
+        loginRequest.setPhoneNumber("123456789");
+        loginRequest.setPassword("password");
+
+        AccountForCustomer account = new AccountForCustomer();
+        account.setPhoneNumber("123456789");
+        account.setPassword("password");
+        account.setDeleted(true); // Account bị khoá
+
+        Authentication authentication = Mockito.mock(Authentication.class);
+        Mockito.when(authentication.getPrincipal()).thenReturn(account);
+        Mockito.when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
+
+        // Gọi phương thức và mong đợi AccountBlockedException
+        authenticationService.loginForCustomer(loginRequest);
     }
 
 }
