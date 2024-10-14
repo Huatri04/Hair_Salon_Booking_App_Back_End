@@ -244,4 +244,24 @@ public class AuthenticationService implements UserDetailsService{
         AccountForEmployee account = (AccountForEmployee) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
         return employeeRepository.findAccountForEmployeeByUsername(account.getUsername());
     }
+
+    //HÀM GET PROFILE CUSTOMER THEO PHONENUMBER
+    public ProfileCustomer getProfileCusById(String phone){
+        AccountForCustomer accountForCustomer = customerRepository.findAccountForCustomerByPhoneNumber(phone);
+        if (accountForCustomer == null){
+            throw new EntityNotFoundException("Customer not found!!!");
+        }
+        return modelMapper.map(accountForCustomer, ProfileCustomer.class);
+    }
+
+    //HÀM GET PROFILE EMPLOYEE THEO ID
+    public ProfileEmployee getProfileEmpById(String id){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(id);
+        if (accountForEmployee == null){
+            throw new EntityNotFoundException("Employee not found!!!");
+        }
+        return modelMapper.map(accountForEmployee, ProfileEmployee.class);
+    }
+
+
 }
