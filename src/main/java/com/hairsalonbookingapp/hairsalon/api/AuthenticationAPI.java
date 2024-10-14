@@ -105,4 +105,15 @@ public class AuthenticationAPI {
         ProfileEmployee profileEmployee = authenticationService.getProfileEmployee();
         return ResponseEntity.ok(profileEmployee);
     }
+
+    @GetMapping("/ProfileCustomer/{phoneNumber}")
+    public ResponseEntity getProfileCustomerByPhone(@PathVariable String phoneNumber){
+        ProfileCustomer profileCustomer = authenticationService.getProfileCusById(phoneNumber);
+        return ResponseEntity.ok(profileCustomer);
+    }
+    @GetMapping("/ProfileEmployee/{id}")
+    public ResponseEntity getProfileEmployeeByID(@PathVariable String id){
+        ProfileEmployee profileEmployee = authenticationService.getProfileEmpById(id);
+        return ResponseEntity.ok(profileEmployee);
+    }
 }
