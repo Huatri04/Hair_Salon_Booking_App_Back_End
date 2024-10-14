@@ -37,6 +37,11 @@ public class TransactionService {
             }
             transaction.setDate(new Date());
             transaction.setEmployee(accountForEmployee);
+            if(transaction.getTransactionType().equalsIgnoreCase("Tiền mặt")){
+
+            }else{
+
+            }
             Transaction newTransaction = transactionRepository.save(transaction);
             return modelMapper.map(newTransaction, TransactionResponse.class);
         } catch (Exception e) {

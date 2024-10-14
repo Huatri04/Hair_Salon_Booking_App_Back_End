@@ -45,4 +45,6 @@ public class Appointment {
     private DiscountCode discountCode;
 
 
+    @OneToOne(mappedBy = "appointment")
+    private Payment payment;
 }

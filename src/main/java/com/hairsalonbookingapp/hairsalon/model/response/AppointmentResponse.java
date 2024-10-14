@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.model.response;
 
+import com.hairsalonbookingapp.hairsalon.entity.HairSalonService;
 import lombok.Data;
 
 import java.util.List;

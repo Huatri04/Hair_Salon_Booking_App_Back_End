@@ -99,6 +99,10 @@ public class SalaryMonthService {
                     continue; // Bỏ qua nếu không muốn cập nhật
                 }
 
+                if(employee.getBasicSalary() == null){
+                    continue;
+                }
+
                 SalaryMonth salaryMonth = new SalaryMonth();
                 salaryMonth.setEmployee(employee);
                 salaryMonth.setMonth(currentMonth);

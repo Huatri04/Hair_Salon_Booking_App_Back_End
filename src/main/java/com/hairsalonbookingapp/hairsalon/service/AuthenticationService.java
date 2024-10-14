@@ -122,9 +122,10 @@ public class AuthenticationService implements UserDetailsService {
 
     // update profile cho customer
 
-    public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer, String phone){
+    public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer){
 //        AccountForCustomer account = modelMapper.map(requestEditProfileCustomer, AccountForCustomer.class);
-        AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(phone);
+//        AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(phone);
+        AccountForCustomer oldAccount = getCurrentAccountForCustomer();
         if (oldAccount == null) {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
@@ -181,9 +182,9 @@ public class AuthenticationService implements UserDetailsService {
     // logic update profile cho employee
 
 
-    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee, String id) {
+    public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee) {
 //        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
-            AccountForEmployee oldAccount = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+            AccountForEmployee oldAccount = getCurrentAccountForEmployee();
             if (oldAccount == null) {
                 throw new Duplicate("Account not found!");// cho dung luon
             } else {
@@ -592,7 +593,7 @@ public class AuthenticationService implements UserDetailsService {
         if(accountForCustomerRepository.findByPhoneNumber(phoneNumber)!=null){
             return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
         } else {
-            throw new AccountNotFoundException("Phone number or password invalid!");
+            throw new AccountNotFoundException("Phonenumber or password invalid!");
         }
     }
 

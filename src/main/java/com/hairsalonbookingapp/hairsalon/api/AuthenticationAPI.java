@@ -49,16 +49,16 @@ public class AuthenticationAPI {
     }
 
     // update profile cua customer
-    @PutMapping("/profile/{id}")
-    public ResponseEntity updatedAccountCustomer(@Valid @RequestBody RequestEditProfileCustomer account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
-        EditProfileCustomerResponse oldAccount = authenticationService.updatedAccount(account, id);
+    @PutMapping("/profile")
+    public ResponseEntity updatedAccountCustomer(@Valid @RequestBody RequestEditProfileCustomer account){ //@PathVariable de tim thang id tu FE
+        EditProfileCustomerResponse oldAccount = authenticationService.updatedAccount(account);
         return ResponseEntity.ok(oldAccount);
     }
 
     //update profile cua employee
-    @PutMapping("/profileEmployee/{id}")
-    public ResponseEntity updatedAccountEmployee(@Valid @RequestBody RequestEditProfileEmployee account, @PathVariable String id){ //@PathVariable de tim thang id tu FE
-        EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccount(account, id);
+    @PutMapping("/profileEmployee")
+    public ResponseEntity updatedAccountEmployee(@Valid @RequestBody RequestEditProfileEmployee account){ //@PathVariable de tim thang id tu FE
+        EditProfileEmployeeResponse oldAccount = authenticationService.updatedAccount(account);
         return ResponseEntity.ok(oldAccount);
     }
 

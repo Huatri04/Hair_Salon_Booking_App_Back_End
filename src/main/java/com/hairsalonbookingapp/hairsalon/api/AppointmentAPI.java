@@ -1,11 +1,13 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
+import com.hairsalonbookingapp.hairsalon.entity.Appointment;
 import com.hairsalonbookingapp.hairsalon.model.request.AppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.DeleteAllAppointmentsRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.KPITotal;
 import com.hairsalonbookingapp.hairsalon.service.AppointmentService;
+import com.hairsalonbookingapp.hairsalon.service.PayService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,6 +23,9 @@ public class AppointmentAPI {
 
     @Autowired
     AppointmentService appointmentService;
+
+    @Autowired
+    PayService payService;
 
     /*@PostMapping("/appointment")
     public ResponseEntity createNewAppointment(@Valid @RequestBody AppointmentRequest appointmentRequest){
@@ -60,9 +65,10 @@ public class AppointmentAPI {
     }
 
     @PutMapping("/complete")
-    public ResponseEntity completeAppointment(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
-        String message = appointmentService.completeAppointment(completeAppointmentRequest);
-        return ResponseEntity.ok(message);
+    public ResponseEntity completeAppointment(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest) throws Exception {
+//        Appointment appointment = appointmentService.completeAppointment(completeAppointmentRequest);
+        String urlVNPay = payService.createUrl(completeAppointmentRequest);
+        return ResponseEntity.ok(urlVNPay);
     }
 
     @GetMapping("/KPI")

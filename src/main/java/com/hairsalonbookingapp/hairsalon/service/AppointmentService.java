@@ -376,32 +376,59 @@ public class AppointmentService {
 
 
     //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT
-    public String completeAppointment(CompleteAppointmentRequest completeAppointmentRequest){
-        Slot slot = slotRepository
-                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
-                        completeAppointmentRequest.getStartSlot(),
-                        completeAppointmentRequest.getStylistId(),
-                        completeAppointmentRequest.getDate()
-                );
-        if(slot != null){
+    public Appointment completeAppointment(CompleteAppointmentRequest completeAppointmentRequest) {
+        Slot slot = slotRepository.findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
+                completeAppointmentRequest.getStartSlot(),
+                completeAppointmentRequest.getStylistId(),
+                completeAppointmentRequest.getDate()
+        );
+
+        if (slot != null) {
             Appointment appointment = slot.getAppointments();
-            appointment.setCompleted(true);
-            appointmentRepository.save(appointment);
+            if (appointment != null) {
+                appointment.setCompleted(true);
+                appointmentRepository.save(appointment);
 
-            AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
-            account.setKPI(account.getKPI() + 1);
-            employeeRepository.save(account);
-
-            /*slot.setAppointments(null);
-            slot.setAvailable(true);
-            slotRepository.save(slot);*/ // KHI TÍNH CHECK COMPLETE SLOT CÓ NGHĨA SLOT ĐÓ ĐÃ QUA RỒI, KO CÒN DÙNG NỮA
-
-            String message = "Complete successfully!!!";
-            return message;
+                AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+                if (account != null) {
+                    account.setKPI(account.getKPI() + 1);
+                    employeeRepository.save(account);
+                }
+                return appointment;
+            } else {
+                throw new EntityNotFoundException("Appointment not found!");
+            }
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }
     }
+
+//    public String completeAppointment(CompleteAppointmentRequest completeAppointmentRequest){
+//        Slot slot = slotRepository
+//                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
+//                        completeAppointmentRequest.getStartSlot(),
+//                        completeAppointmentRequest.getStylistId(),
+//                        completeAppointmentRequest.getDate()
+//                );
+//        if(slot != null){
+//            Appointment appointment = slot.getAppointments();
+//            appointment.setCompleted(true);
+//            appointmentRepository.save(appointment);
+//
+//            AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+//            account.setKPI(account.getKPI() + 1);
+//            employeeRepository.save(account);
+//
+//            /*slot.setAppointments(null);
+//            slot.setAvailable(true);
+//            slotRepository.save(slot);*/ // KHI TÍNH CHECK COMPLETE SLOT CÓ NGHĨA SLOT ĐÓ ĐÃ QUA RỒI, KO CÒN DÙNG NỮA
+//
+//            String message = "Complete successfully!!!";
+//            return message;
+//        } else {
+//            throw new EntityNotFoundException("Slot not found!");
+//        }
+//    }
 
     // DANH SÁCH CÁC STYLIST KHẢ DỤNG -> HỖ TRỢ HÀM DƯỚI
     public List<AccountForEmployee> getAllStylistList(){

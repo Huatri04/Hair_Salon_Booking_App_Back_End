@@ -11,6 +11,8 @@ import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import org.mockito.*;
 import org.modelmapper.ModelMapper;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.testng.Assert;
 import org.testng.annotations.BeforeMethod;
@@ -44,63 +46,6 @@ public class AuthenticationServiceTest {
         accountForCustomerRepository.deleteAll();
     }
 
-//    @Test
-//    public void testRegisterSuccess() {
-//        // Arrange
-//        RegisterRequestForCustomer registerRequest = new RegisterRequestForCustomer();
-//        registerRequest.setEmail("newuser@gmail.com");
-//        registerRequest.setPhoneNumber("0799128953");
-//        registerRequest.setPassword("123456");
-//        registerRequest.setName("newuser");
-//
-//        AccountForCustomer account = new AccountForCustomer();
-//        account.setEmail(registerRequest.getEmail());
-//        account.setPhoneNumber(registerRequest.getPhoneNumber());
-//        account.setPassword(registerRequest.getPassword());
-//        account.setName(registerRequest.getName());
-//
-//        //kiem tra request co map dc vs account hay ko
-//        Mockito.when(modelMapper.map(registerRequest, AccountForCustomer.class)).thenReturn(account);
-//
-//        //kiem tra mail co ton tai hay ko
-//        Mockito.when(accountForCustomerRepository.existsByEmail(account.getEmail())).thenReturn(false);
-//
-//        Mockito.when(accountForCustomerRepository.existsByPhoneNumber(account.getPhoneNumber())).thenReturn(false);
-//
-////        Mockito.when(passwordEncoder.encode("password123")).thenReturn("encodedPassword123");
-//
-//        Mockito.when(accountForCustomerRepository.save(ArgumentMatchers.any(AccountForCustomer.class))).thenAnswer(invocation -> {
-//            AccountForCustomer savedAccount = invocation.getArgument(0);
-//            savedAccount.setCreatAt(new Date());
-//            return savedAccount;
-//        });
-//
-////        Mockito.when(modelMapper.map(ArgumentMatchers.any(AccountForCustomer.class), ArgumentMatchers.eq(AccountForCustomerResponse.class)))
-////                .thenAnswer(invocation -> {
-////                    AccountForCustomer savedAccount = invocation.getArgument(0);
-////                    return new AccountForCustomerResponse(savedAccount.getName(),
-////                            savedAccount.getEmail(),
-////                            savedAccount.getPhoneNumber(),
-////                            savedAccount.getCreatAt());
-////                });
-//
-//        // Act
-//        AccountForCustomerResponse response = authenticationService.register(registerRequest);
-//
-//        // Assert
-//        Assert.assertNotNull(response);
-//        Assert.assertEquals(response.getEmail(), "newuser@gmail.com");
-//        Assert.assertEquals(response.getPhoneNumber(), "0799128953");
-//        Assert.assertEquals(response.getName(), "newuser");
-//
-//
-////        // Verify interactions
-////        Mockito.verify(accountForCustomerRepository, Mockito.times(1)).existsByEmail("newuser@example.com");
-////        Mockito.verify(accountForCustomerRepository, Mockito.times(1)).existsByPhoneNumber("1234567890");
-////        Mockito.verify(passwordEncoder, Mockito.times(1)).encode("password123");
-////        Mockito.verify(accountForCustomerRepository, Mockito.times(1)).save(Mockito.any(AccountForCustomer.class));
-//
-//    }
 
     @Test
     public void testRegisterForCustomerSuccess() {
@@ -136,13 +81,15 @@ public class AuthenticationServiceTest {
 
         // Mô phỏng hành vi của modelMapper khi chuyển đổi Entity sang Response DTO
         Mockito.when(modelMapper.map(ArgumentMatchers.eq(accountForCustomer), ArgumentMatchers.eq(AccountForCustomerResponse.class))).thenReturn(response);
-
+        AccountForCustomerResponse account = authenticationService.register(registerRequestForCustomer);
+        ResponseEntity resp = ResponseEntity.ok(account);
 
         // Assert
         Assert.assertNotNull(response);
         Assert.assertEquals(response.getEmail(), "string@gmail.com");
         Assert.assertEquals(response.getPhoneNumber(), "0799128953");
         Assert.assertEquals(response.getName(), "anh");
+        Assert.assertEquals(resp.getStatusCode(), HttpStatus.OK);
 
     }
 

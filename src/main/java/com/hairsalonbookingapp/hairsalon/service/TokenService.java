@@ -82,7 +82,7 @@ public class TokenService {
         if(authenticationService.isPhoneNumber(name)){
             return null;
         } else {
-            return employeeRepository.findAccountForEmployeeByName(name);
+            return employeeRepository.findAccountForEmployeeByName(name); // nen thay thanh uẻname
         }
     }
 }
