@@ -27,5 +27,14 @@ public class Transaction {
     @JoinColumn(name = "employeeId", nullable = false) // day la foreign key
     private AccountForEmployee employee;
 
+    @ManyToOne
+    @JoinColumn(name = "phoneNumber", nullable = false) // day la foreign key
+    private AccountForCustomer customer;
+
+    @ManyToOne
+    @JoinColumn(name = "paymentId")
+    private Payment payment;
+
+
     private boolean isDeleted = false;
 }

@@ -14,7 +14,7 @@ import java.util.List;
 public class TimeService {
 
     // GIẢ ĐỊNH NGÀY HIỆN TẠI
-    public final LocalDate today = LocalDate.of(2024, 11, 02);
+    public final LocalDate today = getToday();
     // THỜI GIAN BẮT ĐÂÙ VÀ KẾT THÚC CA LÀM VIỆC
     public final int startHour = 7;
     public final int endHour = 10;

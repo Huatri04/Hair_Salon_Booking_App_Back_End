@@ -88,8 +88,8 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(shiftEmployeeList);
     }
 
-    @PostMapping("/available")
-    public ResponseEntity getAvailableShifts(@RequestBody String date){
+    @PostMapping("/available/{date}")
+    public ResponseEntity getAvailableShifts(@PathVariable String date){
         List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlots(date);
         return ResponseEntity.ok(availableSlotList);
     }

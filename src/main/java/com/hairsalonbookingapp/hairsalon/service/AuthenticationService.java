@@ -389,6 +389,7 @@ public class AuthenticationService implements UserDetailsService {
             String originPassword = account.getPassword();
             account.setPassword(passwordEncoder.encode(originPassword));
             account.setCreatedAt(new Date());
+            account.setStatus("Workday");
 
             AccountForEmployee newAccount = employeeRepository.save(account);
 

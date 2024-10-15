@@ -1,11 +1,10 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
-import com.hairsalonbookingapp.hairsalon.entity.ShiftInWeek;
-import com.hairsalonbookingapp.hairsalon.entity.Slot;
+import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.AccountNotFoundException;
+import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.model.request.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.AccountForEmployeeResponse;
@@ -15,11 +14,13 @@ import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.web.bind.MethodArgumentNotValidException;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class ShiftEmployeeService {
@@ -101,6 +102,7 @@ public class ShiftEmployeeService {
         return shiftEmployeeResponse;
     }*/
 
+
     // TẠO SHIFT CHO STYLIST -> DÙNG CHO HÀM DƯỚI
     public List<ShiftEmployeeResponse> generateShiftEmployee(AccountForEmployee accountForEmployee){
         String days = accountForEmployee.getDays(); // LẤY CÁC NGÀY STYLIST CHỌN
@@ -178,6 +180,7 @@ public class ShiftEmployeeService {
             throw new EntityNotFoundException("Can not execute!");
         }
     }
+
 
     // 2 HÀM DƯỚI TEST CHO VUI
     public List<ShiftEmployee> getAllShift(){

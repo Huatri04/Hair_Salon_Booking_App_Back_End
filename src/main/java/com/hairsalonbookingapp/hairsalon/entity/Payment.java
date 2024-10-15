@@ -1,11 +1,13 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.Date;
+import java.util.List;
 
 @Getter
 @Setter
@@ -13,11 +15,15 @@ import java.util.Date;
 public class Payment {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private long PaymentId;
+    private long paymentId;
 
     private Date createAt;
 
     private String typePayment;
+
+    @OneToMany(mappedBy = "payment")
+    @JsonIgnore
+    private List<Transaction> transactions;
 
     @OneToOne
     @JoinColumn(name = "appointmentId")

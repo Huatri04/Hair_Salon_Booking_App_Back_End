@@ -61,6 +61,10 @@ public class AccountForCustomer implements UserDetails {
     @JsonIgnore
     private List<SoftwareSupportApplication> softwareSupportApplications;
 
+    @OneToMany(mappedBy = "customer") // Thiết lập mối quan hệ một-nhiều
+    @JsonIgnore
+    private List<Transaction> transactions;
+
     private String appointmentId;
 
     private boolean status;

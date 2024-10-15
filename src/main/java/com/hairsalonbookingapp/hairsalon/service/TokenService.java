@@ -46,13 +46,45 @@ public class TokenService {
     //tạo ra token cho employee
     public String generateTokenEmployee(AccountForEmployee accountForEmployee){
         String token = Jwts.builder()
-                .subject(accountForEmployee.getName()+ "")
+                .subject(accountForEmployee.getUsername()+ "")
                 .issuedAt(new Date(System.currentTimeMillis())) // 10:30
                 .expiration(new Date(System.currentTimeMillis() + 1000 * 60 * 60 * 24))
                 .signWith(getSigninKey())
                 .compact();
         return token;
     }
+
+//    //verify token cho customer
+//    public AccountForCustomer getAccountCustomerByToken(String token){
+//        Claims claims = Jwts.parser()
+//                .verifyWith(getSigninKey())
+//                .build()
+//                .parseSignedClaims(token)
+//                .getPayload();
+//
+//        String phoneNumber = claims.getSubject();
+//        if(authenticationService.isPhoneNumber(phoneNumber)){
+//            return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
+//        } else {
+//            return null;
+//        }
+//    }
+//
+//    //verify token cho employee
+//    public AccountForEmployee getAccountEmployeeByToken(String token){
+//        Claims claims = Jwts.parser()
+//                .verifyWith(getSigninKey())
+//                .build()
+//                .parseSignedClaims(token)
+//                .getPayload();
+//
+//        String name = claims.getSubject();
+//        if(authenticationService.isPhoneNumber(name)){
+//            return null;
+//        } else {
+//            return employeeRepository.findAccountForEmployeeByUsername(name); // nen thay thanh uẻname
+//        }
+//    }
 
     //verify token cho customer
     public AccountForCustomer getAccountCustomerByToken(String token){
@@ -82,7 +114,7 @@ public class TokenService {
         if(authenticationService.isPhoneNumber(name)){
             return null;
         } else {
-            return employeeRepository.findAccountForEmployeeByName(name); // nen thay thanh uẻname
+            return employeeRepository.findAccountForEmployeeByUsername(name);
         }
     }
 }
