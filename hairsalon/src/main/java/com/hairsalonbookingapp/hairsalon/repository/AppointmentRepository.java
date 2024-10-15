@@ -10,10 +10,10 @@ import java.util.List;
 public interface AppointmentRepository extends JpaRepository<Appointment, Long> {
     /*Appointment findAppointmentByIdAndStatusAndIsDeletedFalse(long id, String status);
     List<Appointment> findAppointmentsByStatusAndIsDeletedFalse(String status);
-    Appointment findAppointmentByIdAndIsDeletedFalse(long id);
     Appointment findAppointmentBySlot_IdAndIsCompletedFalse(long slotID);
     Appointment findAppointmentByIdAndAccountForCustomerAndStatusAndIsDeletedFalse(long id, AccountForCustomer accountForCustomer, String status);*/
     Appointment findAppointmentBySlot_IdAndAccountForCustomerAndIsDeletedFalse(long id, AccountForCustomer accountForCustomer);
     Appointment findAppointmentBySlot_IdAndIsDeletedFalse(long id);
     List<Appointment> findAppointmentsBySlot_ShiftEmployee_AccountForEmployeeAndSlot_DateAndIsCompletedTrue(AccountForEmployee accountForEmployee, String date);
+    Appointment findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(long id, AccountForCustomer accountForCustomer);
 }

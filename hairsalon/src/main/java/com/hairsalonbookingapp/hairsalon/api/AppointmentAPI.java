@@ -71,4 +71,10 @@ public class AppointmentAPI {
         return ResponseEntity.ok(kpiTotalList);
     }
 
+    @PutMapping("/{appointmentId}")
+    public ResponseEntity completeAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long appointmentId){
+        AppointmentResponse appointmentResponse = appointmentService.updateAppointment(appointmentUpdate, appointmentId);
+        return ResponseEntity.ok(appointmentResponse);
+    }
+
 }

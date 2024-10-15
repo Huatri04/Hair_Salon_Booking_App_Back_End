@@ -162,6 +162,36 @@ public class AppointmentService {
             throw new EntityNotFoundException("Can not create appointment: " + e.getMessage());
         }
     }
+
+    // UPDATE APPOINTMENT ->  CUSTOMER LÀM
+    public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long idAppointment){
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);
+        if(oldAppointment == null){
+            throw new EntityNotFoundException("Appointment not found!!!");
+        }
+        // XÓA APPOINTMENT CŨ
+        deleteAppointmentByCustomer(oldAppointment.getId());
+        // TẠO APPOINTMENT MỚI
+        AppointmentRequest appointmentRequest = new AppointmentRequest();
+        long newSlotId = appointmentUpdate.getSlotId();
+        List<Long> newServiceIdList = appointmentUpdate.getServiceIdList();
+        String newCode = appointmentUpdate.getDiscountCode();
+        if(newSlotId != 0){
+            appointmentRequest.setSlotId(newSlotId);
+        }
+
+        if(!newServiceIdList.isEmpty()){
+            appointmentRequest.setServiceIdList(newServiceIdList);
+        }
+
+        if(!newCode.isEmpty()){
+            appointmentRequest.setDiscountCode(newCode);
+        }
+
+        return createNewAppointment(appointmentRequest);
+    }
 /*    //CẬP NHẬT APPOINTMENT -> CUSTOMER LÀM
     // CẬP NHẬT APPOINTMENT CÓ 2 TRƯỜNG HỢP:
     //1. CUSTOMER CHƯA GỬI ĐƠN : TRƯỜNG HỢP NÀY KHÔNG VẤN ĐỀ GÌ, CUSTOMER CÓ THỂ THAO TÁC LẠI CÁC HÀM Ở TRÊN ĐỂ LỰA CHỌN LẠI
@@ -286,10 +316,10 @@ public class AppointmentService {
     }
 
     // XÓA APPOINTMENT -> CUSTOMER LÀM
-    public String deleteAppointmentByCustomer(long slotId){
+    public String deleteAppointmentByCustomer(long idAppointment){
         AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         Appointment oldAppointment = appointmentRepository
-                .findAppointmentBySlot_IdAndAccountForCustomerAndIsDeletedFalse(slotId, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
+                .findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
