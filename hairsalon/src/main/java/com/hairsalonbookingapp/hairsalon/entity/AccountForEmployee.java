@@ -35,7 +35,6 @@ public class AccountForEmployee implements UserDetails {
     private String username;    // TÊN TÀI KHOẢN
 
     @NotBlank(message = "Name must not be blank!")
-    @Column(unique = true)
     private String name;        // TÊN ĐẦY ĐỦ CỦA EMPLOYEE
 
     private String img;

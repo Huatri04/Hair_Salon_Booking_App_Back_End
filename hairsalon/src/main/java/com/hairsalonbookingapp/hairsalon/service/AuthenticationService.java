@@ -119,12 +119,12 @@ public class AuthenticationService implements UserDetailsService{
                     account.setExpertStylistBonus("20%");
                 }
             }*/
-            account.setId("2");
+            account.setId("4");
             //account.setBasicSalary("100000");
             account.setCreatedAt(new Date());
-            account.setExpertStylistBonus(0);
+            account.setExpertStylistBonus(20);
             account.setStatus("Workday");
-            account.setBasicSalary(500000);
+            account.setBasicSalary(700000);
             account.setKPI(4);
             account.setDeleted(false);
 
