@@ -41,8 +41,8 @@ public class AppointmentAPI {
         return ResponseEntity.ok(message);
     }
 
-    @PutMapping("/customerDelete")
-    public ResponseEntity deleteAppointmentByCus(@Valid @RequestBody long slotId){
+    @PutMapping("/customerDelete/{slotId}")
+    public ResponseEntity deleteAppointmentByCus(@PathVariable long slotId){
         String message = appointmentService.deleteAppointmentByCustomer(slotId);
         return ResponseEntity.ok(message);
     }

@@ -212,6 +212,17 @@ public class ShiftEmployeeService {
         return availableSlotList;
     }
 
+    // HÀM LẤY DANH SÁCH STYLIST KHẢ DỤNG DỰA TRÊN GIỜ VÀ NGÀY
+    public List<AvailableSlot> getAllAvailableSlotsByHour(String hour, String date){
+        List<AvailableSlot> availableSlotListByHour = new ArrayList<>();
+        for(AvailableSlot availableSlot : getAllAvailableSlots(date)){
+            if(availableSlot.getStartHour().equals(hour)){
+                availableSlotListByHour.add(availableSlot);
+            }
+        }
+        return availableSlotListByHour;
+    }
+
 
 /* => COMMENT TẠM THỜI
 
