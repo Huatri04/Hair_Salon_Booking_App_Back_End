@@ -17,11 +17,13 @@ public class Transaction {
 
     private String transactionType;
 
-    private long money;
+    private double money;
 
     private String description;
 
     private Date date;
+
+    private String status;
 
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false) // day la foreign key

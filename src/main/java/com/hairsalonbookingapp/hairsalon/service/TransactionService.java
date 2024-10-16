@@ -2,9 +2,14 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestTransaction;
 import com.hairsalonbookingapp.hairsalon.model.response.TransactionListResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.TransactionResponse;
+import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
+import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
+import com.hairsalonbookingapp.hairsalon.repository.PaymentRepository;
 import com.hairsalonbookingapp.hairsalon.repository.TransactionRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -12,7 +17,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 @Service
 public class TransactionService {
@@ -23,35 +30,54 @@ public class TransactionService {
     AuthenticationService authenticationService;
 
     @Autowired
+    AppointmentService appointmentService;
+
+    @Autowired
+    PaymentRepository paymentRepository;
+
+
+
+
+
+    @Autowired
     ModelMapper modelMapper;
     // create Transaction
-    public TransactionResponse createTransaction(RequestTransaction requestTransaction){
-        Transaction transaction = modelMapper.map(requestTransaction, Transaction.class);
+    public TransactionResponse createTransactionInCast(CompleteAppointmentRequest orderRequest) {
+        Appointment appointment = appointmentService.completeAppointment(orderRequest);
+        AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+        try {
+            // Tạo payment
+            Payment payment = new Payment();
+            payment.setAppointment(appointment);
+            payment.setCreateAt(new Date());
+            payment.setTypePayment("Cash");
 
-        try{
-//            String newId = generateId();
-//            feedback.setFeedbackId(newId);
-            AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
-            if(accountForEmployee == null){
-                throw new Duplicate("No current employee found.");
-            }
+            List<Transaction> transactions = new ArrayList<>();
+
+            // Tạo giao dịch
+            Transaction transaction = new Transaction();
+            transaction.setMoney(appointment.getCost());
             transaction.setDate(new Date());
             transaction.setEmployee(accountForEmployee);
-            if(transaction.getTransactionType().equalsIgnoreCase("Tiền mặt")){
+            transaction.setCustomer(appointment.getAccountForCustomer());
+            transaction.setPayment(payment);
+            transaction.setStatus("Success");
+            transaction.setDescription("Thanh toán trực tiếp tại quầy");
+            transactions.add(transaction);
 
-            }else{
+            // Thiết lập giao dịch trong payment
+            payment.setTransactions(transactions);
 
-            }
-            Transaction newTransaction = transactionRepository.save(transaction);
-            return modelMapper.map(newTransaction, TransactionResponse.class);
+            // Lưu payment trước
+            paymentRepository.save(payment);
+
+            // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
         } catch (Exception e) {
             System.out.println(e.getMessage());
-            if(e.getMessage().contains(transaction.getEmployee() + "")){
-                throw new Duplicate("duplicate employee! ");
-            }
         }
         return null;
     }
+
 
 //    public String generateId() {
 //        // Tìm ID cuối cùng theo vai trò

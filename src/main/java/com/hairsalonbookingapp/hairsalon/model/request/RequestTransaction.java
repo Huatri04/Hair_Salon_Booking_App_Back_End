@@ -6,7 +6,7 @@ import lombok.Data;
 public class RequestTransaction {
     private String transactionType;
 
-    private long money;
+    private double money;
 
     private String description;
 }

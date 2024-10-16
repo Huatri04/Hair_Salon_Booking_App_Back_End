@@ -21,7 +21,7 @@ public class Payment {
 
     private String typePayment;
 
-    @OneToMany(mappedBy = "payment")
+    @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
     private List<Transaction> transactions;
 

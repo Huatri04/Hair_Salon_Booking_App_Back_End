@@ -3,6 +3,9 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.NoContentException;
+import com.hairsalonbookingapp.hairsalon.model.EmailDetail;
+import com.hairsalonbookingapp.hairsalon.model.EmailDetailForEmployee;
+import com.hairsalonbookingapp.hairsalon.model.EmailDetailForEmployeeSalary;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonth;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestSalaryMonthForAnEmployee;
 import com.hairsalonbookingapp.hairsalon.model.response.SalaryMonthListResponse;
@@ -31,6 +34,9 @@ public class SalaryMonthService {
 
     @Autowired
     EmployeeRepository employeeRepository;
+
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     ModelMapper modelMapper;
@@ -65,6 +71,12 @@ public class SalaryMonthService {
             salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * fineUnderatedFromKPI);
             salaryMonth.setSumSalary(employee.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
 
+            EmailDetailForEmployeeSalary emailDetail = new EmailDetailForEmployeeSalary();
+            emailDetail.setReceiver(employee);
+            emailDetail.setSubject("Salary Announcement" + currentMonth + "!");
+            emailDetail.setLink("http://localhost:5173/loginEmployee");
+            emailDetail.setSumSalary(salaryMonth.getSumSalary());
+            emailService.sendEmailToEmployeeSalary(emailDetail);
 
             SalaryMonth newSalaryMonth = salaryMonthRepository.save(salaryMonth);
             return modelMapper.map(newSalaryMonth, SalaryMonthResponse.class);
@@ -125,6 +137,14 @@ public class SalaryMonthService {
                 SalaryMonth newSalaryMonth = salaryMonthRepository.save(salaryMonth);
                 SalaryMonthResponse salaryMonthResponse = modelMapper.map(newSalaryMonth, SalaryMonthResponse.class);
                 salaryMonthResponses.add(salaryMonthResponse);
+
+                EmailDetailForEmployeeSalary emailDetail = new EmailDetailForEmployeeSalary();
+                emailDetail.setReceiver(employee);
+                emailDetail.setSubject("Salary Announcement" + currentMonth + "!");
+                emailDetail.setLink("http://localhost:5173/loginEmployee");
+                emailDetail.setSumSalary(salaryMonth.getSumSalary());
+                emailService.sendEmailToEmployeeSalary(emailDetail);
+
                 salaryCreated = true; // Đánh dấu là đã tạo lương thành công
             }
             if (!salaryCreated) {

@@ -13,7 +13,7 @@ public class TransactionResponse {
 
     private String transactionType;
 
-    private long money;
+    private double money;
 
     private String description;
 

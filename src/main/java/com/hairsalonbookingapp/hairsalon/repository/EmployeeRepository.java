@@ -12,6 +12,8 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     Optional<String> findLastIdByRole(@Param("role") String role);
     Optional<AccountForEmployee> findTopByRoleOrderByEmployeeIdDesc(@Param("role") String role);
 
+    AccountForEmployee findByEmail(String email);
+
     // Lấy account có id lớn nhất để tạo id mới
     Optional<AccountForEmployee> findTopByOrderByEmployeeIdDesc();
     AccountForEmployee findAccountForEmployeeByUsername(String username);

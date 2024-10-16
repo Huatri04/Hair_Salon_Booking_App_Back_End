@@ -1,8 +1,13 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
-import com.hairsalonbookingapp.hairsalon.entity.Appointment;
+import com.hairsalonbookingapp.hairsalon.entity.*;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestAppointment;
+import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository;
+import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
+import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
+import com.hairsalonbookingapp.hairsalon.repository.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -14,14 +19,28 @@ import java.security.InvalidKeyException;
 import java.security.NoSuchAlgorithmException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Map;
-import java.util.TreeMap;
+import java.util.*;
 
 @Service
 public class PayService {
 
     @Autowired
     AppointmentService appointmentService;
+
+    @Autowired
+    AppointmentRepository appointmentRepository;
+
+    @Autowired
+    AuthenticationService authenticationService;
+
+    @Autowired
+    AccountForCustomerRepository accountForCustomerRepository;
+
+    @Autowired
+    EmployeeRepository employeeRepository;
+
+    @Autowired
+    PaymentRepository paymentRepository;
 
     public String createUrl(CompleteAppointmentRequest orderRequest) throws  Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
@@ -93,4 +112,48 @@ public class PayService {
         }
         return result.toString();
     }
+
+    public void createTransaction(long appointMentId) {
+        // Tìm appointment
+        Appointment appointment = appointmentRepository.findById(appointMentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found!"));
+
+        // Tạo payment
+        Payment payment = new Payment();
+        payment.setAppointment(appointment);
+        payment.setCreateAt(new Date());
+        payment.setTypePayment("Banking");
+
+        List<Transaction> transactions = new ArrayList<>();
+
+        // Tạo giao dịch cho thanh toán của khách hàng
+        Transaction transaction = new Transaction();
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        transaction.setDate(new Date());
+        transaction.setEmployee(null);
+        transaction.setCustomer(accountForCustomer);
+        transaction.setStatus("Success");
+        transaction.setDescription("Nạp tiền VNPay khách hàng");
+        transactions.add(transaction);
+
+        // Tạo giao dịch cho admin
+        Transaction transaction1 = new Transaction();
+        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
+        transaction1.setDate(new Date());
+        transaction1.setEmployee(employee);
+        transaction1.setCustomer(accountForCustomer);
+        transaction1.setStatus("Success");
+        transaction1.setDescription("Chuyển từ khách hàng tới admin");
+        transactions.add(transaction1);
+
+        // Thiết lập giao dịch trong payment
+        payment.setTransactions(transactions);
+
+        // Lưu payment trước
+        paymentRepository.save(payment);
+
+        // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
+        // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
+    }
+
 }

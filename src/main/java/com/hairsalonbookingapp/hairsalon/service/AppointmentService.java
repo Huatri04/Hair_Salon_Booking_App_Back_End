@@ -2,11 +2,15 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
+import com.hairsalonbookingapp.hairsalon.model.EmailDetail;
+import com.hairsalonbookingapp.hairsalon.model.EmailDetailDeleteAppointment;
 import com.hairsalonbookingapp.hairsalon.model.request.AppointmentRequest;
+import com.hairsalonbookingapp.hairsalon.model.request.AppointmentUpdate;
 import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.DeleteAllAppointmentsRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.AvailableSlot;
+import com.hairsalonbookingapp.hairsalon.model.response.EmailDetailCreateAppointment;
 import com.hairsalonbookingapp.hairsalon.model.response.KPITotal;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
@@ -54,6 +58,8 @@ public class AppointmentService {
 
     @Autowired
     TimeService timeService;
+    @Autowired
+    EmailService emailService;
 
     @Autowired
     DiscountCodeRepository discountCodeRepository;
@@ -124,6 +130,8 @@ public class AppointmentService {
             double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
             appointment.setCost(totalCost);
 
+
+
             Appointment newAppointment = appointmentRepository.save(appointment);
 
             //SET OBJ APPOINTMENT VÀO CÁC OBJ KHÁC
@@ -158,6 +166,16 @@ public class AppointmentService {
             appointmentResponse.setCustomer(accountForCustomer.getName());
             appointmentResponse.setService(serviceNameList);
             appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+
+            EmailDetailCreateAppointment emailDetail = new EmailDetailCreateAppointment();
+            emailDetail.setReceiver(appointment.getAccountForCustomer());
+            emailDetail.setSubject("You have scheduled an appointment at our salon!");
+            emailDetail.setAppointmentId(appointmentResponse.getId());
+            emailDetail.setServiceName(appointmentResponse.getService());
+            emailDetail.setNameStylist(appointmentResponse.getStylist());
+            emailDetail.setDay(appointmentResponse.getDay());
+            emailDetail.setStartHour(appointmentResponse.getStartHour());
+            emailService.sendEmailCreateAppointment(emailDetail);
 
             return appointmentResponse;
         } catch (Exception e) {
@@ -279,6 +297,16 @@ public class AppointmentService {
             String phoneNumber = newAppointment.getAccountForCustomer().getPhoneNumber();
             String email = newAppointment.getAccountForCustomer().getEmail();
 
+            EmailDetailDeleteAppointment emailDetail = new EmailDetailDeleteAppointment();
+            emailDetail.setReceiver(newAppointment.getAccountForCustomer());
+            emailDetail.setSubject("You have canceled scheduled an appointment at our salon!");
+            emailDetail.setAppointmentId(newAppointment.getAppointmentId());
+            emailDetail.setServiceName(newAppointment.getHairSalonServices());
+            emailDetail.setNameStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+            emailDetail.setDay(newAppointment.getDate());
+            emailDetail.setStartHour(newAppointment.getSlot().getStartSlot());
+            emailService.sendEmailChangedAppointment(emailDetail);
+
             String message = "Delete successfully: " + "Phone = " + phoneNumber + "; Email = " + email;
             return message;
 
@@ -288,10 +316,10 @@ public class AppointmentService {
     }
 
     // XÓA APPOINTMENT -> CUSTOMER LÀM
-    public String deleteAppointmentByCustomer(long slotId){
+    public String deleteAppointmentByCustomer(long idAppointment){
         AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         Appointment oldAppointment = appointmentRepository
-                .findAppointmentBySlot_SlotIdAndAccountForCustomerAndIsDeletedFalse(slotId, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
+                .findAppointmentByAppointmentIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
@@ -308,6 +336,16 @@ public class AppointmentService {
                 discountCode.setAppointment(null);
                 discountCodeRepository.save(discountCode);
             }
+
+            EmailDetailDeleteAppointment emailDetail = new EmailDetailDeleteAppointment();
+            emailDetail.setReceiver(newAppointment.getAccountForCustomer());
+            emailDetail.setSubject("You have canceled scheduled an appointment at our salon!");
+            emailDetail.setAppointmentId(newAppointment.getAppointmentId());
+            emailDetail.setServiceName(newAppointment.getHairSalonServices());
+            emailDetail.setNameStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+            emailDetail.setDay(newAppointment.getDate());
+            emailDetail.setStartHour(newAppointment.getSlot().getStartSlot());
+            emailService.sendEmailChangedAppointment(emailDetail);
 
             String message = "Delete successfully!!!";
             return message;
@@ -335,6 +373,7 @@ public class AppointmentService {
                     }
                 }
             }
+
 
             return messages;
         } else {
@@ -458,7 +497,36 @@ public class AppointmentService {
         return kpiTotalList;
     }
 
+    // UPDATE APPOINTMENT ->  CUSTOMER LÀM
+    public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long idAppointment){
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentByAppointmentIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);
+        if(oldAppointment == null){
+            throw new EntityNotFoundException("Appointment not found!!!");
+        }
+        // XÓA APPOINTMENT CŨ
+        deleteAppointmentByCustomer(oldAppointment.getAppointmentId());
+        // TẠO APPOINTMENT MỚI
+        AppointmentRequest appointmentRequest = new AppointmentRequest();
+        long newSlotId = appointmentUpdate.getSlotId();
+        List<Long> newServiceIdList = appointmentUpdate.getServiceIdList();
+        String newCode = appointmentUpdate.getDiscountCode();
+        if(newSlotId != 0){
+            appointmentRequest.setSlotId(newSlotId);
+        }
+        if(!newServiceIdList.isEmpty()){
+            appointmentRequest.setServiceIdList(newServiceIdList);
+        }
+        if(!newCode.isEmpty()){
+            appointmentRequest.setDiscountCode(newCode);
+        }
 
+
+
+
+        return createNewAppointment(appointmentRequest);
+    }
 
 
 }

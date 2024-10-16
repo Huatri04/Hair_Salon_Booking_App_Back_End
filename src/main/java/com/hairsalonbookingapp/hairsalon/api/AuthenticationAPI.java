@@ -116,4 +116,25 @@ public class AuthenticationAPI {
         ProfileEmployee profileEmployee = authenticationService.getProfileEmpById(id);
         return ResponseEntity.ok(profileEmployee);
     }
+
+    @PostMapping("/forgotPassword")
+    public ResponseEntity forgotPassword(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        authenticationService.forgotPassword(forgotPasswordRequest.getEmail());
+        return ResponseEntity.ok("Check your email to confirm reset password");
+    }
+    @PostMapping("/resetPassword")
+    public ResponseEntity resetPassword(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        authenticationService.resetPassword(resetPasswordRequest);
+        return ResponseEntity.ok("Password reset successfully");
+    }
+    @PostMapping("/forgotPassword/employee")
+    public ResponseEntity forgotPasswordEmployee(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
+        authenticationService.forgotPassword(forgotPasswordRequest.getEmail());
+        return ResponseEntity.ok("Check your email to confirm reset password");
+    }
+    @PostMapping("/resetPassword/employee")
+    public ResponseEntity resetPasswordEmployee(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
+        authenticationService.resetPassword(resetPasswordRequest);
+        return ResponseEntity.ok("Password reset successfully");
+    }
 }

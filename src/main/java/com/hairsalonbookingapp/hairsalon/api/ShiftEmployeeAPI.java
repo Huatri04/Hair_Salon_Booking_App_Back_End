@@ -94,5 +94,11 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(availableSlotList);
     }
 
+    @GetMapping("/slot/{date}/{hour}")
+    public ResponseEntity getAvailableShiftsByHour(@PathVariable String date, @PathVariable String hour){
+        List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlotsByHour(hour, date);
+        return ResponseEntity.ok(availableSlotList);
+    }
+
 
 }

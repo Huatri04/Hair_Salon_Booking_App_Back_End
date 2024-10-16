@@ -663,4 +663,55 @@ public class AuthenticationService implements UserDetailsService {
         return modelMapper.map(accountForEmployee, ProfileEmployee.class);
     }
 
+    public void forgotPassword(String email) {
+        AccountForCustomer account = accountForCustomerRepository.findAccountForCustomerByEmail(email);
+        if(account == null) {
+            throw new EntityNotFoundException("Account not found");
+        }
+        String token = tokenService.generateTokenCustomer(account);
+        EmailDetail emailDetail = new EmailDetail();
+        emailDetail.setReceiver(account);//set receiver
+        emailDetail.setSubject("Reset password");
+        emailDetail.setLink("https://www.google.com/?token="+token);
+        emailService.sendEmail(emailDetail);
+
+    }
+
+    public AccountForCustomer resetPassword(ResetPasswordRequest resetPasswordRequest) {
+        AccountForCustomer account = getCurrentAccountForCustomer();
+        account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+        try{
+            accountForCustomerRepository.save(account);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return account;
+    }
+
+    public void forgotPasswordEmployee(String email) {
+        AccountForEmployee account = employeeRepository.findByEmail(email);
+        if(account == null) {
+            throw new EntityNotFoundException("Account not found");
+        }
+        String token = tokenService.generateTokenEmployee(account);
+        EmailDetailForEmployee emailDetail = new EmailDetailForEmployee();
+        emailDetail.setReceiver(account);//set receiver
+        emailDetail.setSubject("Reset password");
+        emailDetail.setLink("https://www.google.com/?token="+token);
+        emailService.sendEmailToEmployee(emailDetail);
+
+    }
+
+    public AccountForEmployee resetPasswordEmployee(ResetPasswordRequest resetPasswordRequest) {
+        AccountForEmployee account = getCurrentAccountForEmployee();
+        account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
+        try{
+            employeeRepository.save(account);
+        } catch (RuntimeException e) {
+            throw new RuntimeException(e);
+        }
+
+        return account;
+    }
 }
