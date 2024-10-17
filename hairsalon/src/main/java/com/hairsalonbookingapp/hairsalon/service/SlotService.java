@@ -3,10 +3,7 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
-import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
-import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
-import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
-import com.hairsalonbookingapp.hairsalon.model.ViewAppointmentRequest;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
@@ -49,6 +46,9 @@ public class SlotService {
 
     @Autowired
     EmployeeService employeeService;
+
+    @Autowired
+    ShiftEmployeeService shiftEmployeeService;
 
     //TẠO SLOT
     public List<Slot> generateSlots(SlotRequest slotRequest){
@@ -300,7 +300,7 @@ public class SlotService {
     }
 
 
-    // CUSTOMER XEM AVAILABLE HOUR [THỦ CÔNG]
+    // CUSTOMER XEM KHUNG GIỜ KHẢ DỤNG CỦA STYLIST TRONG NGÀY
     public List<String> getStartHoursByCustomer(ViewAppointmentRequest viewAppointmentRequest){
         List<SlotResponse> slotResponseList = viewSlotsOfStylist(viewAppointmentRequest);
         if(slotResponseList == null){
@@ -318,11 +318,24 @@ public class SlotService {
         return startHours;
     }
 
-    // CUSTOMER NHỜ HỆ THỐNG CHỌN GIÚP STYLIST [TỰ ĐỘNG]
-    public List<String> getStartHoursBySystem(){
+    // CUSTOMER XEM TẤT CẢ KHUNG GIỜ KHẢ DỤNG TRONG NGÀY
+    public List<String> getStartHoursAvailable(String date){
+        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
+        List<Slot> list = new ArrayList<>();
+        List<LocalTime> localTimeList = timeService.getSLots(timeService.startHour, timeService.endHour, timeService.duration);
+        for(LocalTime time : localTimeList){
+            if(time.equals(localTimeList.get(localTimeList.size() - 1))){
+                break;        // DỪNG NẾU TIME = ENDHOUR
+            } else {
+                List<Slot> slotList = slotRepository
+                        .findSlotsByDateAndStartSlotAndIsAvailableTrue(date, time.toString());
+                if(!slotList.isEmpty()){
+                    availableHours.add(time.toString());
+                }
+            }
+        }
+        return availableHours;
 
-
-        return startHours;
     }
 
 

@@ -11,7 +11,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class AppointmentUpdate {
-    long slotId;
+    String startHour;
+    String date;
+    String stylistId;
     List<Long> serviceIdList;
     String discountCode;
 }

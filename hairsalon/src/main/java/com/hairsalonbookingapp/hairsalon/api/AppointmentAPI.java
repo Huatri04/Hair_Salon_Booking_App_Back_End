@@ -35,6 +35,12 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointment);
     }
 
+    @PostMapping("/system")
+    public ResponseEntity createNewAppointmentBySystem(@Valid @RequestBody AppointmentRequestSystem appointmentRequestSystem){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentBySystem(appointmentRequestSystem);
+        return ResponseEntity.ok(appointment);
+    }
+
     @PutMapping("/staffDelete/{slotId}")
     public ResponseEntity deleteAppointmentByStaff(@PathVariable long slotId){
         String message = appointmentService.deleteAppointmentByStaff(slotId);

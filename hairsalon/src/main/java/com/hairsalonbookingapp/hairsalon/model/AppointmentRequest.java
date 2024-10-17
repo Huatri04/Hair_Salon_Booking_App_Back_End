@@ -9,7 +9,9 @@ import java.util.List;
 @Data
 @NoArgsConstructor
 public class AppointmentRequest {
-    long slotId;
+    String startHour;
+    String date;
+    String stylistId;
     List<Long> serviceIdList;
     String discountCode;
 }

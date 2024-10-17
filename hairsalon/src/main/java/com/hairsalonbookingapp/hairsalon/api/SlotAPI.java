@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/slot")
 @SecurityRequirement(name = "api")
 public class SlotAPI {
 
@@ -27,6 +27,17 @@ public class SlotAPI {
         return ResponseEntity.ok(slotResponseList);
     }
 
+    @GetMapping("/handmade")
+    public ResponseEntity viewStartHourByCustomer(@Valid @RequestBody ViewAppointmentRequest viewAppointmentRequest){
+        List<String> stringList = slotService.getStartHoursByCustomer(viewAppointmentRequest);
+        return ResponseEntity.ok(stringList);
+    }
+
+    @GetMapping("/system")
+    public ResponseEntity viewStartHoursAvailable(@PathVariable String date){
+        List<String> stringList = slotService.getStartHoursAvailable(date);
+        return ResponseEntity.ok(stringList);
+    }
     /*@PostMapping("/slot")
     public ResponseEntity createNewSlot(@Valid @RequestBody SlotRequest slotRequest){
         List<SlotResponse> slots = slotService.createSlots(slotRequest);
