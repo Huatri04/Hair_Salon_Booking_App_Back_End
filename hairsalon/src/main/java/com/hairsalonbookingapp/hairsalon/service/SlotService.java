@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.SlotRequest;
 import com.hairsalonbookingapp.hairsalon.model.SlotResponse;
+import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
 import com.hairsalonbookingapp.hairsalon.model.ViewAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
@@ -45,6 +46,9 @@ public class SlotService {
 
     @Autowired
     TimeService timeService;
+
+    @Autowired
+    EmployeeService employeeService;
 
     //TẠO SLOT
     public List<Slot> generateSlots(SlotRequest slotRequest){
@@ -294,6 +298,36 @@ public class SlotService {
             throw new EntityNotFoundException("Slot not found!");
         }
     }
+
+
+    // CUSTOMER XEM AVAILABLE HOUR [THỦ CÔNG]
+    public List<String> getStartHoursByCustomer(ViewAppointmentRequest viewAppointmentRequest){
+        List<SlotResponse> slotResponseList = viewSlotsOfStylist(viewAppointmentRequest);
+        if(slotResponseList == null){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+
+        List<String> startHours = new ArrayList<>();
+        for (SlotResponse slotResponse : slotResponseList){
+            if(slotResponse.isAvailable()){
+                String startHour = slotResponse.getStartSlot();
+                startHours.add(startHour);
+            }
+        }
+
+        return startHours;
+    }
+
+    // CUSTOMER NHỜ HỆ THỐNG CHỌN GIÚP STYLIST [TỰ ĐỘNG]
+    public List<String> getStartHoursBySystem(){
+
+
+        return startHours;
+    }
+
+
+
+
 
 
 }

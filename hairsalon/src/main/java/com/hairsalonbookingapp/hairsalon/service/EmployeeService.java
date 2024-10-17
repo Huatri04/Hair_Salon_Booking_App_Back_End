@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Service
 public class EmployeeService {
@@ -80,6 +81,15 @@ public class EmployeeService {
         }
     }
 
+
+
+    // CUSTOMER NHỜ HỆ THỐNG CHỌN GIÚP STYLIST [TỰ ĐỘNG]
+    public StylistInfo generateRandomStylist() {
+        List<StylistInfo> stylistInfoList = getAllAvailableStylist();
+        Random random = new Random();
+        int randomIndex = random.nextInt(stylistInfoList.size());
+        return stylistInfoList.get(randomIndex);
+    }
 
 
 
