@@ -25,13 +25,13 @@ public class SlotAPI {
         return ResponseEntity.ok(slotResponseList);
     }
 
-    @GetMapping("/handmade")
+    @PostMapping("/handmade")
     public ResponseEntity viewStartHourByCustomer(@Valid @RequestBody ViewAppointmentRequest viewAppointmentRequest){
         List<String> stringList = slotService.getStartHoursByCustomer(viewAppointmentRequest);
         return ResponseEntity.ok(stringList);
     }
 
-    @GetMapping("/system")
+    @GetMapping("/system/{date}")
     public ResponseEntity viewStartHoursAvailable(@PathVariable String date){
         List<String> stringList = slotService.getStartHoursAvailable(date);
         return ResponseEntity.ok(stringList);
