@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -285,8 +286,27 @@ public class AppointmentService {
         if(oldAppointment == null){
             throw new EntityNotFoundException("Appointment not found!!!");
         }
-        // XÓA APPOINTMENT CŨ
-        deleteAppointmentByCustomer(oldAppointment.getId());
+        // LẤY LẠI APPOINTMENT REQUEST CŨ
+        List<Long> oldServiceIdList = new ArrayList<>();
+        List<HairSalonService> hairSalonServiceList = oldAppointment.getHairSalonServices();
+        for(HairSalonService service : hairSalonServiceList){
+            long idService = service.getId();
+            oldServiceIdList.add(idService);
+        }
+        AppointmentRequest oldRequest = new AppointmentRequest();
+        oldRequest.setDate(oldAppointment.getSlot().getDate());
+        DiscountCode oldCode = oldAppointment.getDiscountCode();
+        if(oldCode == null){
+            oldRequest.setDiscountCode("");
+        } else {
+            oldRequest.setDiscountCode(oldCode.getId());
+        }
+
+        oldRequest.setStartHour(oldAppointment.getSlot().getStartSlot());
+        oldRequest.setStylistId(oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getId());
+        oldRequest.setServiceIdList(oldServiceIdList);
+
+
         // TẠO APPOINTMENT MỚI
         AppointmentRequest appointmentRequest = new AppointmentRequest();
 
@@ -295,26 +315,38 @@ public class AppointmentService {
         String newStylistId = appointmentUpdate.getStylistId();
         List<Long> newServiceIdList = appointmentUpdate.getServiceIdList();
         String newCode = appointmentUpdate.getDiscountCode();
-        if(!newDate.isEmpty()){
+        if(!newDate.isEmpty() && !newDate.equals(oldRequest.getDate())){
             appointmentRequest.setDate(newDate);
+        } else {
+            appointmentRequest.setDate(oldRequest.getDate());
         }
 
-        if(!newHour.isEmpty()){
+        if(!newHour.isEmpty() && !newHour.equals(oldRequest.getStartHour())){
             appointmentRequest.setStartHour(newHour);
+        } else {
+            appointmentRequest.setStartHour(oldRequest.getStartHour());
         }
 
-        if (!newStylistId.isEmpty()){
+        if (!newStylistId.isEmpty() && !newStylistId.equals(oldRequest.getStylistId())){
             appointmentRequest.setStylistId(newStylistId);
+        } else {
+            appointmentRequest.setStylistId(oldRequest.getStylistId());
         }
 
-        if(!newServiceIdList.isEmpty()){
+        if(!newServiceIdList.isEmpty() && !newServiceIdList.equals(oldRequest.getServiceIdList())){
             appointmentRequest.setServiceIdList(newServiceIdList);
+        } else {
+            appointmentRequest.setServiceIdList(oldRequest.getServiceIdList());
         }
 
-        if(!newCode.isEmpty()){
+        if(!newCode.isEmpty() && !newCode.equals(oldRequest.getDiscountCode())){
             appointmentRequest.setDiscountCode(newCode);
+        } else {
+            appointmentRequest.setDiscountCode(oldRequest.getDiscountCode());
         }
 
+        //XÓA APPOINTMENT CŨ VÀ TẠO CÁI MỚI
+        deleteAppointmentByCustomer(oldAppointment.getId());
         return createNewAppointment(appointmentRequest);
     }
 /*    //CẬP NHẬT APPOINTMENT -> CUSTOMER LÀM
@@ -455,6 +487,7 @@ public class AppointmentService {
             slot.setAvailable(true);
             slotRepository.save(slot);
 
+
             //DISCOUNT CODE
             DiscountCode discountCode = newAppointment.getDiscountCode();
             if(discountCode != null){
@@ -539,7 +572,13 @@ public class AppointmentService {
         if(slot != null){
             Appointment appointment = slot.getAppointments();
             appointment.setCompleted(true);
-            appointmentRepository.save(appointment);
+            Appointment newAppontment = appointmentRepository.save(appointment);
+
+            AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
+            long point = accountForCustomer.getPoint();
+            long newPoint = point + 1;
+            accountForCustomer.setPoint(newPoint);
+            customerRepository.save(accountForCustomer);
 
             AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
             account.setCompletedSlot(account.getCompletedSlot() + 1);
