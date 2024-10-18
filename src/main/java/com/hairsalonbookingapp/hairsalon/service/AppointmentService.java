@@ -105,7 +105,13 @@ public class AppointmentService {
             Appointment appointment = new Appointment();
 
             // SLOT
-            Slot slot = slotRepository.findSlotBySlotIdAndIsAvailableTrue(appointmentRequest.getSlotId());
+//            Slot slot = slotRepository.findSlotBySlotIdAndIsAvailableTrue(appointmentRequest.getSlotId());
+            Slot slot = slotRepository
+                    .findSlotByStartSlotAndDateAndShiftEmployee_AccountForEmployee_EmployeeIdAndIsAvailableTrue(
+                            appointmentRequest.getStartHour(),
+                            appointmentRequest.getDate(),
+                            appointmentRequest.getStylistId()
+                    );
             appointment.setSlot(slot);
 
             //ACCOUNT FOR CUSTOMER
@@ -511,26 +517,68 @@ public class AppointmentService {
         if(oldAppointment == null){
             throw new EntityNotFoundException("Appointment not found!!!");
         }
-        // XÓA APPOINTMENT CŨ
-        deleteAppointmentByCustomer(oldAppointment.getAppointmentId());
+
+        // LẤY LẠI APPOINTMENT REQUEST CŨ
+        List<Long> oldServiceIdList = new ArrayList<>();
+        List<HairSalonService> hairSalonServiceList = oldAppointment.getHairSalonServices();
+        for(HairSalonService service : hairSalonServiceList){
+            long idService = service.getId();
+            oldServiceIdList.add(idService);
+        }
+        AppointmentRequest oldRequest = new AppointmentRequest();
+        oldRequest.setDate(oldAppointment.getSlot().getDate());
+        DiscountCode oldCode = oldAppointment.getDiscountCode();
+        if(oldCode == null){
+            oldRequest.setDiscountCode("");
+        } else {
+            oldRequest.setDiscountCode(oldCode.getDiscountCodeId());
+        }
+
+        oldRequest.setStartHour(oldAppointment.getSlot().getStartSlot());
+        oldRequest.setStylistId(oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getEmployeeId());
+        oldRequest.setServiceIdList(oldServiceIdList);
+
+
         // TẠO APPOINTMENT MỚI
         AppointmentRequest appointmentRequest = new AppointmentRequest();
-        long newSlotId = appointmentUpdate.getSlotId();
+
+        String newDate = appointmentUpdate.getDate();
+        String newHour = appointmentUpdate.getStartHour();
+        String newStylistId = appointmentUpdate.getStylistId();
         List<Long> newServiceIdList = appointmentUpdate.getServiceIdList();
         String newCode = appointmentUpdate.getDiscountCode();
-        if(newSlotId != 0){
-            appointmentRequest.setSlotId(newSlotId);
+        if(!newDate.isEmpty() && !newDate.equals(oldRequest.getDate())){
+            appointmentRequest.setDate(newDate);
+        } else {
+            appointmentRequest.setDate(oldRequest.getDate());
         }
-        if(!newServiceIdList.isEmpty()){
+
+        if(!newHour.isEmpty() && !newHour.equals(oldRequest.getStartHour())){
+            appointmentRequest.setStartHour(newHour);
+        } else {
+            appointmentRequest.setStartHour(oldRequest.getStartHour());
+        }
+
+        if (!newStylistId.isEmpty() && !newStylistId.equals(oldRequest.getStylistId())){
+            appointmentRequest.setStylistId(newStylistId);
+        } else {
+            appointmentRequest.setStylistId(oldRequest.getStylistId());
+        }
+
+        if(!newServiceIdList.isEmpty() && !newServiceIdList.equals(oldRequest.getServiceIdList())){
             appointmentRequest.setServiceIdList(newServiceIdList);
+        } else {
+            appointmentRequest.setServiceIdList(oldRequest.getServiceIdList());
         }
-        if(!newCode.isEmpty()){
+
+        if(!newCode.isEmpty() && !newCode.equals(oldRequest.getDiscountCode())){
             appointmentRequest.setDiscountCode(newCode);
+        } else {
+            appointmentRequest.setDiscountCode(oldRequest.getDiscountCode());
         }
 
-
-
-
+        //XÓA APPOINTMENT CŨ VÀ TẠO CÁI MỚI
+        deleteAppointmentByCustomer(oldAppointment.getAppointmentId());
         return createNewAppointment(appointmentRequest);
     }
 

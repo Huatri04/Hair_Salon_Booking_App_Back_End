@@ -10,12 +10,18 @@ import java.util.List;
 @NoArgsConstructor
 public class AppointmentUpdate {
 
+    String startHour;
+    String date;
     String stylistId;
-    @Min(value = 0, message = "Invalid slotID!")
-    long slotId;
-    @Min(value = 0, message = "Invalid serviceID!")
-    long serviceId;
-    String discountCodeId;
     List<Long> serviceIdList;
     String discountCode;
+
+//    String stylistId;
+//    @Min(value = 0, message = "Invalid slotID!")
+//    long slotId;
+//    @Min(value = 0, message = "Invalid serviceID!")
+//    long serviceId;
+//    String discountCodeId;
+//    List<Long> serviceIdList;
+//    String discountCode;
 }
