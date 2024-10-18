@@ -7,10 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
@@ -26,6 +23,18 @@ public class SlotAPI {
     public ResponseEntity viewSlotsOfStylist(@Valid @RequestBody ViewAppointmentRequest viewAppointmentRequest){
         List<SlotResponse> slotResponseList = slotService.viewSlotsOfStylist(viewAppointmentRequest);
         return ResponseEntity.ok(slotResponseList);
+    }
+
+    @GetMapping("/handmade")
+    public ResponseEntity viewStartHourByCustomer(@Valid @RequestBody ViewAppointmentRequest viewAppointmentRequest){
+        List<String> stringList = slotService.getStartHoursByCustomer(viewAppointmentRequest);
+        return ResponseEntity.ok(stringList);
+    }
+
+    @GetMapping("/system")
+    public ResponseEntity viewStartHoursAvailable(@PathVariable String date){
+        List<String> stringList = slotService.getStartHoursAvailable(date);
+        return ResponseEntity.ok(stringList);
     }
 
     /*@PostMapping("/slot")

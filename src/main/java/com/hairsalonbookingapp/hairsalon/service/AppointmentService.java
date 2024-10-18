@@ -426,7 +426,13 @@ public class AppointmentService {
             Appointment appointment = slot.getAppointments();
             if (appointment != null) {
                 appointment.setCompleted(true);
-                appointmentRepository.save(appointment);
+                Appointment newAppontment = appointmentRepository.save(appointment);
+
+                AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
+                long point = accountForCustomer.getPoint();
+                long newPoint = point + 1;
+                accountForCustomer.setPoint(newPoint);
+                accountForCustomerRepository.save(accountForCustomer);
 
                 AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
                 if (account != null) {

@@ -126,22 +126,32 @@ public class PayService {
 
         List<Transaction> transactions = new ArrayList<>();
 
+        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
+        if (employee == null) {
+            throw new IllegalStateException("Không tìm thấy nhân viên thực hiện giao dịch.");
+        }
+
         // Tạo giao dịch cho thanh toán của khách hàng
         Transaction transaction = new Transaction();
-        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+//        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        AccountForCustomer accountForCustomer = appointment.getAccountForCustomer();
         transaction.setDate(new Date());
-        transaction.setEmployee(null);
+        transaction.setEmployee(employee);
+        transaction.setMoney(appointment.getCost());
         transaction.setCustomer(accountForCustomer);
         transaction.setStatus("Success");
+        transaction.setPayment(payment);
         transaction.setDescription("Nạp tiền VNPay khách hàng");
         transactions.add(transaction);
 
         // Tạo giao dịch cho admin
         Transaction transaction1 = new Transaction();
-        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
+//        AccountForEmployee employee = appointment.getSlot().getShiftEmployee().getAccountForEmployee();
         transaction1.setDate(new Date());
         transaction1.setEmployee(employee);
+        transaction1.setMoney(appointment.getCost());
         transaction1.setCustomer(accountForCustomer);
+        transaction1.setPayment(payment);
         transaction1.setStatus("Success");
         transaction1.setDescription("Chuyển từ khách hàng tới admin");
         transactions.add(transaction1);

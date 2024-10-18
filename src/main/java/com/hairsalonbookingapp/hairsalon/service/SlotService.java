@@ -42,6 +42,9 @@ public class SlotService {
     AppointmentRepository appointmentRepository;
 
     @Autowired
+    ShiftEmployeeService shiftEmployeeService;
+
+    @Autowired
     TimeService timeService;
 
     //TẠO SLOT
@@ -291,6 +294,44 @@ public class SlotService {
         } else {
             throw new EntityNotFoundException("Slot not found!");
         }
+    }
+
+    // CUSTOMER XEM KHUNG GIỜ KHẢ DỤNG CỦA STYLIST TRONG NGÀY
+    public List<String> getStartHoursByCustomer(ViewAppointmentRequest viewAppointmentRequest){
+        List<SlotResponse> slotResponseList = viewSlotsOfStylist(viewAppointmentRequest);
+        if(slotResponseList == null){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+
+        List<String> startHours = new ArrayList<>();
+        for (SlotResponse slotResponse : slotResponseList){
+            if(slotResponse.isAvailable()){
+                String startHour = slotResponse.getStartSlot();
+                startHours.add(startHour);
+            }
+        }
+
+        return startHours;
+    }
+
+    // CUSTOMER XEM TẤT CẢ KHUNG GIỜ KHẢ DỤNG TRONG NGÀY
+    public List<String> getStartHoursAvailable(String date){
+        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
+        List<Slot> list = new ArrayList<>();
+        List<LocalTime> localTimeList = timeService.getSLots(timeService.startHour, timeService.endHour, timeService.duration);
+        for(LocalTime time : localTimeList){
+            if(time.equals(localTimeList.get(localTimeList.size() - 1))){
+                break;        // DỪNG NẾU TIME = ENDHOUR
+            } else {
+                List<Slot> slotList = slotRepository
+                        .findSlotsByDateAndStartSlotAndIsAvailableTrue(date, time.toString());
+                if(!slotList.isEmpty()){
+                    availableHours.add(time.toString());
+                }
+            }
+        }
+        return availableHours;
+
     }
 
 

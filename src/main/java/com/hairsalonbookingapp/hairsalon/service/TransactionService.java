@@ -59,6 +59,7 @@ public class TransactionService {
             transaction.setMoney(appointment.getCost());
             transaction.setDate(new Date());
             transaction.setEmployee(accountForEmployee);
+
             transaction.setCustomer(appointment.getAccountForCustomer());
             transaction.setPayment(payment);
             transaction.setStatus("Success");
