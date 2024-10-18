@@ -178,11 +178,12 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            AccountForEmployee accountForEmployee = null;
-            for(Slot slot : slotList){
+            AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
+            /*for(Slot slot : slotList){
                 accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
                 break;
-            }
+            }*/
+
 
             //LOGIC Y CHANG HÀM TẠO, KHÁC Ở CHỖ STYLIST EXPERT KHÔNG CỘNG BONUS THÊM
             try {
@@ -446,20 +447,25 @@ public class AppointmentService {
                 .findAppointmentBySlot_IdAndIsDeletedFalse(slotId);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
-            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             //SLOT
-            Slot slot = newAppointment.getSlot();
+            Slot slot = oldAppointment.getSlot();
             slot.setAppointments(null);
             slot.setAvailable(false);
             slotRepository.save(slot);
 
+            oldAppointment.setSlot(null);
+
             //DISCOUNT CODE
-            DiscountCode discountCode = newAppointment.getDiscountCode();
+            DiscountCode discountCode = oldAppointment.getDiscountCode();
             if(discountCode != null){
                 discountCode.setAppointment(null);
                 discountCodeRepository.save(discountCode);
             }
+
+            oldAppointment.setDiscountCode(null);
+
+            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             String phoneNumber = newAppointment.getAccountForCustomer().getPhoneNumber();
             String email = newAppointment.getAccountForCustomer().getEmail();
@@ -479,21 +485,25 @@ public class AppointmentService {
                 .findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
-            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             //SLOT
-            Slot slot = newAppointment.getSlot();
+            Slot slot = oldAppointment.getSlot();
             slot.setAppointments(null);
             slot.setAvailable(true);
             slotRepository.save(slot);
 
+            oldAppointment.setSlot(null);
 
             //DISCOUNT CODE
-            DiscountCode discountCode = newAppointment.getDiscountCode();
+            DiscountCode discountCode = oldAppointment.getDiscountCode();
             if(discountCode != null){
                 discountCode.setAppointment(null);
                 discountCodeRepository.save(discountCode);
             }
+
+            oldAppointment.setDiscountCode(null);
+
+            appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             String message = "Delete successfully!!!";
             return message;
