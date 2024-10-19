@@ -473,8 +473,12 @@ public class AppointmentService {
             String message = "Delete successfully: " + "Phone = " + phoneNumber + "; Email = " + email;
             return message;
 
-        } else {
-            throw new EntityNotFoundException("Appointment not found!");
+        } else {  // KHÔNG CÓ APPOINTMENT NÀO ĐƯỢC ĐẶT TRONG SLOT ĐÓ
+            Slot slot = slotRepository.findSlotById(slotId);
+            slot.setAvailable(false);
+            slotRepository.save(slot);
+            String message = "Delete successfully!";
+            return message;
         }
     }
 
@@ -519,7 +523,7 @@ public class AppointmentService {
     // NẾU CÓ VẤN ĐỀ ĐỘT XUẤT, STAFF GỬI EMAIL ĐẾN CUSTOMER
     // STAFF XÓA CÁC APPOINMENTS NẾU STYLIST NHẬN APPOINTMENT ĐÓ BẬN TRONG NGÀY
     public List<String> deleteAppointmentsOfStylist(DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
-        List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlots(deleteAllAppointmentsRequest.getDate()); // TÌM CÁC SLOT TRONG NGÀY
+        /*List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlots(deleteAllAppointmentsRequest.getDate()); // TÌM CÁC SLOT TRONG NGÀY
         List<String> messages = new ArrayList<>();
         if(availableSlotList != null){
             for(AvailableSlot availableSlot : availableSlotList) {
@@ -535,7 +539,21 @@ public class AppointmentService {
             return messages;
         } else {
             throw new EntityNotFoundException("Slots not found!");
+        }*/
+
+        List<Slot> slotList = slotRepository
+                .findSlotsByShiftEmployee_AccountForEmployee_IdAndDate(
+                        deleteAllAppointmentsRequest.getStylistId(),
+                        deleteAllAppointmentsRequest.getDate());
+        if(slotList == null){
+            throw new EntityNotFoundException("Slot not found!");
         }
+        List<String> messages = new ArrayList<>();
+        for(Slot slot : slotList){
+            String message = deleteAppointmentByStaff(slot.getId());
+            messages.add(message);
+        }
+        return messages;
     }
 
     // CUSTOMER XEM LẠI LỊCH SỬ APPOINTMENT
