@@ -1,10 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Appointment;
-import com.hairsalonbookingapp.hairsalon.model.request.AppointmentRequest;
-import com.hairsalonbookingapp.hairsalon.model.request.AppointmentUpdate;
-import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
-import com.hairsalonbookingapp.hairsalon.model.request.DeleteAllAppointmentsRequest;
+import com.hairsalonbookingapp.hairsalon.model.request.*;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.KPITotal;
 import com.hairsalonbookingapp.hairsalon.service.AppointmentService;
@@ -104,4 +101,9 @@ public class AppointmentAPI {
         return ResponseEntity.ok(kpiTotalList);
     }
 
+    @PostMapping("/system")
+    public ResponseEntity createNewAppointmentBySystem(@Valid @RequestBody AppointmentRequestSystem appointmentRequestSystem){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentBySystem(appointmentRequestSystem);
+        return ResponseEntity.ok(appointment);
+    }
 }
