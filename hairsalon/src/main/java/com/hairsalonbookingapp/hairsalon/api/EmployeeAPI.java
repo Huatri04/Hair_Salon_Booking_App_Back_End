@@ -31,4 +31,10 @@ public class EmployeeAPI {
         List<StylistInfo> stylistInfos = employeeService.getAllAvailableStylist();
         return ResponseEntity.ok(stylistInfos);
     }
+
+    @GetMapping("/employee")
+    public ResponseEntity getAllEmployees(){
+        List<EmployeeInfo> employeeInfoList = employeeService.getAllEmployees();
+        return ResponseEntity.ok(employeeInfoList);
+    }
 }

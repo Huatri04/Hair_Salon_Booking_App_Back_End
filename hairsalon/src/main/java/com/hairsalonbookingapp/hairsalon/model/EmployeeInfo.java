@@ -19,4 +19,8 @@ public class EmployeeInfo {
     String stylistLevel; // [Stylist]
     double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
     int KPI; // KPI của stylist // [Stylist]
+    String status;
+    boolean isDeleted;
+    String days;
+    int completedSlot;
 }
