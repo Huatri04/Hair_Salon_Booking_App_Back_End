@@ -82,16 +82,16 @@ public class AppointmentService {
     //HỆ THỐNG CHỐT -> CUSTOMER LÀM
     public AppointmentResponse createNewAppointment(AppointmentRequest appointmentRequest) {
         try {
-            List<String> serviceNameList = new ArrayList<>();
-            List<Long> serviceIdList = appointmentRequest.getServiceIdList();  // NGƯỜI DÙNG CHỌN NHIỀU LOẠI DỊCH VỤ
-            List<HairSalonService> hairSalonServiceList = new ArrayList<>();
+            List<String> serviceNameList = new ArrayList<>();  //TẠO LIST CHỨA TÊN CÁC DỊCH VỤ CUSTOMER CHỌN
+            List<Long> serviceIdList = appointmentRequest.getServiceIdList();  // LẤY DANH SÁCH ID DỊCH VỤ CUSTOMER CHỌN
+            List<HairSalonService> hairSalonServiceList = new ArrayList<>();   // TẠO LIST CHỨA OBJ DỊCH VỤ
             double bonusDiscountCode = 0;    // PHÍ GIẢM GIÁ CỦA MÃ (NẾU CÓ)
             double bonusEmployee = 0;   // PHÍ TRẢ THÊM CHO STYLIST DỰA TRÊN CẤP ĐỘ
             double serviceFee = 0;
-            for(long serviceId : serviceIdList){
+            for(long serviceId : serviceIdList){  // VỚI MỖI ID DỊCH VỤ STYLIST CHỌN, CHUYỂN NÓ THÀNH OBJ VÀ GÁN VÀO LIST
                 HairSalonService service = serviceRepository.findHairSalonServiceById(serviceId);
-                hairSalonServiceList.add(service);
-                serviceNameList.add(service.getName());
+                hairSalonServiceList.add(service);  // GÁN VÀO DANH SÁCH OBJ DỊCH VỤ
+                serviceNameList.add(service.getName());  // GÁN VÀO DANH SÁCH TÊN DỊCH VỤ
                 serviceFee += service.getCost();  // PHÍ GỐC CỦA SERVICE
             }
             //TẠO APPOINTMENT
@@ -105,7 +105,7 @@ public class AppointmentService {
                             appointmentRequest.getDate(),
                             appointmentRequest.getStylistId()
                     );
-            appointment.setSlot(slot);
+            appointment.setSlot(slot);  // TÌM SLOT DỰA TRÊN THÔNG TIN REQUEST VÀ GÁN VÀO APPOINTMENT
 
             //ACCOUNT FOR CUSTOMER
             AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
