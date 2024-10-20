@@ -5,10 +5,13 @@ import com.hairsalonbookingapp.hairsalon.exception.DuplicateEntity;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceRequest;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceResponse;
+import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceResponsePage;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceUpdate;
 import com.hairsalonbookingapp.hairsalon.repository.ServiceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -106,7 +109,7 @@ public class HairSalonBookingAppService {
     }
 
     // VIEW AVAILABLE SERVICE -> CUSTOMER LÀM
-    public List<HairSalonServiceResponse> getAllAvailableService(){
+    /*public List<HairSalonServiceResponse> getAllAvailableService(){
         List<HairSalonService> list = serviceRepository.findHairSalonServicesByIsAvailableTrue();       // LẤY TẤT CẢ SERVICE KHẢ DỤNG
         if(list != null){
             List<HairSalonServiceResponse> responseList = new ArrayList<>();
@@ -118,6 +121,24 @@ public class HairSalonBookingAppService {
         } else {
             throw new EntityNotFoundException("Service not found!");
         }
+    }*/
+
+    public HairSalonServiceResponsePage getAllAvailableService(int page, int size){
+        Page<HairSalonService> servicePage = serviceRepository
+                .findHairSalonServicesByIsAvailableTrue(PageRequest.of(page, size));       // LẤY TẤT CẢ SERVICE KHẢ DỤNG
+        HairSalonServiceResponsePage hairSalonServiceResponsePage = new HairSalonServiceResponsePage();
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
+
+        for(HairSalonService hairSalonService : servicePage.getContent()){
+            HairSalonServiceResponse hairSalonServiceResponse = modelMapper.map(hairSalonService, HairSalonServiceResponse.class);
+            hairSalonServiceResponseList.add(hairSalonServiceResponse);
+        }
+
+        hairSalonServiceResponsePage.setContent(hairSalonServiceResponseList);
+        hairSalonServiceResponsePage.setPageNumber(servicePage.getNumber());
+        hairSalonServiceResponsePage.setTotalElements(servicePage.getTotalElements());
+        hairSalonServiceResponsePage.setTotalPages(servicePage.getTotalPages());
+        return hairSalonServiceResponsePage;
     }
 
 

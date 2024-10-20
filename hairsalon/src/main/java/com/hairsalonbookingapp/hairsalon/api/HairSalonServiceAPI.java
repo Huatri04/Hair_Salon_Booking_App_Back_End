@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.entity.HairSalonService;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceRequest;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceResponse;
+import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceResponsePage;
 import com.hairsalonbookingapp.hairsalon.model.HairSalonServiceUpdate;
 import com.hairsalonbookingapp.hairsalon.service.HairSalonBookingAppService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
@@ -52,8 +53,8 @@ public class HairSalonServiceAPI {
     }
 
     @GetMapping("/availableService")
-    public ResponseEntity getAllAvailableService(){
-        List<HairSalonServiceResponse> hairSalonServices = hairSalonBookingAppService.getAllAvailableService();
+    public ResponseEntity getAllAvailableService(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        HairSalonServiceResponsePage hairSalonServices = hairSalonBookingAppService.getAllAvailableService(page, size);
         return ResponseEntity.ok(hairSalonServices);
     }
 }
