@@ -36,6 +36,13 @@ public class ShiftWeekAPI {
     }
 
     // [MANAGER]
+    @PutMapping("/shiftInWeek")
+    public ResponseEntity updateAllShiftInWeeks(@Valid @RequestBody ShiftWeekUpdate shiftWeekUpdate){
+        List<ShiftWeekResponse> shift = shiftWeekService.updateAllShiftInWeeks(shiftWeekUpdate);
+        return ResponseEntity.ok(shift);
+    }
+
+    // [MANAGER]
     @DeleteMapping("/shiftInWeek/{day}")
     public ResponseEntity deleteShiftInWeek(@PathVariable String day){
         ShiftWeekResponse shift = shiftWeekService.deleteShift(day);
