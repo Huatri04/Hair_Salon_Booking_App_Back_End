@@ -131,8 +131,8 @@ public class ShiftEmployeeService {
             SlotRequest slotRequest = new SlotRequest();
             slotRequest.setDate(newShiftEmployee.getDate());
             slotRequest.setShiftEmployeeId(newShiftEmployee.getShiftEmployeeId());
-            slotRequest.setStartHour(timeService.setStartHour());
-            slotRequest.setEndHour(timeService.setEndHour());
+            slotRequest.setStartHour(timeService.setStartHour(day));
+            slotRequest.setEndHour(timeService.setEndHour(day));
             slotRequest.setDuration(timeService.duration);
             List<Slot> slotList = slotService.generateSlots(slotRequest);
             newShiftEmployee.setSlots(slotList);

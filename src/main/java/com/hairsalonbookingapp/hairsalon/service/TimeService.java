@@ -24,13 +24,13 @@ public class TimeService {
     @Autowired
     ShiftWeekService shiftWeekService;
 
-    public int setStartHour(){
-        String startHour = shiftWeekService.getFirstAvailableShiftWeek().getStartHour();
+    public int setStartHour(String day){
+        String startHour = shiftWeekService.getAvailableShiftWeekByDay(day).getStartHour();
         return Integer.parseInt(startHour.substring(0,2));
     }
 
-    public int setEndHour(){
-        String endHour = shiftWeekService.getFirstAvailableShiftWeek().getEndHour();
+    public int setEndHour(String day){
+        String endHour = shiftWeekService.getAvailableShiftWeekByDay(day).getEndHour();
         return Integer.parseInt(endHour.substring(0,2));
     }
 

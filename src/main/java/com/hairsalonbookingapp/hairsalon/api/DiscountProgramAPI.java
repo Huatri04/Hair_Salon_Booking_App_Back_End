@@ -32,9 +32,15 @@ public class DiscountProgramAPI {
         return ResponseEntity.ok(discountProgramResponse);
     }
 
-    @GetMapping
+    @GetMapping("/manager")
     public ResponseEntity getAllDiscountProgram(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
         DiscountProgramListResponse discountPrograms = discountProgramService.getAllDiscountProgram(page, size);
+        return ResponseEntity.ok(discountPrograms);
+    }
+
+    @GetMapping
+    public ResponseEntity getAllDiscountProgramInCustomer(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        DiscountProgramListResponse discountPrograms = discountProgramService.getAllDiscountProgramInCustomer(page, size);
         return ResponseEntity.ok(discountPrograms);
     }
 
@@ -48,6 +54,18 @@ public class DiscountProgramAPI {
     @GetMapping("{id}")
     public ResponseEntity getDiscountProgramInfo(@PathVariable int id){
         DiscountProgramInfoResponse discountProgram = discountProgramService.getInfoDiscountProgram(id);
+        return ResponseEntity.ok(discountProgram);
+    }
+
+    @PutMapping("/discountProgram/start")
+    public ResponseEntity startDiscountProgram(@PathVariable int id){
+        DiscountProgramResponse discountProgram = discountProgramService.startProgram(id);
+        return ResponseEntity.ok(discountProgram);
+    }
+
+    @DeleteMapping("/discountProgram/end")
+    public ResponseEntity endDiscountProgram(@PathVariable int id){
+        DiscountProgramResponse discountProgram = discountProgramService.endProgram(id);
         return ResponseEntity.ok(discountProgram);
     }
 }

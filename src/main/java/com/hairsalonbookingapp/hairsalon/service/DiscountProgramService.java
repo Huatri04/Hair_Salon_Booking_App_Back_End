@@ -18,7 +18,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.Optional;
 
 @Service
@@ -38,6 +41,7 @@ public class DiscountProgramService {
             if (discountProgram.getPointChange() < 0) {
                 throw new CreateException("Point change must be large than 0!");
             }
+            discountProgram.setStatus("Not Start");
             DiscountProgram newDiscountProgram = discountProgramRepository.save(discountProgram);
             return modelMapper.map(newDiscountProgram, DiscountProgramResponse.class);
         } catch (Exception e) {
@@ -96,10 +100,11 @@ public class DiscountProgramService {
         // tim toi id ma FE cung cap
         DiscountProgram discountProgramNeedDelete = discountProgramRepository.findDiscountProgramByDiscountProgramId(discountProgramId);
         if(discountProgramNeedDelete == null){
-            throw new Duplicate("Feedback not found!"); // dung tai day
+            throw new Duplicate("Program not found!"); // dung tai day
         }
 
         discountProgramNeedDelete.setDeleted(true);
+        discountProgramNeedDelete.setStatus("Ended");
         DiscountProgram deletedDiscountProgramm = discountProgramRepository.save(discountProgramNeedDelete);
         return modelMapper.map(deletedDiscountProgramm, DiscountProgramResponse.class);
     }
@@ -109,6 +114,19 @@ public class DiscountProgramService {
 //        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramsByIsDeletedFalse();
 //        return discountPrograms;
         Page discountProgramPage = discountProgramRepository.findDiscountProgramsByIsDeletedFalseOrderByEndedDateAsc(PageRequest.of(page, size));
+        DiscountProgramListResponse discountProgramListResponse = new DiscountProgramListResponse();
+        discountProgramListResponse.setTotalPage(discountProgramPage.getTotalPages());
+        discountProgramListResponse.setContent(discountProgramPage.getContent());
+        discountProgramListResponse.setPageNumber(discountProgramPage.getNumber());
+        discountProgramListResponse.setTotalElement(discountProgramPage.getTotalElements());
+        return discountProgramListResponse;
+    }
+
+    // show list of DiscountProgram
+    public DiscountProgramListResponse getAllDiscountProgramInCustomer(int page, int size){
+//        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramsByIsDeletedFalse();
+//        return discountPrograms;
+        Page discountProgramPage = discountProgramRepository.findByStatusOrderByEndedDateAsc(PageRequest.of(page, size), "In Process");
         DiscountProgramListResponse discountProgramListResponse = new DiscountProgramListResponse();
         discountProgramListResponse.setTotalPage(discountProgramPage.getTotalPages());
         discountProgramListResponse.setContent(discountProgramPage.getContent());
@@ -127,6 +145,7 @@ public class DiscountProgramService {
         DiscountProgram discountProgram = modelMapper.map(requestUpdateDiscountProgram, DiscountProgram.class);
 //        List<DiscountProgram> discountPrograms = discountProgramRepository.findDiscountProgramByName(name);
         DiscountProgram oldDiscountProgram = discountProgramRepository.findDiscountProgramByDiscountProgramId(id);
+        LocalDate today = LocalDate.now();
         if (oldDiscountProgram == null) {
             throw new Duplicate("Discount program not found!");// cho dung luon
         } else {
@@ -147,8 +166,16 @@ public class DiscountProgramService {
                     oldDiscountProgram.setEndedDate(discountProgram.getEndedDate());
                 }
 
-                if (discountProgram.getStatus() != null && !discountProgram.getStatus().isEmpty()) {
-                    oldDiscountProgram.setStatus(discountProgram.getStatus());
+                // Cập nhật status dựa vào startDate và endDate
+                LocalDate startDate = convertToLocalDate(oldDiscountProgram.getStartedDate());
+                LocalDate endDate = convertToLocalDate(oldDiscountProgram.getEndedDate());
+
+                if (startDate.isAfter(today)) {
+                    oldDiscountProgram.setStatus("Not Start");
+                } else if ((startDate.isEqual(today) || startDate.isBefore(today)) && endDate.isAfter(today)) {
+                    oldDiscountProgram.setStatus("In Process");
+                } else if (endDate.isBefore(today) || endDate.isEqual(today)) {
+                    oldDiscountProgram.setStatus("Ended");
                 }
 
                 if (discountProgram.getPercentage() != 0) {
@@ -166,6 +193,11 @@ public class DiscountProgramService {
                 throw new UpdatedException("Discount Program can not update!");
             }
         }
+    }
+
+    // Hàm chuyển đổi từ Date sang LocalDate
+    private LocalDate convertToLocalDate(Date date) {
+        return date.toInstant().atZone(ZoneId.systemDefault()).toLocalDate();
     }
 
     //GET PROFILE DiscountProgram

@@ -18,7 +18,5 @@ public class RequestUpdateDiscountProgram {
 
     private Date endedDate;
 
-    private String status;
-
     private double percentage;
 }

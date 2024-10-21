@@ -41,7 +41,8 @@ public class Filter extends OncePerRequestFilter {
             "/api/loginEmployee",
             "/api/loginCustomer",
             "/api/forgotPassword",
-            "/api/forgotPassword/employee"
+            "/api/forgotPassword/employee",
+            "/api/availableService"
     );
 
     public boolean checkIsPublicAPI(String uri){
