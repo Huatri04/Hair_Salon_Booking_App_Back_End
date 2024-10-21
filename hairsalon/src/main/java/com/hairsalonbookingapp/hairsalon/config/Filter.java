@@ -41,7 +41,8 @@ public class Filter extends OncePerRequestFilter {
             "/api/registerEmployee",
             "/api/registerCustomer",  // có thể xóa register vì mình chỉ làm login
             "/api/loginEmployee",
-            "/api/loginCustomer"
+            "/api/loginCustomer",
+            "/api/availableService"
     );
 
     public boolean checkIsPublicAPI(String uri){
