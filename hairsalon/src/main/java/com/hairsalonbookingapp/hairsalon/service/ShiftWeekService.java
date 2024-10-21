@@ -99,17 +99,17 @@ public class ShiftWeekService {
         }
     }
 
-    // HÀM LẤY NGÀY ĐẦU TIÊN TRONG SỐ TẤT CẢ CÁC NGAỲ KHẢ DỤNG
-    public ShiftInWeek getFirstAvailableShiftWeek(){
-        List<ShiftInWeek> shiftInWeeks = shiftWeekRepository
-                .findShiftInWeeksByIsAvailableTrue();
-        if(shiftInWeeks.isEmpty()){
-            throw new EntityNotFoundException("No day available!");
+    // HÀM LẤY SHIFT WEEK THEO NGÀY NHẬP
+    public ShiftInWeek getAvailableShiftWeekByDay(String day){
+        ShiftInWeek shiftInWeek = shiftWeekRepository
+                .findShiftInWeekByDayOfWeekAndIsAvailableTrue(day);
+        if(shiftInWeek == null){
+            throw new EntityNotFoundException("Shift not found!");
         }
-        return shiftInWeeks.get(0);
+        return shiftInWeek;
     }
 
-    // HÀM CẬP NHẬT TOÀN BỘ THỜI GIAN TRONG TUẦN: TẤT CẢ CÁC NGAỲ TRONG TUẦN PHẢI CHUNG KHUNG THỜI GIAN -> MANAGER LÀM
+    // HÀM CẬP NHẬT TOÀN BỘ THỜI GIAN TRONG TUẦN: TẤT CẢ CÁC NGAỲ TRONG TUẦN SẼ CHUNG KHUNG THỜI GIAN -> MANAGER LÀM
     public List<ShiftWeekResponse> updateAllShiftInWeeks(ShiftWeekUpdate shiftWeekUpdate){
         List<ShiftInWeek> shiftInWeekList = shiftWeekRepository.findShiftInWeeksByIsAvailableTrue();
         if(shiftInWeekList.isEmpty()){

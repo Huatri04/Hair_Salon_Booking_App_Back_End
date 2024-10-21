@@ -19,22 +19,22 @@ public class TimeService {
     @Autowired
     ShiftWeekService shiftWeekService;
 
-    public int setStartHour(){
-        String startHour = shiftWeekService.getFirstAvailableShiftWeek().getStartHour();
+    public int setStartHour(String day){
+        String startHour = shiftWeekService.getAvailableShiftWeekByDay(day).getStartHour();
         return Integer.parseInt(startHour.substring(0,2));
     }
 
-    public int setEndHour(){
-        String endHour = shiftWeekService.getFirstAvailableShiftWeek().getEndHour();
+    public int setEndHour(String day){
+        String endHour = shiftWeekService.getAvailableShiftWeekByDay(day).getEndHour();
         return Integer.parseInt(endHour.substring(0,2));
     }
 
     // GIẢ ĐỊNH NGÀY HIỆN TẠI
-    //public final LocalDate today = LocalDate.of(2025, 01, 01);
-    public final LocalDate today = getToday();
+    public final LocalDate today = LocalDate.of(2024, 11, 11);
+    //public final LocalDate today = getToday();
     // THỜI GIAN BẮT ĐÂÙ VÀ KẾT THÚC CA LÀM VIỆC
-    public int startHour = 7;
-    public int endHour = 10;
+    //public int startHour = 7;
+    //public int endHour = 10;
     public final long duration = 60;
 
     // DANH SÁCH CÁC NGÀY TRONG NĂM
