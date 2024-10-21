@@ -350,19 +350,7 @@ public class AppointmentService {
 
             oldAppointment.setDiscountCode(null);
 
-            Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
-
-
-
-            EmailDetailDeleteAppointment emailDetail = new EmailDetailDeleteAppointment();
-            emailDetail.setReceiver(newAppointment.getAccountForCustomer());
-            emailDetail.setSubject("You have canceled scheduled an appointment at our salon!");
-            emailDetail.setAppointmentId(newAppointment.getAppointmentId());
-            emailDetail.setServiceName(newAppointment.getHairSalonServices());
-            emailDetail.setNameStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
-            emailDetail.setDay(newAppointment.getDate());
-            emailDetail.setStartHour(newAppointment.getSlot().getStartSlot());
-            emailService.sendEmailChangedAppointment(emailDetail);
+            appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
             String message = "Delete successfully!!!";
             return message;
@@ -589,9 +577,14 @@ public class AppointmentService {
             appointmentRequest.setDiscountCode(oldRequest.getDiscountCode());
         }
 
+        // Ghi log để kiểm tra giá trị trước khi xóa và tạo mới
+        System.out.println("Deleting appointment ID: " + oldAppointment.getAppointmentId());
+        System.out.println("Creating new appointment with request: " + appointmentRequest);
+
+
         //XÓA APPOINTMENT CŨ VÀ TẠO CÁI MỚI
         deleteAppointmentByCustomer(oldAppointment.getAppointmentId());
-        System.out.println(appointmentRequest.getDate() + " ," + appointmentRequest.getStartHour());
+
         return createNewAppointment(appointmentRequest);
     }
 

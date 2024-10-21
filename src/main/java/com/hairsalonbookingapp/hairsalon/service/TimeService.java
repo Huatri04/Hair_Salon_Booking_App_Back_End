@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -16,9 +17,22 @@ public class TimeService {
     // GIẢ ĐỊNH NGÀY HIỆN TẠI
     public final LocalDate today = getToday();
     // THỜI GIAN BẮT ĐÂÙ VÀ KẾT THÚC CA LÀM VIỆC
-    public final int startHour = 7;
-    public final int endHour = 10;
+//    public final int startHour = 7;
+//    public final int endHour = 10;
     public final long duration = 60;
+
+    @Autowired
+    ShiftWeekService shiftWeekService;
+
+    public int setStartHour(){
+        String startHour = shiftWeekService.getFirstAvailableShiftWeek().getStartHour();
+        return Integer.parseInt(startHour.substring(0,2));
+    }
+
+    public int setEndHour(){
+        String endHour = shiftWeekService.getFirstAvailableShiftWeek().getEndHour();
+        return Integer.parseInt(endHour.substring(0,2));
+    }
 
     // DANH SÁCH CÁC NGÀY TRONG NĂM
     public List<LocalDate> getAllDaysInYear(int year) {

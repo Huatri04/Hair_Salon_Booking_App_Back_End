@@ -49,19 +49,19 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointmentResponse);
     }
 
-    @PutMapping("/staffDelete/{slotId}")
+    @DeleteMapping("/staffDelete/{slotId}")
     public ResponseEntity deleteAppointmentByStaff(@PathVariable long slotId){
         String message = appointmentService.deleteAppointmentByStaff(slotId);
         return ResponseEntity.ok(message);
     }
 
-    @PutMapping("/customerDelete")
-    public ResponseEntity deleteAppointmentByCus(@Valid @RequestBody long slotId){
-        String message = appointmentService.deleteAppointmentByCustomer(slotId);
+    @DeleteMapping("/customerDelete/{idAppointment}")
+    public ResponseEntity deleteAppointmentByCus(@PathVariable long idAppointment){
+        String message = appointmentService.deleteAppointmentByCustomer(idAppointment);
         return ResponseEntity.ok(message);
     }
 
-    @PutMapping("/deleteAll")
+    @DeleteMapping("/deleteAll")
     public ResponseEntity daleteAllAppointments(@Valid @RequestBody DeleteAllAppointmentsRequest deleteAllAppointmentsRequest){
         List<String> messages = appointmentService.deleteAppointmentsOfStylist(deleteAllAppointmentsRequest);
         return ResponseEntity.ok(messages);

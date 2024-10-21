@@ -318,7 +318,7 @@ public class SlotService {
     public List<String> getStartHoursAvailable(String date){
         List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
         List<Slot> list = new ArrayList<>();
-        List<LocalTime> localTimeList = timeService.getSLots(timeService.startHour, timeService.endHour, timeService.duration);
+        List<LocalTime> localTimeList = timeService.getSLots(timeService.setStartHour(), timeService.setEndHour(), timeService.duration);
         for(LocalTime time : localTimeList){
             if(time.equals(localTimeList.get(localTimeList.size() - 1))){
                 break;        // DỪNG NẾU TIME = ENDHOUR

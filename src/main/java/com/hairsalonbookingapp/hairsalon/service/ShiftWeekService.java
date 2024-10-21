@@ -97,4 +97,28 @@ public class ShiftWeekService {
         }
     }
 
+    // HÀM LẤY NGÀY ĐẦU TIÊN TRONG SỐ TẤT CẢ CÁC NGAỲ KHẢ DỤNG
+    public ShiftInWeek getFirstAvailableShiftWeek(){
+        List<ShiftInWeek> shiftInWeeks = shiftWeekRepository
+                .findShiftInWeeksByIsAvailableTrue();
+        if(shiftInWeeks.isEmpty()){
+            throw new EntityNotFoundException("No day available!");
+        }
+        return shiftInWeeks.get(0);
+    }
+
+    // HÀM CẬP NHẬT TOÀN BỘ THỜI GIAN TRONG TUẦN: TẤT CẢ CÁC NGAỲ TRONG TUẦN PHẢI CHUNG KHUNG THỜI GIAN -> MANAGER LÀM
+    public List<ShiftWeekResponse> updateAllShiftInWeeks(ShiftWeekUpdate shiftWeekUpdate){
+        List<ShiftInWeek> shiftInWeekList = shiftWeekRepository.findShiftInWeeksByIsAvailableTrue();
+        if(shiftInWeekList.isEmpty()){
+            throw new EntityNotFoundException("No shift found!");
+        }
+        List<ShiftWeekResponse> shiftWeekResponseList = new ArrayList<>();
+        for(ShiftInWeek shiftInWeek : shiftInWeekList){
+            ShiftWeekResponse shiftWeekResponse = updateShift(shiftWeekUpdate, shiftInWeek.getDayOfWeek());
+            shiftWeekResponseList.add(shiftWeekResponse);
+        }
+        return shiftWeekResponseList;
+    }
+
 }
