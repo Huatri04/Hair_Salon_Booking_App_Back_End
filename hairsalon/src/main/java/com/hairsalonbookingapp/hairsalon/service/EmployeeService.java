@@ -105,6 +105,24 @@ public class EmployeeService {
         return employeeInfoList;
     }
 
+    //HÀM CHECK DANH SÁCH CÁC STYLIST COI CÓ AI CHƯA SET NGÀY LÀM VIỆC KHÔNG
+    public List<String> getStylistsThatWorkDaysNull(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<String> foundStylists = new ArrayList<>(); // DANH SÁCH CÁC STYLIST BẮT ĐƯỢC
+        List<AccountForEmployee> allStylists = employeeRepository
+                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(allStylists.isEmpty()){
+            throw new EntityNotFoundException("Stylist not found!");
+        }
+        for(AccountForEmployee accountForEmployee : allStylists){
+            if(accountForEmployee.getDays() == null){
+                foundStylists.add(accountForEmployee.getId());
+            }
+        }
+        return foundStylists;
+    }
+
 
 
 
