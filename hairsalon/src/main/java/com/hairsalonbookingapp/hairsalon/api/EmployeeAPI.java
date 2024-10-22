@@ -37,4 +37,10 @@ public class EmployeeAPI {
         List<EmployeeInfo> employeeInfoList = employeeService.getAllEmployees();
         return ResponseEntity.ok(employeeInfoList);
     }
+
+    @GetMapping("/stylist/workDayNull")
+    public ResponseEntity checkStylistHasNull(){
+        List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNull();
+        return ResponseEntity.ok(stylistIdList);
+    }
 }
