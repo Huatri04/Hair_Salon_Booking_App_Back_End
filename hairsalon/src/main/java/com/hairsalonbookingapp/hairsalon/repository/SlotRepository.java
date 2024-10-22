@@ -21,4 +21,5 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
     Slot findSlotById(long id);
     List<Slot> findSlotsByShiftEmployee_AccountForEmployee_IdAndDate(String stylistId, String date);
     Slot findSlotByStartSlotAndDateAndShiftEmployee_AccountForEmployee_IdAndIsAvailableTrue(String startSlot, String date, String stylistId);
+    List<Slot> findSlotsByDateAndIsAvailableTrue(String date);
 }

@@ -58,6 +58,10 @@ public class HairSalonBookingAppService {
                     oldService.setImage(hairSalonServiceUpdate.getImage());
                 }
 
+                if(!hairSalonServiceUpdate.getDescription().isEmpty()){
+                    oldService.setDescription(hairSalonServiceUpdate.getDescription());
+                }
+
                 HairSalonService newService = serviceRepository.save(oldService);
                 return modelMapper.map(newService, HairSalonServiceResponse.class);
             } catch(Exception e) {

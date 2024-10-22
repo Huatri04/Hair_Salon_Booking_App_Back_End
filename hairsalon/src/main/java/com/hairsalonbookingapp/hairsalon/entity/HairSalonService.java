@@ -30,6 +30,8 @@ public class HairSalonService {
 
     private String image;
 
+    private String description; //MÔ TẢ DỊCH VỤ
+
     private boolean isAvailable = true;   //SERVICE CÓ KHẢ DỤNG KHÔNG
 
     @ManyToMany(mappedBy = "hairSalonServices")

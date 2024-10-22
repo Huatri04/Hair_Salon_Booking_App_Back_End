@@ -140,5 +140,17 @@ public class TimeService {
         return list;
     }
 
+    // HÀM NHẬN NGÀY VÀ TRẢ VỀ THỨ
+    public String getDay(String date){
+        String year = date.substring(0,4);
+        int yearInt = Integer.parseInt(year);
+        String month = date.substring(5,7);
+        int monthInt = Integer.parseInt(month);
+        String day = date.substring(8);
+        int dayInt = Integer.parseInt(day);
+        String dayOfWeek = LocalDate.of(yearInt, monthInt, dayInt).getDayOfWeek().name();
+        return dayOfWeek;
+    }
+
 
 }

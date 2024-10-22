@@ -19,4 +19,6 @@ public class HairSalonServiceUpdate {
     private int timeOfService;
 
     private String image;
+
+    private String description;
 }

@@ -16,4 +16,6 @@ public class HairSalonServiceRequest {
     private int timeOfService;
 
     private String image;
+
+    private String description;
 }

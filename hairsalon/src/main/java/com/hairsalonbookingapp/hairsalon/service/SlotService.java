@@ -319,7 +319,8 @@ public class SlotService {
     }
 
     // CUSTOMER XEM TẤT CẢ KHUNG GIỜ KHẢ DỤNG TRONG NGÀY
-    public List<String> getStartHoursAvailable(String date, String day){
+    public List<String> getStartHoursAvailable(String date){
+        /*String day = timeService.getDay(date);
         List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
         List<Slot> list = new ArrayList<>();
         List<LocalTime> localTimeList = timeService.getSLots(timeService.setStartHour(day), timeService.setEndHour(day), timeService.duration);
@@ -331,6 +332,21 @@ public class SlotService {
                         .findSlotsByDateAndStartSlotAndIsAvailableTrue(date, time.toString());
                 if(!slotList.isEmpty()){
                     availableHours.add(time.toString());
+                }
+            }
+        }
+        return availableHours;*/
+        List<Slot> slotList = slotRepository.findSlotsByDateAndIsAvailableTrue(date);
+        if(slotList.isEmpty()){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
+        for(int i = 1; i <= 24; i++){
+            for(Slot slot : slotList){
+                String hour = slot.getStartSlot();
+                if(i == Integer.parseInt(hour.substring(0,2))){
+                    availableHours.add(hour);
+                    break;
                 }
             }
         }
