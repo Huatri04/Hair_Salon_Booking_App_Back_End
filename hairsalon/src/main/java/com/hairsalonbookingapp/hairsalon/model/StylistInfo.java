@@ -10,4 +10,5 @@ public class StylistInfo {
     String phoneNumber;
     String stylistLevel;
     String status;
+    double expertStylistBonus;
 }
