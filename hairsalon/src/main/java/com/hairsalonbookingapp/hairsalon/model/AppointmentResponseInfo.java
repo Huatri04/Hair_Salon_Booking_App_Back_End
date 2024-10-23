@@ -8,7 +8,7 @@ import java.util.List;
 public class AppointmentResponseInfo {
     long id;
     double cost;
-    String day;
+    String date;
     String startHour;
     String customer;  // USERNAME
     List<String> service;

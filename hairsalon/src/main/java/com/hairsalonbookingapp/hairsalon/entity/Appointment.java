@@ -25,6 +25,10 @@ public class Appointment {
 
     private boolean isCompleted = false;  // ĐƠN CHƯA HOÀN THÀNH
 
+    private String date;
+    private String startHour;
+    private String stylist;
+
     @OneToOne
     @JoinColumn(name = "slotId")            // THỜI GIAN + STYLIST
     Slot slot;

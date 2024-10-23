@@ -129,6 +129,10 @@ public class AppointmentService {
             double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
             appointment.setCost(totalCost);
 
+            appointment.setDate(slot.getDate());
+            appointment.setStartHour(slot.getStartSlot());
+            appointment.setStylist(slot.getShiftEmployee().getAccountForEmployee().getName());
+
             Appointment newAppointment = appointmentRepository.save(appointment);
 
             //SET OBJ APPOINTMENT VÀO CÁC OBJ KHÁC
@@ -234,6 +238,10 @@ public class AppointmentService {
                 double totalCost = serviceFee - (bonusDiscountCode * serviceFee);
                 appointment.setCost(totalCost);
 
+                appointment.setDate(slot.getDate());
+                appointment.setStartHour(slot.getStartSlot());
+                appointment.setStylist(slot.getShiftEmployee().getAccountForEmployee().getName());
+
                 Appointment newAppointment = appointmentRepository.save(appointment);
 
                 //SET OBJ APPOINTMENT VÀO CÁC OBJ KHÁC
@@ -332,6 +340,10 @@ public class AppointmentService {
 
             double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
             appointment.setCost(totalCost);
+
+            appointment.setDate(slot.getDate());
+            appointment.setStartHour(slot.getStartSlot());
+            appointment.setStylist(slot.getShiftEmployee().getAccountForEmployee().getName());
 
             Appointment newAppointment = appointmentRepository.save(appointment);
 
@@ -435,6 +447,10 @@ public class AppointmentService {
 
                 double totalCost = serviceFee - (bonusDiscountCode * serviceFee);
                 appointment.setCost(totalCost);
+
+                appointment.setDate(slot.getDate());
+                appointment.setStartHour(slot.getStartSlot());
+                appointment.setStylist(slot.getShiftEmployee().getAccountForEmployee().getName());
 
                 Appointment newAppointment = appointmentRepository.save(appointment);
 
@@ -761,23 +777,21 @@ public class AppointmentService {
     }
 
     // CUSTOMER XEM LẠI LỊCH SỬ APPOINTMENT
-    public List<AppointmentResponse> checkAppointmentHistory(){
+    public List<AppointmentResponseInfo> checkAppointmentHistory(){
         AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         List<Appointment> appointmentList = accountForCustomer.getAppointments();
-        if(appointmentList != null){
-            List<AppointmentResponse> appointmentResponseList = new ArrayList<>();
+        if(!appointmentList.isEmpty()){
+            List<AppointmentResponseInfo> appointmentResponseList = new ArrayList<>();
             for(Appointment appointment : appointmentList){
-                AppointmentResponse appointmentResponse = new AppointmentResponse();
+                AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
 
                 appointmentResponse.setId(appointment.getId());
                 appointmentResponse.setCost(appointment.getCost());
-                appointmentResponse.setDay(appointment.getSlot().getDate());
-                appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
+                appointmentResponse.setDate(appointment.getDate());
+                appointmentResponse.setStartHour(appointment.getStartHour());
                 appointmentResponse.setCustomer(accountForCustomer.getCustomerName());
-
-                //Appointment newAppointment = appointmentRepository.findAppointmentById(appointment.getId()); // LẤY THÔNG TIN TRONG APPOINTMENT HIỆN TẠI
-                //appointmentResponse.setDeleted(newAppointment.isDeleted());
-                //appointmentResponse.setCompleted(newAppointment.isCompleted());
+                appointmentResponse.setDeleted(appointment.isDeleted());
+                appointmentResponse.setCompleted(appointment.isCompleted());
 
                 List<String> serviceNameList = new ArrayList<>();
                 List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
@@ -786,7 +800,7 @@ public class AppointmentService {
                     serviceNameList.add(serviceName);
                 }
                 appointmentResponse.setService(serviceNameList);
-                appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+                appointmentResponse.setStylist(appointment.getStylist());
 
                 appointmentResponseList.add(appointmentResponse);
             }
@@ -880,6 +894,10 @@ public class AppointmentService {
     }
 
 
+    public long forFun(){
+        Slot slot = slotRepository.findSlotById(1);
+        return slot.getAppointments().getId();
+    }
 
 
 }

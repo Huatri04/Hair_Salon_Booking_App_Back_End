@@ -73,7 +73,7 @@ public class AppointmentAPI {
 
     @GetMapping
     public ResponseEntity getAppointmentHistory(){
-        List<AppointmentResponse> appointments = appointmentService.checkAppointmentHistory();
+        List<AppointmentResponseInfo> appointments = appointmentService.checkAppointmentHistory();
         return ResponseEntity.ok(appointments);
     }
 
@@ -93,6 +93,12 @@ public class AppointmentAPI {
     public ResponseEntity completeAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long appointmentId){
         AppointmentResponse appointmentResponse = appointmentService.updateAppointment(appointmentUpdate, appointmentId);
         return ResponseEntity.ok(appointmentResponse);
+    }
+
+    @GetMapping("/fun")
+    public ResponseEntity viewFun(){
+        long a = appointmentService.forFun();
+        return ResponseEntity.ok(a);
     }
 
 }
