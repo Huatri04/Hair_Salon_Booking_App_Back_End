@@ -57,13 +57,13 @@ public class DiscountProgramAPI {
         return ResponseEntity.ok(discountProgram);
     }
 
-    @PutMapping("/discountProgram/start")
+    @PutMapping("/discountProgram/start/{id}")
     public ResponseEntity startDiscountProgram(@PathVariable int id){
         DiscountProgramResponse discountProgram = discountProgramService.startProgram(id);
         return ResponseEntity.ok(discountProgram);
     }
 
-    @DeleteMapping("/discountProgram/end")
+    @DeleteMapping("/discountProgram/end/{id}")
     public ResponseEntity endDiscountProgram(@PathVariable int id){
         DiscountProgramResponse discountProgram = discountProgramService.endProgram(id);
         return ResponseEntity.ok(discountProgram);

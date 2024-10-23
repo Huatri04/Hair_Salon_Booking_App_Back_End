@@ -20,4 +20,7 @@ public class EmployeeInfo {
     private long stylistSelectionFee;
     private int targetKPI;
     int KPI; // KPI của stylist // [Stylist]
+    String status;
+    boolean isDeleted;
+    String days;
 }

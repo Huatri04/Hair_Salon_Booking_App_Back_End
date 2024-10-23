@@ -31,9 +31,9 @@ public class SlotAPI {
         return ResponseEntity.ok(stringList);
     }
 
-    @GetMapping("/system/{date}/{day}")
-    public ResponseEntity viewStartHoursAvailable(@PathVariable String date, @PathVariable String day){
-        List<String> stringList = slotService.getStartHoursAvailable(date, day);
+    @GetMapping("/system/{date}")
+    public ResponseEntity viewStartHoursAvailable(@PathVariable String date){
+        List<String> stringList = slotService.getStartHoursAvailable(date);
         return ResponseEntity.ok(stringList);
     }
 

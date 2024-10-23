@@ -315,28 +315,10 @@ public class SlotService {
     }
 
     // CUSTOMER XEM TẤT CẢ KHUNG GIỜ KHẢ DỤNG TRONG NGÀY
-    public List<String> getStartHoursAvailable(String date, String day){
-        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
-        List<Slot> list = new ArrayList<>();
-        List<LocalTime> localTimeList = timeService.getSLots(timeService.setStartHour(day), timeService.setEndHour(day), timeService.duration);
-        for(LocalTime time : localTimeList){
-            if(time.equals(localTimeList.get(localTimeList.size() - 1))){
-                break;        // DỪNG NẾU TIME = ENDHOUR
-            } else {
-                List<Slot> slotList = slotRepository
-                        .findSlotsByDateAndStartSlotAndIsAvailableTrue(date, time.toString());
-                if(!slotList.isEmpty()){
-                    availableHours.add(time.toString());
-                }
-            }
-        }
-        return availableHours;
-
-    }
-//    public List<String> getStartHoursAvailable(String date){
+//    public List<String> getStartHoursAvailable(String date, String day){
 //        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
 //        List<Slot> list = new ArrayList<>();
-//        List<LocalTime> localTimeList = timeService.getSLots(timeService.setStartHour(), timeService.setEndHour(), timeService.duration);
+//        List<LocalTime> localTimeList = timeService.getSLots(timeService.setStartHour(day), timeService.setEndHour(day), timeService.duration);
 //        for(LocalTime time : localTimeList){
 //            if(time.equals(localTimeList.get(localTimeList.size() - 1))){
 //                break;        // DỪNG NẾU TIME = ENDHOUR
@@ -351,6 +333,25 @@ public class SlotService {
 //        return availableHours;
 //
 //    }
+    public List<String> getStartHoursAvailable(String date){
+        List<Slot> slotList = slotRepository.findSlotsByDateAndIsAvailableTrue(date);
+        if(slotList.isEmpty()){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+        List<String> availableHours = new ArrayList<>(); // MẢNG CHỨA CÁC KHUNG GIỜ KHẢ DỤNG
+        for(int i = 1; i <= 24; i++){
+            for(Slot slot : slotList){
+                String hour = slot.getStartSlot();
+                if(i == Integer.parseInt(hour.substring(0,2))){
+                    availableHours.add(hour);
+                    break;
+                }
+            }
+        }
+        return availableHours;
+
+    }
+
 
 
 }

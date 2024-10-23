@@ -80,6 +80,19 @@ public class EmployeeService {
         }
     }
 
+    // HÀM LẤY TOÀN BỘ EMPLOYEE KHÔNG QUAN TRỌNG ROLE LÀ GÌ
+    public List<EmployeeInfo> getAllEmployees(){
+        List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAll();
+        if(accountForEmployeeList.isEmpty()){
+            throw new EntityNotFoundException("Employee not found!");
+        }
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        return employeeInfoList;
+    }
 
 
 
