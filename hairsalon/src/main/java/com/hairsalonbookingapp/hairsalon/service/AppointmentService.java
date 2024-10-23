@@ -775,6 +775,10 @@ public class AppointmentService {
                 appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
                 appointmentResponse.setCustomer(accountForCustomer.getCustomerName());
 
+                //Appointment newAppointment = appointmentRepository.findAppointmentById(appointment.getId()); // LẤY THÔNG TIN TRONG APPOINTMENT HIỆN TẠI
+                //appointmentResponse.setDeleted(newAppointment.isDeleted());
+                //appointmentResponse.setCompleted(newAppointment.isCompleted());
+
                 List<String> serviceNameList = new ArrayList<>();
                 List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
                 for(HairSalonService service : hairSalonServiceList) {
@@ -790,6 +794,26 @@ public class AppointmentService {
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
+        /*List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
+        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
+        List<Appointment> appointmentList = appointmentRepository.findAppointmentsByAccountForCustomer(accountForCustomer);
+        if(appointmentList.isEmpty()){
+            throw new EntityNotFoundException("You do not have any appointments!");
+        }
+        for(Appointment appointment : appointmentList){
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDay(appointment.getSlot().getDate());
+            appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(accountForCustomer.getCustomerName());
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            appointmentResponseInfoList.add(appointmentResponse);
+        }
+        return appointmentResponseInfoList;*/
     }
 
 
