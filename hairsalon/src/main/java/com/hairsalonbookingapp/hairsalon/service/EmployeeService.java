@@ -3,11 +3,14 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.EmployeeInfo;
+import com.hairsalonbookingapp.hairsalon.model.EmployeeResponsePage;
 import com.hairsalonbookingapp.hairsalon.model.FindEmployeeRequest;
 import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
 import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -23,8 +26,8 @@ public class EmployeeService {
     @Autowired
     ModelMapper modelMapper;
 
-    public List<EmployeeInfo> getEmployeeByRole(FindEmployeeRequest findEmployeeRequest){
-        String status = "Workday";
+    public EmployeeResponsePage getEmployeeByRole(FindEmployeeRequest findEmployeeRequest, int page, int size){
+        /*String status = "Workday";
         List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
         if(findEmployeeRequest.getRole().equals("Stylist")){
             if(findEmployeeRequest.getStylistLevel().equals("Normal")){
@@ -48,7 +51,39 @@ public class EmployeeService {
             return employeeInfoList;
         } else {
             throw new EntityNotFoundException("Employee not found!");
+        }*/
+        String status = "Workday";
+        String role = findEmployeeRequest.getRole();
+        String stylistLevel = null;
+        if(role.equals("Stylist")){
+            stylistLevel = findEmployeeRequest.getStylistLevel();
+            if(stylistLevel.isEmpty()){
+                throw new EntityNotFoundException("Stylist level must not be blank!");
+            }
         }
+
+        Page<AccountForEmployee> accountForEmployeePage = employeeRepository
+                .findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse(
+                        role,
+                        stylistLevel,
+                        status,
+                        PageRequest.of(page, size));
+        if(accountForEmployeePage.isEmpty()){
+            throw new EntityNotFoundException("Employee not found!");
+        }
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeePage.getContent()){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        EmployeeResponsePage employeeResponsePage = new EmployeeResponsePage();
+        employeeResponsePage.setContent(employeeInfoList);
+        employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
+        employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
+        employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
+
+        return employeeResponsePage;
+
     }
 
 

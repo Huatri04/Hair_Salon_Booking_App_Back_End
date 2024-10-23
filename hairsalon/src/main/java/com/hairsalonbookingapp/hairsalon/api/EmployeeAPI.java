@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.model.EmployeeInfo;
+import com.hairsalonbookingapp.hairsalon.model.EmployeeResponsePage;
 import com.hairsalonbookingapp.hairsalon.model.FindEmployeeRequest;
 import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
 import com.hairsalonbookingapp.hairsalon.service.EmployeeService;
@@ -21,9 +22,9 @@ public class EmployeeAPI {
     EmployeeService employeeService;
 
     @PostMapping("/employee")
-    public ResponseEntity getEmployeeByRole(@Valid @RequestBody FindEmployeeRequest findEmployeeRequest){
-        List<EmployeeInfo> employeeInfoList = employeeService.getEmployeeByRole(findEmployeeRequest);
-        return ResponseEntity.ok(employeeInfoList);
+    public ResponseEntity getEmployeeByRole(@Valid @RequestBody FindEmployeeRequest findEmployeeRequest, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        EmployeeResponsePage employeeResponsePage = employeeService.getEmployeeByRole(findEmployeeRequest, page, size);
+        return ResponseEntity.ok(employeeResponsePage);
     }
 
     @GetMapping("/stylist")

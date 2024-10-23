@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.repository;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.repository.query.Param;
 
@@ -22,4 +24,5 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     //List<AccountForEmployee> findAccountForEmployeeByRoleStaffAndStatusWorkdayAndIsDeletedFalse();
     //List<AccountForEmployee> findAccountForEmployeeByRoleAdminAndStatusWorkdayAndIsDeletedFalse();
     AccountForEmployee findAccountForEmployeeById(String id);
+    Page<AccountForEmployee> findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse(String role, String stylistLevel, String status, Pageable pageable);
 }

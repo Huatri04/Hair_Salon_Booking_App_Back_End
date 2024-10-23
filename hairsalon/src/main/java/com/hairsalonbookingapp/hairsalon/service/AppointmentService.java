@@ -11,9 +11,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class AppointmentService {
@@ -804,30 +802,12 @@ public class AppointmentService {
 
                 appointmentResponseList.add(appointmentResponse);
             }
+            Collections.reverse(appointmentResponseList);
             return appointmentResponseList;
+
         } else {
             throw new EntityNotFoundException("Appointment not found!");
         }
-        /*List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
-        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
-        List<Appointment> appointmentList = appointmentRepository.findAppointmentsByAccountForCustomer(accountForCustomer);
-        if(appointmentList.isEmpty()){
-            throw new EntityNotFoundException("You do not have any appointments!");
-        }
-        for(Appointment appointment : appointmentList){
-            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
-
-            appointmentResponse.setId(appointment.getId());
-            appointmentResponse.setCost(appointment.getCost());
-            appointmentResponse.setDay(appointment.getSlot().getDate());
-            appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
-            appointmentResponse.setCustomer(accountForCustomer.getCustomerName());
-            appointmentResponse.setDeleted(appointment.isDeleted());
-            appointmentResponse.setCompleted(appointment.isCompleted());
-
-            appointmentResponseInfoList.add(appointmentResponse);
-        }
-        return appointmentResponseInfoList;*/
     }
 
 
