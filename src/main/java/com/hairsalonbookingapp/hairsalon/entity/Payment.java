@@ -6,6 +6,7 @@ import lombok.Generated;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
@@ -23,7 +24,7 @@ public class Payment {
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonIgnore
-    private List<Transaction> transactions;
+    private List<Transaction> transactions = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "appointmentId")

@@ -69,7 +69,7 @@ public class AccountForEmployee implements UserDetails {
 
     private Integer targetKPI = 0;
 
-    private Long stylistSelectionFee;
+    private Double stylistSelectionFee;
 
     @Min(value = 0, message = "Basic Salary must at least 0")
     private Double basicSalary;

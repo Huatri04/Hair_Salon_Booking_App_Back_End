@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.repository;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.util.List;
@@ -28,4 +29,11 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     List<AccountForEmployee> findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse(String role, String stylistLevel, String status);
     List<AccountForEmployee> findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(String role, String status);
     AccountForEmployee findAccountForEmployeeByEmployeeIdAndStatusAndIsDeletedFalse(String id, String status);
+
+    @Query("SELECT COUNT(e.employeeId) FROM AccountForEmployee as e WHERE e.role <> 'MANAGER'")
+    long countAllExceptManager();
+
+    @Query(value = "SELECT e.name, e.img, e.KPI FROM account_for_employee e WHERE e.role = 'Stylist' ORDER BY e.KPI DESC LIMIT 5", nativeQuery = true)
+    List<Object[]> findTop5StylistsByKPI();
+
 }

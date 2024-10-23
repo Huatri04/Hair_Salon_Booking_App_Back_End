@@ -106,4 +106,16 @@ public class AppointmentAPI {
         AppointmentResponse appointment = appointmentService.createNewAppointmentBySystem(appointmentRequestSystem);
         return ResponseEntity.ok(appointment);
     }
+
+    @PostMapping("/staff")
+    public ResponseEntity createNewAppointmentByStaff(@Valid @RequestBody AppointmentRequest appointmentRequest, @RequestParam String phoneNumber){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentByStaff(appointmentRequest, phoneNumber);
+        return ResponseEntity.ok(appointment);
+    }
+
+    @PostMapping("/system/staff")
+    public ResponseEntity createNewAppointmentBySystemStaff(@Valid @RequestBody AppointmentRequestSystem appointmentRequestSystem, @RequestParam String phoneNumber){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentBySystemStaff(appointmentRequestSystem, phoneNumber);
+        return ResponseEntity.ok(appointment);
+    }
 }

@@ -139,6 +139,7 @@ public class PayService {
         transaction.setEmployee(employee);
         transaction.setMoney(appointment.getCost());
         transaction.setCustomer(accountForCustomer);
+        transaction.setTransactionType("Banking");
         transaction.setStatus("Success");
         transaction.setPayment(payment);
         transaction.setDescription("Nạp tiền VNPay khách hàng");
@@ -151,6 +152,7 @@ public class PayService {
         transaction1.setEmployee(employee);
         transaction1.setMoney(appointment.getCost());
         transaction1.setCustomer(accountForCustomer);
+        transaction1.setTransactionType("Banking");
         transaction1.setPayment(payment);
         transaction1.setStatus("Success");
         transaction1.setDescription("Chuyển từ khách hàng tới admin");

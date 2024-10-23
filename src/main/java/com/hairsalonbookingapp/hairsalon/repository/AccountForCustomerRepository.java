@@ -15,4 +15,5 @@ public interface AccountForCustomerRepository extends JpaRepository<AccountForCu
     boolean existsByEmail(String email);
     boolean existsByPhoneNumber(String phoneNumber);
     Optional<AccountForCustomer> findByEmail(String email);
+    long countByIsDeletedFalse();
 }

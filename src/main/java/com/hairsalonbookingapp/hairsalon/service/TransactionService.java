@@ -43,59 +43,44 @@ public class TransactionService {
     ModelMapper modelMapper;
     // create Transaction
     public TransactionResponse createTransactionInCast(CompleteAppointmentRequest orderRequest) {
+        // Lấy thông tin appointment và nhân viên
         Appointment appointment = appointmentService.completeAppointment(orderRequest);
         AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+
+        if (appointment == null || accountForEmployee == null) {
+            throw new IllegalStateException("Thông tin cuộc hẹn hoặc nhân viên không hợp lệ.");
+        }
+
         try {
-            // Tạo payment
+            // Tạo Payment
             Payment payment = new Payment();
             payment.setAppointment(appointment);
             payment.setCreateAt(new Date());
             payment.setTypePayment("Cash");
 
-            List<Transaction> transactions = new ArrayList<>();
-
-            // Tạo giao dịch
+            // Tạo Transaction
             Transaction transaction = new Transaction();
             transaction.setMoney(appointment.getCost());
             transaction.setDate(new Date());
             transaction.setEmployee(accountForEmployee);
-
             transaction.setCustomer(appointment.getAccountForCustomer());
+            transaction.setTransactionType("Cash");
             transaction.setPayment(payment);
             transaction.setStatus("Success");
             transaction.setDescription("Thanh toán trực tiếp tại quầy");
-            transactions.add(transaction);
 
-            // Thiết lập giao dịch trong payment
-            payment.setTransactions(transactions);
+            // Thêm Transaction vào Payment
+            payment.getTransactions().add(transaction);
 
-            // Lưu payment trước
+            // Lưu Payment (giao dịch sẽ được lưu cùng do CascadeType.ALL)
             paymentRepository.save(payment);
+            return null;
 
-            // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            e.printStackTrace(); // Ghi log chi tiết để kiểm tra lỗi
+            throw new RuntimeException("Lỗi khi lưu giao dịch.");
         }
-        return null;
     }
-
-
-//    public String generateId() {
-//        // Tìm ID cuối cùng theo vai trò
-//        Optional<Feedback> lastFeedback = feedbackRepository.findTopByOrderByFeedbackIdDesc();
-//        int newIdNumber = 1; // Mặc định bắt đầu từ 1
-//
-//        // Nếu có tài khoản cuối cùng, lấy ID
-//        if (lastFeedback.isPresent()) {
-//            String lastId = lastFeedback.get().getFeedbackId();
-//            newIdNumber = Integer.parseInt(lastId.replaceAll("\\D+", "")) + 1; // Tăng số lên 1
-//        }
-//
-//
-//        String prefix = "FB";
-//
-//        return String.format("%s%06d", prefix, newIdNumber); // Tạo ID mới với format
-//    }
 
 
     //delete Transaction
