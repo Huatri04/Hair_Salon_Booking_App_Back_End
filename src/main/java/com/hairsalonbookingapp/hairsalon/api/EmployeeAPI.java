@@ -1,8 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.model.response.EmployeeInfo;
+import com.hairsalonbookingapp.hairsalon.model.response.*;
 import com.hairsalonbookingapp.hairsalon.model.request.FindEmployeeRequest;
-import com.hairsalonbookingapp.hairsalon.model.response.StylistInfo;
 import com.hairsalonbookingapp.hairsalon.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -21,26 +20,32 @@ public class EmployeeAPI {
     EmployeeService employeeService;
 
     @PostMapping("/employee")
-    public ResponseEntity getEmployeeByRole(@Valid @RequestBody FindEmployeeRequest findEmployeeRequest){
-        List<EmployeeInfo> employeeInfoList = employeeService.getEmployeeByRole(findEmployeeRequest);
-        return ResponseEntity.ok(employeeInfoList);
+    public ResponseEntity getEmployeeByRole(@Valid @RequestBody FindEmployeeRequest findEmployeeRequest, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        EmployeeResponsePage employeeResponsePage = employeeService.getEmployeeByRole(findEmployeeRequest, page, size);
+        return ResponseEntity.ok(employeeResponsePage);
     }
 
     @GetMapping("/stylist")
-    public ResponseEntity getAllStylist(){
-        List<StylistInfo> stylistInfos = employeeService.getAllAvailableStylist();
-        return ResponseEntity.ok(stylistInfos);
+    public ResponseEntity getAllStylist(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+//        List<StylistInfo> stylistInfos = employeeService.getAllAvailableStylist();
+//        return ResponseEntity.ok(stylistInfos);
+        StylistListResponse stylistListResponse = employeeService.getAllAvailableStylist(page, size);
+        return ResponseEntity.ok(stylistListResponse);
     }
 
     @GetMapping("/employee")
-    public ResponseEntity getAllEmployees(){
-        List<EmployeeInfo> employeeInfoList = employeeService.getAllEmployees();
-        return ResponseEntity.ok(employeeInfoList);
+    public ResponseEntity getAllEmployees(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+//        List<EmployeeInfo> employeeInfoList = employeeService.getAllEmployees();
+//        return ResponseEntity.ok(employeeInfoList);
+        EmployeeListResponse employeeListResponse = employeeService.getAllEmployees(page, size);
+        return ResponseEntity.ok(employeeListResponse);
     }
 
     @GetMapping("/stylist/workDayNull")
-    public ResponseEntity checkStylistHasNull(){
-        List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNull();
-        return ResponseEntity.ok(stylistIdList);
+    public ResponseEntity checkStylistHasNull(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+//        List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNull();
+//        return ResponseEntity.ok(stylistIdList);
+        StylistWorkDayNullListResponse stylistWorkDayNullListResponse = employeeService.getStylistsThatWorkDaysNull(page, size);
+        return ResponseEntity.ok(stylistWorkDayNullListResponse);
     }
 }

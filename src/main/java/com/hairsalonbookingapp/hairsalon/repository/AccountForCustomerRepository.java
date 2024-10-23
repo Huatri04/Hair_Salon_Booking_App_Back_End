@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.repository;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -16,4 +18,6 @@ public interface AccountForCustomerRepository extends JpaRepository<AccountForCu
     boolean existsByPhoneNumber(String phoneNumber);
     Optional<AccountForCustomer> findByEmail(String email);
     long countByIsDeletedFalse();
+    Page<AccountForCustomer> findAll(Pageable pageable);
+
 }

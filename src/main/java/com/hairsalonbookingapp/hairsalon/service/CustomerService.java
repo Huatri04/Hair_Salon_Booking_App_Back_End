@@ -2,9 +2,12 @@ package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.model.response.CustomerAccountInfo;
+import com.hairsalonbookingapp.hairsalon.model.response.CustomerResponsePage;
 import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -20,13 +23,27 @@ public class CustomerService {
     ModelMapper modelMapper;
 
     // LẤY TOÀN BỘ CUSTOMER
-    public List<CustomerAccountInfo> getAllCustomerAccounts(){
-        List<AccountForCustomer> accountForCustomerList = customerRepository.findAll();
+    public CustomerResponsePage getAllCustomerAccounts(int page, int size){
+        Page<AccountForCustomer> accountForCustomerPage = customerRepository.findAll(PageRequest.of(page, size));
         List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
-        for(AccountForCustomer accountForCustomer : accountForCustomerList){
+        for(AccountForCustomer accountForCustomer : accountForCustomerPage.getContent()){
             CustomerAccountInfo customerAccountInfo = modelMapper.map(accountForCustomer, CustomerAccountInfo.class);
             customerAccountInfoList.add(customerAccountInfo);
         }
-        return customerAccountInfoList;
+        CustomerResponsePage customerResponsePage = new CustomerResponsePage();
+        customerResponsePage.setContent(customerAccountInfoList);
+        customerResponsePage.setTotalPages(accountForCustomerPage.getTotalPages());
+        customerResponsePage.setTotalElements(accountForCustomerPage.getTotalElements());
+        customerResponsePage.setPageNumber(accountForCustomerPage.getNumber());
+        return customerResponsePage;
     }
+//    public List<CustomerAccountInfo> getAllCustomerAccounts(){
+//        List<AccountForCustomer> accountForCustomerList = customerRepository.findAll();
+//        List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
+//        for(AccountForCustomer accountForCustomer : accountForCustomerList){
+//            CustomerAccountInfo customerAccountInfo = modelMapper.map(accountForCustomer, CustomerAccountInfo.class);
+//            customerAccountInfoList.add(customerAccountInfo);
+//        }
+//        return customerAccountInfoList;
+//    }
 }
