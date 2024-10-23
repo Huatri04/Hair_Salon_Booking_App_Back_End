@@ -27,6 +27,8 @@ public class HairSalonService {
     //@Pattern(regexp = "^\\d+$", message = "Invalid time!")
     private int timeOfService;
 
+    private String description; //MÔ TẢ DỊCH VỤ
+
     private String image;
 
     private boolean isAvailable = true;   //SERVICE CÓ KHẢ DỤNG KHÔNG

@@ -17,5 +17,7 @@ public class HairSalonServiceRequest {
     @Max(value = 60, message = "Invalid time!")
     private int timeOfService;
 
+    private String description; //MÔ TẢ DỊCH VỤ
+
     private String image;
 }

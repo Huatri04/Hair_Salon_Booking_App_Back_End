@@ -52,11 +52,14 @@ public class ShiftEmployeeService {
     @Autowired
     SlotService slotService;
 
+    @Autowired
+    EmployeeService employeeService;
+
 
     //ĐĂNG KÝ SHIFT EMPLOYEE (STYLIST) -> MANAGER LÀM
     public AccountForEmployeeResponse registerShifts(StylistShiftRequest stylistShiftRequest) {
         // CẬP NHẬT VÀO ACCOUNT FOR EMPLOYEE
-        String days = stylistShiftRequest.getDay1() + "," + stylistShiftRequest.getDay2() + "," + stylistShiftRequest.getDay3();
+        String days = String.join(",", stylistShiftRequest.getWorkDays()); // LẤY CÁC GIÁ TRỊ TRONG LIST WORKDAYS VÀ BIẾN NÓ THÀNH 1 CHUỖI
         String stylistID = stylistShiftRequest.getStylistID();
         AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(stylistID);
 
@@ -167,19 +170,35 @@ public class ShiftEmployeeService {
 
     // TẠO ALL SHIFTS CHO ALL STYLISTS -> MANAGER LÀM
     public List<ShiftEmployeeResponse> generateAllShiftEmployees(){
-        String role = "Stylist";
-        String status = "Workday";
-        List<ShiftEmployeeResponse> allShiftEmployeeResponseList = new ArrayList<>();
-        List<AccountForEmployee> accountForEmployeeList = employeeRepository
-                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
-        if(accountForEmployeeList != null) {
-            for(AccountForEmployee accountForEmployee : accountForEmployeeList){
-                List<ShiftEmployeeResponse> shiftEmployeeResponseList = generateShiftEmployee(accountForEmployee);
-                allShiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
+        //CHECK XEM MANAGER ĐÃ DÙNG CHỨC NĂNG NÀY CHƯA
+        List<LocalDate> nextWeekDays = timeService.getNextWeekDays(timeService.today); // LIST CÁC NGÀY TUẦN SAU
+        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll(); // LIST CÁC SHIFT EMPLOYEE TRONG DB
+        for(LocalDate nextWeekDay : nextWeekDays){
+            for(ShiftEmployee shiftEmployee : shiftEmployeeList){
+                if(nextWeekDay.toString().equals(shiftEmployee.getDate())){
+                    throw new DuplicateEntity("You can only use this function once per week!!!");
+                }
             }
-            return allShiftEmployeeResponseList;
+        }
+        // => MANAGER CHƯA DÙNG CHỨC NĂNG NÀY
+        List<String> foundStylists = employeeService.getStylistsThatWorkDaysNull(); // CHECK XEM CÓ STYLIST NÀO CHƯA SET WORKDAY
+        if(foundStylists.isEmpty()){ //TÌM KHÔNG THẤY
+            String role = "Stylist";
+            String status = "Workday";
+            List<ShiftEmployeeResponse> allShiftEmployeeResponseList = new ArrayList<>();
+            List<AccountForEmployee> accountForEmployeeList = employeeRepository
+                    .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+            if(accountForEmployeeList != null) {
+                for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+                    List<ShiftEmployeeResponse> shiftEmployeeResponseList = generateShiftEmployee(accountForEmployee);
+                    allShiftEmployeeResponseList.addAll(shiftEmployeeResponseList);
+                }
+                return allShiftEmployeeResponseList;
+            } else {
+                throw new EntityNotFoundException("Can not execute!");
+            }
         } else {
-            throw new EntityNotFoundException("Can not execute!");
+            throw new EntityNotFoundException("Can not process because some stylists did not set work days!!!");
         }
     }
 

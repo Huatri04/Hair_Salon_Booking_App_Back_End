@@ -14,5 +14,7 @@ public class HairSalonServiceUpdate {
     @Min(value = 0, message = "Invalid time!")
     private int timeOfService;
 
+    private String description; //MÔ TẢ DỊCH VỤ
+
     private String image;
 }

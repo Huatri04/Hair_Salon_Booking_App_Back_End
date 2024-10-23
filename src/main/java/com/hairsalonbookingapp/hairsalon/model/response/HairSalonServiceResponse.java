@@ -10,4 +10,5 @@ public class HairSalonServiceResponse {
     private int timeOfService;
     private String image;
     private boolean isAvailable;
+    private String description; //MÔ TẢ DỊCH VỤ
 }
