@@ -821,14 +821,17 @@ public class AppointmentService {
                 );
         if(slot != null){
             Appointment appointment = slot.getAppointments();
-            appointment.setCompleted(true);
-            Appointment newAppontment = appointmentRepository.save(appointment);
+            if(appointment != null){ // TRƯỜNG HỢP CUSTOMER (CÓ ACC) ĐẶT LỊCH TRONG SLOT ĐÓ VÀ MUỐN THANH TOÁN
+                appointment.setCompleted(true);
+                Appointment newAppontment = appointmentRepository.save(appointment);
 
-            AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
-            long point = accountForCustomer.getPoint();
-            long newPoint = point + 1;
-            accountForCustomer.setPoint(newPoint);
-            customerRepository.save(accountForCustomer);
+                AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
+                long point = accountForCustomer.getPoint();
+                long newPoint = point + 1;
+                accountForCustomer.setPoint(newPoint);
+                customerRepository.save(accountForCustomer);
+            }
+            // TRƯỜNG HỢP GUEST(KO CÓ ACC) MUỐN THANH TOÁN THÌ CHỈ CẦN CỘNG THÊM SLOT HOÀN THÀNH CHO STYLIST LÀ ĐỦ
 
             AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
             account.setCompletedSlot(account.getCompletedSlot() + 1);

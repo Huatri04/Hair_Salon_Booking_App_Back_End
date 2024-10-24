@@ -128,7 +128,7 @@ public class EmployeeService {
 
     // HÀM LẤY TOÀN BỘ EMPLOYEE KHÔNG QUAN TRỌNG ROLE LÀ GÌ
     public List<EmployeeInfo> getAllEmployees(){
-        List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAll();
+        List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAccountForEmployeesByIsDeletedFalse();
         if(accountForEmployeeList.isEmpty()){
             throw new EntityNotFoundException("Employee not found!");
         }
