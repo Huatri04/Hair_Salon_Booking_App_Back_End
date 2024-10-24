@@ -129,7 +129,7 @@ public class AuthenticationAPI {
     }
     @PostMapping("/forgotPassword/employee")
     public ResponseEntity forgotPasswordEmployee(@Valid @RequestBody ForgotPasswordRequest forgotPasswordRequest) {
-        authenticationService.forgotPassword(forgotPasswordRequest.getEmail());
+        authenticationService.forgotPasswordEmployee(forgotPasswordRequest.getEmail());
         return ResponseEntity.ok("Check your email to confirm reset password");
     }
     @PostMapping("/resetPassword/employee")

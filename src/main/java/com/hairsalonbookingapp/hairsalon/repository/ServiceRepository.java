@@ -1,6 +1,8 @@
 package com.hairsalonbookingapp.hairsalon.repository;
 
 import com.hairsalonbookingapp.hairsalon.entity.HairSalonService;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 
@@ -11,6 +13,8 @@ public interface ServiceRepository extends JpaRepository<HairSalonService, Long>
     List<HairSalonService> findHairSalonServicesByIsAvailableTrue();
     //List<HairSalonService> findHairSalonServicesByIsAvailableTrue();
     HairSalonService findHairSalonServiceById(long id);
+
+    Page<HairSalonService> findHairSalonServicesByIsAvailableTrue(Pageable pageable);
 
     @Query(value = """
         SELECT hs.name, hs.description, hs.image, COUNT(sa.service_id) AS service_count

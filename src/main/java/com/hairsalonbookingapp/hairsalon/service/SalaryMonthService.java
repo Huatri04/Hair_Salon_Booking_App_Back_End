@@ -93,7 +93,7 @@ public class SalaryMonthService {
         List<SalaryMonthResponse> salaryMonthResponses = new ArrayList<>();
         try {
             // Lấy danh sách tất cả nhân viên
-            List<AccountForEmployee> employees = employeeRepository.findAll();
+            List<AccountForEmployee> employees = employeeRepository.findAccountForEmployeesByIsDeletedFalse();
             if (employees.isEmpty()) {
                 throw new Duplicate("No employees found");
             }

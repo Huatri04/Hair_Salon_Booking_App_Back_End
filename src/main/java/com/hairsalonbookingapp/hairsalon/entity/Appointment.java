@@ -22,7 +22,10 @@ public class Appointment {
 
     private boolean isDeleted = false;
 
-    private Date date;
+//    private Date date;
+    private String date;
+    private String startHour;
+    private String stylist;
 
     @OneToOne
     @JoinColumn(name = "slotId")

@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
+import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestTransaction;
 import com.hairsalonbookingapp.hairsalon.model.response.TransactionListResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.TransactionResponse;
@@ -18,12 +19,12 @@ public class TransactionAPI {
     @Autowired
     TransactionService transactionService;
 
-//    @PostMapping
-////    @PreAuthorize("hasAuthority('customer')")
-//    public ResponseEntity createTransaction(@Valid @RequestBody long appointmentId){
-//        TransactionResponse transactionResponse = transactionService.createTransactionInCast(appointmentId);
-//        return ResponseEntity.ok(transactionResponse);
-//    }
+    @PostMapping
+//    @PreAuthorize("hasAuthority('customer')")
+    public ResponseEntity createTransaction(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
+        TransactionResponse transactionResponse = transactionService.createTransactionInCast(completeAppointmentRequest);
+        return ResponseEntity.ok(transactionResponse);
+    }
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteTransaction(@PathVariable int id){

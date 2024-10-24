@@ -6,9 +6,12 @@ import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.request.HairSalonServiceRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.HairSalonServiceResponse;
 import com.hairsalonbookingapp.hairsalon.model.request.HairSalonServiceUpdate;
+import com.hairsalonbookingapp.hairsalon.model.response.HairSalonServiceResponsePage;
 import com.hairsalonbookingapp.hairsalon.repository.ServiceRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -94,19 +97,22 @@ public class HairSalonBookingAppService {
     }
 
     //get all service  -> MANAGER LÀM
-    public List<HairSalonServiceResponse> getAllService(){
-        List<HairSalonService> list = serviceRepository.findAll();       // LẤY TẤT CẢ SERVICE BẤT KỂ KHẢ DỤNG HAY KHÔNG
-        if(list != null){
-            List<HairSalonServiceResponse> responseList = new ArrayList<>();
-            for(HairSalonService hairSalonService : list){
-                HairSalonServiceResponse hairSalonServiceResponse = modelMapper.map(hairSalonService, HairSalonServiceResponse.class);
-                responseList.add(hairSalonServiceResponse);
-            }
-            return responseList;
-        } else {
-            throw new EntityNotFoundException("Service not found!");
-            //return null;
+    public HairSalonServiceResponsePage getAllService(int page, int size){
+        Page<HairSalonService> servicePage = serviceRepository
+                .findHairSalonServicesByIsAvailableTrue(PageRequest.of(page, size));       // LẤY TẤT CẢ SERVICE KHẢ DỤNG
+        HairSalonServiceResponsePage hairSalonServiceResponsePage = new HairSalonServiceResponsePage();
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
+
+        for(HairSalonService hairSalonService : servicePage.getContent()){
+            HairSalonServiceResponse hairSalonServiceResponse = modelMapper.map(hairSalonService, HairSalonServiceResponse.class);
+            hairSalonServiceResponseList.add(hairSalonServiceResponse);
         }
+
+        hairSalonServiceResponsePage.setContent(hairSalonServiceResponseList);
+        hairSalonServiceResponsePage.setPageNumber(servicePage.getNumber());
+        hairSalonServiceResponsePage.setTotalElements(servicePage.getTotalElements());
+        hairSalonServiceResponsePage.setTotalPages(servicePage.getTotalPages());
+        return hairSalonServiceResponsePage;
     }
 
     // VIEW AVAILABLE SERVICE -> CUSTOMER LÀM

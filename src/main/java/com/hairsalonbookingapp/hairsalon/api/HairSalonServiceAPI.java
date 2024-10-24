@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.model.request.HairSalonServiceRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.HairSalonServiceResponse;
 import com.hairsalonbookingapp.hairsalon.model.request.HairSalonServiceUpdate;
+import com.hairsalonbookingapp.hairsalon.model.response.HairSalonServiceResponsePage;
 import com.hairsalonbookingapp.hairsalon.service.HairSalonBookingAppService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -45,8 +46,8 @@ public class HairSalonServiceAPI {
     }
 
     @GetMapping("/service")
-    public ResponseEntity getAllService(){
-        List<HairSalonServiceResponse> hairSalonServices = hairSalonBookingAppService.getAllService();
+    public ResponseEntity getAllService(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        HairSalonServiceResponsePage hairSalonServices = hairSalonBookingAppService.getAllService(page, size);
         return ResponseEntity.ok(hairSalonServices);
     }
 

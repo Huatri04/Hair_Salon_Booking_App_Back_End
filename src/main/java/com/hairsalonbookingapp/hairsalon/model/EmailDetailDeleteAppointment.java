@@ -15,6 +15,6 @@ public class EmailDetailDeleteAppointment {
     private long appointmentId;
     private List<HairSalonService> serviceName;
     private String nameStylist;
-    private Date day;
+    private String day;
     private String startHour;
 }

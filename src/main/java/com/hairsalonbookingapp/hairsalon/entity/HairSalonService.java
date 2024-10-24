@@ -16,7 +16,7 @@ public class HairSalonService {
     private long id;
 
     //@NotBlank(message = "Service name must not be blank!")
-    @Column(unique = true)
+
     private String name;
 
     //@NotBlank(message = "Service cost must not be blank!")

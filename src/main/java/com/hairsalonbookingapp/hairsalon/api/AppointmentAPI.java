@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 import com.hairsalonbookingapp.hairsalon.entity.Appointment;
 import com.hairsalonbookingapp.hairsalon.model.request.*;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponseInfo;
 import com.hairsalonbookingapp.hairsalon.model.response.KPITotal;
 import com.hairsalonbookingapp.hairsalon.service.AppointmentService;
 import com.hairsalonbookingapp.hairsalon.service.PayService;
@@ -69,7 +70,7 @@ public class AppointmentAPI {
 
     @GetMapping
     public ResponseEntity getAppointmentHistory(){
-        List<AppointmentResponse> appointments = appointmentService.checkAppointmentHistory();
+        List<AppointmentResponseInfo> appointments = appointmentService.checkAppointmentHistory();
         return ResponseEntity.ok(appointments);
     }
 

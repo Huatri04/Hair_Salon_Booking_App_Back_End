@@ -30,7 +30,7 @@ public class Transaction {
     private AccountForEmployee employee;
 
     @ManyToOne
-    @JoinColumn(name = "phoneNumber", nullable = false) // day la foreign key
+    @JoinColumn(name = "phoneNumber", nullable = true) // day la foreign key
     private AccountForCustomer customer;
 
     @ManyToOne
