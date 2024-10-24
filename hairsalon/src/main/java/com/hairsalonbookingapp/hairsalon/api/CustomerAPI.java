@@ -14,16 +14,22 @@ import org.springframework.web.bind.annotation.RestController;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api")
+@RequestMapping("/api/customer")
 @SecurityRequirement(name = "api")
 public class CustomerAPI {
 
     @Autowired
     CustomerService customerService;
 
-    @GetMapping("/customer")
+    @GetMapping
     public ResponseEntity getAllCustomers(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
         CustomerResponsePage customerResponsePage = customerService.getAllCustomerAccounts(page, size);
         return ResponseEntity.ok(customerResponsePage);
+    }
+
+    @GetMapping("/deleted")
+    public ResponseEntity getAllBanedCustomers(){
+        List<CustomerAccountInfo> customerAccountInfoList = customerService.getAllBanedCustomerAccounts();
+        return ResponseEntity.ok(customerAccountInfoList);
     }
 }

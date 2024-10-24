@@ -44,4 +44,10 @@ public class EmployeeAPI {
         List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNull();
         return ResponseEntity.ok(stylistIdList);
     }
+
+    @GetMapping("/employee/deleted")
+    public ResponseEntity getAllBanedEmployees(){
+        List<EmployeeInfo> employeeInfoList = employeeService.getAllBanedEmployees();
+        return ResponseEntity.ok(employeeInfoList);
+    }
 }

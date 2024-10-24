@@ -285,7 +285,7 @@ public class AppointmentService {
         }
     }
 
-    //STAFF ĐẶT LỊCH HẸN GIÚP CUSTOMER
+    //STAFF ĐẶT LỊCH HẸN CHO GUEST
     public AppointmentResponse createNewAppointmentByStaff(AppointmentRequest appointmentRequest){
         try {
             List<String> serviceNameList = new ArrayList<>();  //TẠO LIST CHỨA TÊN CÁC DỊCH VỤ CUSTOMER CHỌN

@@ -26,4 +26,5 @@ public interface EmployeeRepository extends JpaRepository<AccountForEmployee, St
     AccountForEmployee findAccountForEmployeeById(String id);
     Page<AccountForEmployee> findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse(String role, String stylistLevel, String status, Pageable pageable);
     List<AccountForEmployee> findAccountForEmployeesByIsDeletedFalse();
+    List<AccountForEmployee> findAccountForEmployeesByIsDeletedTrue();
 }

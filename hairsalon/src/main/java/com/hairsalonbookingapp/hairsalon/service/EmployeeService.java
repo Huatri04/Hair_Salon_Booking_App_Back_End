@@ -140,6 +140,23 @@ public class EmployeeService {
         return employeeInfoList;
     }
 
+    //HÀM LẤY TOÀN BỘ TÀI KHOẢN EMPLOYEE BỊ BAN/DELETED
+    public List<EmployeeInfo> getAllBanedEmployees(){
+        List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAccountForEmployeesByIsDeletedTrue();
+        if(accountForEmployeeList.isEmpty()){
+            throw new EntityNotFoundException("Employee not found!");
+        }
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        return employeeInfoList;
+    }
+
+
+
+
     //HÀM CHECK DANH SÁCH CÁC STYLIST COI CÓ AI CHƯA SET NGÀY LÀM VIỆC KHÔNG
     public List<String> getStylistsThatWorkDaysNull(){
         String role = "Stylist";

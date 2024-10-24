@@ -33,7 +33,7 @@ public class CustomerService {
         return customerAccountInfoList;
     }*/
     public CustomerResponsePage getAllCustomerAccounts(int page, int size){
-        Page<AccountForCustomer> accountForCustomerPage = customerRepository.findAll(PageRequest.of(page, size));
+        Page<AccountForCustomer> accountForCustomerPage = customerRepository.findAccountForCustomersByIsDeletedFalse(PageRequest.of(page, size));
         List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
         for(AccountForCustomer accountForCustomer : accountForCustomerPage.getContent()){
             CustomerAccountInfo customerAccountInfo = modelMapper.map(accountForCustomer, CustomerAccountInfo.class);
@@ -45,5 +45,16 @@ public class CustomerService {
         customerResponsePage.setTotalElements(accountForCustomerPage.getTotalElements());
         customerResponsePage.setPageNumber(accountForCustomerPage.getNumber());
         return customerResponsePage;
+    }
+
+    //HÀM LẤY CUSTOMER ACCOUNT BỊ BAN
+    public List<CustomerAccountInfo> getAllBanedCustomerAccounts(){
+        List<AccountForCustomer> accountForCustomerList = customerRepository.findAccountForCustomersByIsDeletedTrue();
+        List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
+        for(AccountForCustomer accountForCustomer : accountForCustomerList){
+            CustomerAccountInfo customerAccountInfo = modelMapper.map(accountForCustomer, CustomerAccountInfo.class);
+            customerAccountInfoList.add(customerAccountInfo);
+        }
+        return customerAccountInfoList;
     }
 }
