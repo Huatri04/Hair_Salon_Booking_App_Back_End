@@ -29,7 +29,7 @@ public class EmployeeAPI {
 
     @GetMapping("/stylist")
     public ResponseEntity getAllStylist(){
-        List<StylistInfo> stylistInfos = employeeService.getAllAvailableStylist();
+        List<EmployeeInfo> stylistInfos = employeeService.getAllAvailableStylist();
         return ResponseEntity.ok(stylistInfos);
     }
 

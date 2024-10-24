@@ -88,17 +88,17 @@ public class EmployeeService {
 
 
     //GET ALL STYLIST
-    public List<StylistInfo> getAllAvailableStylist(){
+    public List<EmployeeInfo> getAllAvailableStylist(){
         String role = "Stylist";
         String status = "Workday";
-        List<StylistInfo> stylistInfos = new ArrayList<>();
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
         List<AccountForEmployee> list = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
-        if(list != null){
+        if(!list.isEmpty()){
             for(AccountForEmployee account : list){
-                StylistInfo stylistInfo = modelMapper.map(account, StylistInfo.class);
-                stylistInfos.add(stylistInfo);
+                EmployeeInfo employeeInfo = modelMapper.map(account, EmployeeInfo.class);
+                employeeInfoList.add(employeeInfo);
             }
-            return stylistInfos;
+            return employeeInfoList;
         } else {
             throw new EntityNotFoundException("Stylist not found!");
         }
@@ -118,13 +118,13 @@ public class EmployeeService {
 
 
 
-    // CUSTOMER NHỜ HỆ THỐNG CHỌN GIÚP STYLIST [TỰ ĐỘNG]
+    /*// CUSTOMER NHỜ HỆ THỐNG CHỌN GIÚP STYLIST [TỰ ĐỘNG]
     public StylistInfo generateRandomStylist() {
         List<StylistInfo> stylistInfoList = getAllAvailableStylist();
         Random random = new Random();
         int randomIndex = random.nextInt(stylistInfoList.size());
         return stylistInfoList.get(randomIndex);
-    }
+    }*/
 
     // HÀM LẤY TOÀN BỘ EMPLOYEE KHÔNG QUAN TRỌNG ROLE LÀ GÌ
     public List<EmployeeInfo> getAllEmployees(){
