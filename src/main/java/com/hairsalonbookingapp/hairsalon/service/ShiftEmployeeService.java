@@ -138,6 +138,7 @@ public class ShiftEmployeeService {
             slotRequest.setEndHour(timeService.setEndHour(day));
             slotRequest.setDuration(timeService.duration);
             List<Slot> slotList = slotService.generateSlots(slotRequest);
+
             newShiftEmployee.setSlots(slotList);
             // SAVE LẠI VÀO DB
             ShiftEmployee savedShift = shiftEmployeeRepository.save(newShiftEmployee);
