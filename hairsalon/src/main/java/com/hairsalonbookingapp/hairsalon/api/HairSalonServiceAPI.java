@@ -47,8 +47,8 @@ public class HairSalonServiceAPI {
     }
 
     @GetMapping("/service")
-    public ResponseEntity getAllService(){
-        List<HairSalonServiceResponse> hairSalonServices = hairSalonBookingAppService.getAllService();
+    public ResponseEntity getAllService(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        HairSalonServiceResponsePage hairSalonServices = hairSalonBookingAppService.getAllService(page, size);
         return ResponseEntity.ok(hairSalonServices);
     }
 
