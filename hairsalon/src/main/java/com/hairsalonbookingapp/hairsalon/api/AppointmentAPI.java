@@ -42,14 +42,14 @@ public class AppointmentAPI {
     }
 
     @PostMapping("/staff")
-    public ResponseEntity createNewAppointmentByStaff(@Valid @RequestBody AppointmentRequest appointmentRequest, @RequestParam String phoneNumber){
-        AppointmentResponse appointment = appointmentService.createNewAppointmentByStaff(appointmentRequest, phoneNumber);
+    public ResponseEntity createNewAppointmentByStaff(@Valid @RequestBody AppointmentRequest appointmentRequest){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentByStaff(appointmentRequest);
         return ResponseEntity.ok(appointment);
     }
 
     @PostMapping("/system/staff")
-    public ResponseEntity createNewAppointmentBySystemStaff(@Valid @RequestBody AppointmentRequestSystem appointmentRequestSystem, @RequestParam String phoneNumber){
-        AppointmentResponse appointment = appointmentService.createNewAppointmentBySystemStaff(appointmentRequestSystem, phoneNumber);
+    public ResponseEntity createNewAppointmentBySystemStaff(@Valid @RequestBody AppointmentRequestSystem appointmentRequestSystem){
+        AppointmentResponse appointment = appointmentService.createNewAppointmentBySystemStaff(appointmentRequestSystem);
         return ResponseEntity.ok(appointment);
     }
 
