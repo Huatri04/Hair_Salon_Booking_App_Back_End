@@ -48,7 +48,7 @@ public class CustomerService {
     }
 
     //HÀM LẤY CUSTOMER ACCOUNT BỊ BAN
-    public List<CustomerAccountInfo> getAllBanedCustomerAccounts(){
+    /*public List<CustomerAccountInfo> getAllBanedCustomerAccounts(){
         List<AccountForCustomer> accountForCustomerList = customerRepository.findAccountForCustomersByIsDeletedTrue();
         List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
         for(AccountForCustomer accountForCustomer : accountForCustomerList){
@@ -56,5 +56,19 @@ public class CustomerService {
             customerAccountInfoList.add(customerAccountInfo);
         }
         return customerAccountInfoList;
+    }*/
+    public CustomerResponsePage getAllBanedCustomerAccounts(int page, int size){
+        Page<AccountForCustomer> accountForCustomerPage = customerRepository.findAccountForCustomersByIsDeletedTrue(PageRequest.of(page, size));
+        List<CustomerAccountInfo> customerAccountInfoList = new ArrayList<>();
+        for(AccountForCustomer accountForCustomer : accountForCustomerPage.getContent()){
+            CustomerAccountInfo customerAccountInfo = modelMapper.map(accountForCustomer, CustomerAccountInfo.class);
+            customerAccountInfoList.add(customerAccountInfo);
+        }
+        CustomerResponsePage customerResponsePage = new CustomerResponsePage();
+        customerResponsePage.setContent(customerAccountInfoList);
+        customerResponsePage.setTotalPages(accountForCustomerPage.getTotalPages());
+        customerResponsePage.setTotalElements(accountForCustomerPage.getTotalElements());
+        customerResponsePage.setPageNumber(accountForCustomerPage.getNumber());
+        return customerResponsePage;
     }
 }

@@ -28,8 +28,8 @@ public class CustomerAPI {
     }
 
     @GetMapping("/deleted")
-    public ResponseEntity getAllBanedCustomers(){
-        List<CustomerAccountInfo> customerAccountInfoList = customerService.getAllBanedCustomerAccounts();
-        return ResponseEntity.ok(customerAccountInfoList);
+    public ResponseEntity getAllBanedCustomers(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        CustomerResponsePage customerResponsePage = customerService.getAllBanedCustomerAccounts(page, size);
+        return ResponseEntity.ok(customerResponsePage);
     }
 }

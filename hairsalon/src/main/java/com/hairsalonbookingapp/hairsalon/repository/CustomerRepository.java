@@ -14,4 +14,5 @@ public interface CustomerRepository extends JpaRepository<AccountForCustomer, St
     Page<AccountForCustomer> findAll(Pageable pageable);
     List<AccountForCustomer> findAccountForCustomersByIsDeletedTrue();
     Page<AccountForCustomer> findAccountForCustomersByIsDeletedFalse(Pageable pageable);
+    Page<AccountForCustomer> findAccountForCustomersByIsDeletedTrue(Pageable pageable);
 }

@@ -127,7 +127,7 @@ public class EmployeeService {
     }*/
 
     // HÀM LẤY TOÀN BỘ EMPLOYEE KHÔNG QUAN TRỌNG ROLE LÀ GÌ
-    public List<EmployeeInfo> getAllEmployees(){
+    /*public List<EmployeeInfo> getAllEmployees(){
         List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAccountForEmployeesByIsDeletedFalse();
         if(accountForEmployeeList.isEmpty()){
             throw new EntityNotFoundException("Employee not found!");
@@ -138,10 +138,26 @@ public class EmployeeService {
             employeeInfoList.add(employeeInfo);
         }
         return employeeInfoList;
+    }*/
+    public EmployeeResponsePage getAllEmployees(int page, int size){
+        Page<AccountForEmployee> accountForEmployeePage = employeeRepository.findAccountForEmployeesByIsDeletedFalse(PageRequest.of(page, size));
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeePage.getContent()){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        EmployeeResponsePage employeeResponsePage = new EmployeeResponsePage();
+        employeeResponsePage.setContent(employeeInfoList);
+        employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
+        employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
+        employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
+        return employeeResponsePage;
     }
 
+
+
     //HÀM LẤY TOÀN BỘ TÀI KHOẢN EMPLOYEE BỊ BAN/DELETED
-    public List<EmployeeInfo> getAllBanedEmployees(){
+    /*public List<EmployeeInfo> getAllBanedEmployees(){
         List<AccountForEmployee> accountForEmployeeList = employeeRepository.findAccountForEmployeesByIsDeletedTrue();
         if(accountForEmployeeList.isEmpty()){
             throw new EntityNotFoundException("Employee not found!");
@@ -152,7 +168,22 @@ public class EmployeeService {
             employeeInfoList.add(employeeInfo);
         }
         return employeeInfoList;
+    }*/
+    public EmployeeResponsePage getAllBanedEmployees(int page, int size){
+        Page<AccountForEmployee> accountForEmployeePage = employeeRepository.findAccountForEmployeesByIsDeletedTrue(PageRequest.of(page, size));
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeePage.getContent()){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        EmployeeResponsePage employeeResponsePage = new EmployeeResponsePage();
+        employeeResponsePage.setContent(employeeInfoList);
+        employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
+        employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
+        employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
+        return employeeResponsePage;
     }
+
 
 
 
