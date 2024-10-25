@@ -16,5 +16,5 @@ public class RequestUpdateProfileEmployeeByManager {
 
     private String stylistLevel;
 
-    private Integer KPI;
+    private Integer targetKPI;
 }

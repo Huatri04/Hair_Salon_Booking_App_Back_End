@@ -11,4 +11,6 @@ public class StylistInfo {
     String stylistLevel;
     String status;
     private Double stylistSelectionFee;
+    private int targetKPI;
+    int KPI; // KPI của stylist // [Stylist]
 }

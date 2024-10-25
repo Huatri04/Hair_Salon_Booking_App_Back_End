@@ -18,5 +18,6 @@ public class ProfileEmployee {
     String stylistLevel; // [Stylist]
     private Long stylistSelectionFee;
     int KPI; // KPI của stylist // [Stylist]
+    int targetKPI;
     String days;
 }

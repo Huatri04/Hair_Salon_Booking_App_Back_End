@@ -16,4 +16,7 @@ public class EditProfileEmployeeResponse {
     private String phoneNumber;
 
     private String stylistLevel;
+
+    private Integer targetKPI;
+    private Integer KPI;
 }

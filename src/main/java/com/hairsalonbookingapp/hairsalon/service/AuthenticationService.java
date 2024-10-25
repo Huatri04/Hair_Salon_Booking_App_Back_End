@@ -267,7 +267,7 @@ public class AuthenticationService implements UserDetailsService {
                     if(account.getTargetKPI() < 0 ){
                         throw new UpdatedException("Target KPI must be at least 0");
                     }
-                    oldAccount.setKPI(account.getKPI());
+                    oldAccount.setTargetKPI(account.getTargetKPI());
                 }
 
                 if(account.getStylistSelectionFee() != null){
