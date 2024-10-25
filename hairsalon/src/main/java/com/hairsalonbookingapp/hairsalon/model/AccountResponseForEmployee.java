@@ -18,12 +18,12 @@ public class AccountResponseForEmployee {
     String email;
     String phoneNumber;
     String degrees; // Bằng cấp // [Stylist]
-    double basicSalary;
+    Double basicSalary;
     Date createdAt;
     String role;
     String stylistLevel; // [Stylist]
-    double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
-    int KPI; // KPI của stylist // [Stylist]
+    Double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    Integer KPI; // KPI của stylist // [Stylist]
     String token;
     String days;
 }

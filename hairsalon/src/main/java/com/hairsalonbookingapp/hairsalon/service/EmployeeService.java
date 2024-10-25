@@ -11,6 +11,7 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -54,7 +55,7 @@ public class EmployeeService {
         }*/
         String status = "Workday";
         String role = findEmployeeRequest.getRole();
-        String stylistLevel = null;
+        String stylistLevel = "NotStylist";
         if(role.equals("Stylist")){
             stylistLevel = findEmployeeRequest.getStylistLevel();
             if(stylistLevel.isEmpty()){
@@ -205,6 +206,8 @@ public class EmployeeService {
         }
         return foundStylists;
     }
+
+
 
 
 

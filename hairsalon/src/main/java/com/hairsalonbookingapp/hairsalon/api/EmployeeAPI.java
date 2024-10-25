@@ -50,4 +50,6 @@ public class EmployeeAPI {
         EmployeeResponsePage employeeResponsePage = employeeService.getAllBanedEmployees(page, size);
         return ResponseEntity.ok(employeeResponsePage);
     }
+
+
 }

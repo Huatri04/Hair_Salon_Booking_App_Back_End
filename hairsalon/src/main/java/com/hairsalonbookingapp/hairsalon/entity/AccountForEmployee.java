@@ -49,7 +49,7 @@ public class AccountForEmployee implements UserDetails {
 
     private String degrees; // Bằng cấp // [Stylist]
 
-    private double basicSalary;
+    private Double basicSalary;
 
     private Date createdAt;
 
@@ -65,19 +65,19 @@ public class AccountForEmployee implements UserDetails {
     @Pattern(regexp = "Normal|Expert|NotStylist", message = "StylistLevel is invalid!")
     private String stylistLevel; // [Stylist]
 
-    private double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
+    private Double expertStylistBonus; // phí trả thêm cho expert stylist // [Stylist]
 
     //@NotBlank(message = "Status must not be blank!")
     //@Pattern(regexp = "Workday|On leave", message = "Status is invalid!")
     private String status;   // TRẠNG THÁI LÀM VIỆC [ĐANG LÀM / TẠM NGHỈ]
 
-    private int KPI; // KPI của stylist // [Stylist]
+    private Integer KPI; // KPI của stylist // [Stylist]
 
     private boolean isDeleted = false;  // TÀI KHOẢN CÒN KHẢ DỤNG KHÔNG
 
     private String days; // NGÀY LÀM VIỆC (THỨ 2,3,4...) -> CÚ PHÁP: MONDAY, TUESDAY,....
 
-    private int completedSlot = 0; // SỐ SLOT HOÀN THÀNH
+    private Integer completedSlot = 0; // SỐ SLOT HOÀN THÀNH
 
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
