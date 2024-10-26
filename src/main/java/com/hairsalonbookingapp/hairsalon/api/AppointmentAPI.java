@@ -119,4 +119,10 @@ public class AppointmentAPI {
         AppointmentResponse appointment = appointmentService.createNewAppointmentBySystemStaff(appointmentRequestSystem);
         return ResponseEntity.ok(appointment);
     }
+
+    @GetMapping("/{date}/{phone}")
+    public ResponseEntity getAllAppointmentsByDateAndPhone(@PathVariable String date, @PathVariable String phone){
+        List<AppointmentResponseInfo> appointmentResponseInfoList = appointmentService.getAppointmentBySĐT(phone, date);
+        return ResponseEntity.ok(appointmentResponseInfoList);
+    }
 }

@@ -52,6 +52,7 @@ public class EmployeeService {
 //    }
 
     public EmployeeResponsePage getEmployeeByRole(FindEmployeeRequest findEmployeeRequest, int page, int size){
+
         String status = "Workday";
         String role = findEmployeeRequest.getRole();
         String stylistLevel = null;
@@ -68,7 +69,7 @@ public class EmployeeService {
                         stylistLevel,
                         status,
                         PageRequest.of(page, size));
-        if(accountForEmployeePage.isEmpty()){
+        if(accountForEmployeePage.getContent().isEmpty()){
             throw new EntityNotFoundException("Employee not found!");
         }
         List<EmployeeInfo> employeeInfoList = new ArrayList<>();
@@ -81,7 +82,6 @@ public class EmployeeService {
         employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
         employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
         employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
-
 
         return employeeResponsePage;
 
@@ -147,30 +147,19 @@ public class EmployeeService {
     }
 
     // HÀM LẤY TOÀN BỘ EMPLOYEE KHÔNG QUAN TRỌNG ROLE LÀ GÌ
-    public EmployeeListResponse getAllEmployees(int page, int size) {
-        // Tạo yêu cầu phân trang với số trang và kích thước mỗi trang
-        PageRequest pageRequest = PageRequest.of(page, size);
-
-        // Lấy danh sách nhân viên đã phân trang từ database
-        Page<AccountForEmployee> employeePage = employeeRepository.findByIsDeletedFalse(pageRequest);
-
-        // Tạo danh sách EmployeeInfo để chứa kết quả đã chuyển đổi
+    public EmployeeResponsePage getAllEmployees(int page, int size){
+        Page<AccountForEmployee> accountForEmployeePage = employeeRepository.findAccountForEmployeesByIsDeletedFalse(PageRequest.of(page, size));
         List<EmployeeInfo> employeeInfoList = new ArrayList<>();
-
-        // Duyệt qua từng phần tử trong trang và chuyển đổi sang EmployeeInfo
-        for (AccountForEmployee account : employeePage.getContent()) {
-            EmployeeInfo employeeInfo = modelMapper.map(account, EmployeeInfo.class);
+        for(AccountForEmployee accountForEmployee : accountForEmployeePage.getContent()){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
             employeeInfoList.add(employeeInfo);
         }
-
-        // Tạo đối tượng EmployeeListResponse để trả về kết quả
-        EmployeeListResponse response = new EmployeeListResponse();
-        response.setTotalPage(employeePage.getTotalPages());
-        response.setContent(employeeInfoList);
-        response.setPageNumber(employeePage.getNumber());
-        response.setTotalElement(employeePage.getTotalElements());
-
-        return response;
+        EmployeeResponsePage employeeResponsePage = new EmployeeResponsePage();
+        employeeResponsePage.setContent(employeeInfoList);
+        employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
+        employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
+        employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
+        return employeeResponsePage;
     }
 
 //    public List<EmployeeInfo> getAllEmployees(){
@@ -194,7 +183,7 @@ public class EmployeeService {
         // Tạo yêu cầu phân trang
         PageRequest pageRequest = PageRequest.of(page, size);
 
-        // Lấy stylist theo phân trang từ database
+        // Lấy stylist theo phân trang từ cơ sở dữ liệu
         Page<AccountForEmployee> stylistPage = employeeRepository
                 .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status, pageRequest);
 
@@ -203,15 +192,16 @@ public class EmployeeService {
             throw new EntityNotFoundException("Stylist not found!");
         }
 
-        // Duyệt qua từng stylist và kiểm tra nếu 'days' là null
+        // Tạo danh sách stylist có days = null
         List<String> foundStylists = new ArrayList<>();
         for (AccountForEmployee account : stylistPage.getContent()) {
             if (account.getDays() == null) {
-                foundStylists.add(account.getEmployeeId());
+                String stylistInfo = "Id: " + account.getEmployeeId() + ", Name: " + account.getName();
+                foundStylists.add(stylistInfo);
             }
         }
 
-        // Tạo StylistIdListResponse để trả về danh sách và thông tin phân trang
+        // Tạo đối tượng StylistWorkDayNullListResponse để trả về thông tin phân trang và nội dung
         StylistWorkDayNullListResponse response = new StylistWorkDayNullListResponse();
         response.setTotalPage(stylistPage.getTotalPages());
         response.setContent(foundStylists);
@@ -220,6 +210,7 @@ public class EmployeeService {
 
         return response;
     }
+
 
     public List<String> getStylistsThatWorkDaysNull(){
         String role = "Stylist";
@@ -232,11 +223,26 @@ public class EmployeeService {
         }
         for(AccountForEmployee accountForEmployee : allStylists){
             if(accountForEmployee.getDays() == null){
-                foundStylists.add(accountForEmployee.getEmployeeId());
+                String foundStylist = "Id: " + accountForEmployee.getEmployeeId() + ", Name: " + accountForEmployee.getName();
+                foundStylists.add(foundStylist);
             }
         }
         return foundStylists;
     }
 
+    public EmployeeResponsePage getAllBanedEmployees(int page, int size){
+        Page<AccountForEmployee> accountForEmployeePage = employeeRepository.findAccountForEmployeesByIsDeletedTrue(PageRequest.of(page, size));
+        List<EmployeeInfo> employeeInfoList = new ArrayList<>();
+        for(AccountForEmployee accountForEmployee : accountForEmployeePage.getContent()){
+            EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
+            employeeInfoList.add(employeeInfo);
+        }
+        EmployeeResponsePage employeeResponsePage = new EmployeeResponsePage();
+        employeeResponsePage.setContent(employeeInfoList);
+        employeeResponsePage.setTotalPages(accountForEmployeePage.getTotalPages());
+        employeeResponsePage.setTotalElements(accountForEmployeePage.getTotalElements());
+        employeeResponsePage.setPageNumber(accountForEmployeePage.getNumber());
+        return employeeResponsePage;
+    }
 
 }

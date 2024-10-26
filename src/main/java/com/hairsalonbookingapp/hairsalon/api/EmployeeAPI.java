@@ -37,7 +37,7 @@ public class EmployeeAPI {
     public ResponseEntity getAllEmployees(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
 //        List<EmployeeInfo> employeeInfoList = employeeService.getAllEmployees();
 //        return ResponseEntity.ok(employeeInfoList);
-        EmployeeListResponse employeeListResponse = employeeService.getAllEmployees(page, size);
+        EmployeeResponsePage employeeListResponse = employeeService.getAllEmployees(page, size);
         return ResponseEntity.ok(employeeListResponse);
     }
 
@@ -48,4 +48,11 @@ public class EmployeeAPI {
         StylistWorkDayNullListResponse stylistWorkDayNullListResponse = employeeService.getStylistsThatWorkDaysNull(page, size);
         return ResponseEntity.ok(stylistWorkDayNullListResponse);
     }
+
+    @GetMapping("/employee/deleted")
+    public ResponseEntity getAllBanedEmployees(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        EmployeeResponsePage employeeResponsePage = employeeService.getAllBanedEmployees(page, size);
+        return ResponseEntity.ok(employeeResponsePage);
+    }
+
 }
