@@ -4,10 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.request.CompleteAppointmentRequest;
 import com.hairsalonbookingapp.hairsalon.model.request.RequestAppointment;
-import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository;
-import com.hairsalonbookingapp.hairsalon.repository.AppointmentRepository;
-import com.hairsalonbookingapp.hairsalon.repository.EmployeeRepository;
-import com.hairsalonbookingapp.hairsalon.repository.PaymentRepository;
+import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -38,6 +35,9 @@ public class PayService {
 
     @Autowired
     EmployeeRepository employeeRepository;
+
+    @Autowired
+    SlotRepository slotRepository;
 
     @Autowired
     PaymentRepository paymentRepository;
@@ -113,27 +113,36 @@ public class PayService {
         return result.toString();
     }
 
-    public void createTransaction(long appointMentId) {
+    public void createTransaction(CompleteAppointmentRequest completeAppointmentRequest) {
         // Tìm appointment
-        Appointment appointment = appointmentRepository.findById(appointMentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment not found!"));
+        Slot slot = slotRepository
+                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
+                        completeAppointmentRequest.getStartSlot(),
+                        completeAppointmentRequest.getStylistId(),
+                        completeAppointmentRequest.getDate()
+                );
+        if (slot != null) {
+            Appointment appointment = slot.getAppointments();
+            if (appointment == null) {
+                throw new EntityNotFoundException("Appointment not found!");
+            }
 
-        // Tạo payment
-        Payment payment = new Payment();
-        payment.setAppointment(appointment);
-        payment.setCreateAt(new Date());
-        payment.setTypePayment("Banking");
+            // Tạo payment
+            Payment payment = new Payment();
+            payment.setAppointment(appointment);
+            payment.setCreateAt(new Date());
+            payment.setTypePayment("Banking");
 
-        List<Transaction> transactions = new ArrayList<>();
+            List<Transaction> transactions = new ArrayList<>();
 
-        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
-        if (employee == null) {
-            throw new IllegalStateException("Không tìm thấy nhân viên thực hiện giao dịch.");
-        }
+            AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
+            if (employee == null) {
+                throw new IllegalStateException("Không tìm thấy nhân viên thực hiện giao dịch.");
+            }
 
-        AccountForCustomer accountForCustomer = appointment.getAccountForCustomer();
-        // Tạo giao dịch cho thanh toán của khách hàng
-        Transaction transaction = new Transaction();
+            AccountForCustomer accountForCustomer = appointment.getAccountForCustomer();
+            // Tạo giao dịch cho thanh toán của khách hàng
+            Transaction transaction = new Transaction();
 //        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
 
 //        transaction.setDate(new Date());
@@ -146,27 +155,27 @@ public class PayService {
 //        transaction.setDescription("Nạp tiền VNPay khách hàng");
 //        transactions.add(transaction);
 
-        // Tạo giao dịch cho admin
-        Transaction transaction1 = new Transaction();
+            // Tạo giao dịch cho admin
+            Transaction transaction1 = new Transaction();
 //        AccountForEmployee employee = appointment.getSlot().getShiftEmployee().getAccountForEmployee();
-        transaction1.setDate(new Date());
-        transaction1.setEmployee(employee);
-        transaction1.setMoney(appointment.getCost());
-        transaction1.setCustomer(accountForCustomer);
-        transaction1.setTransactionType("Banking");
-        transaction1.setPayment(payment);
-        transaction1.setStatus("Success");
-        transaction1.setDescription("Chuyển từ khách hàng tới salon");
-        transactions.add(transaction1);
+            transaction1.setDate(new Date());
+            transaction1.setEmployee(employee);
+            transaction1.setMoney(appointment.getCost());
+            transaction1.setCustomer(accountForCustomer);
+            transaction1.setTransactionType("Banking");
+            transaction1.setPayment(payment);
+            transaction1.setStatus("Success");
+            transaction1.setDescription("Chuyển từ khách hàng tới salon");
+            transactions.add(transaction1);
 
-        // Thiết lập giao dịch trong payment
-        payment.setTransactions(transactions);
+            // Thiết lập giao dịch trong payment
+            payment.setTransactions(transactions);
 
-        // Lưu payment trước
-        paymentRepository.save(payment);
+            // Lưu payment trước
+            paymentRepository.save(payment);
 
-        // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
-        // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
+            // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
+            // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
+        }
     }
-
 }

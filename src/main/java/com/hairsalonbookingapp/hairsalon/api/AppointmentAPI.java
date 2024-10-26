@@ -82,7 +82,7 @@ public class AppointmentAPI {
             if ("Banking".equalsIgnoreCase(paymentType)) {
                 String urlVNPay = payService.createUrl(completeAppointmentRequest);
                 // Tạo giao dịch VNPay
-                payService.createTransaction(completeAppointmentRequest.getAppointmentId());
+                payService.createTransaction(completeAppointmentRequest);
                 return ResponseEntity.ok(urlVNPay);
             } else if ("Cash".equalsIgnoreCase(paymentType)) {
                 // Xử lý thanh toán tiền mặt

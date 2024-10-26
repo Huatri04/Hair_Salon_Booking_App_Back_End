@@ -673,7 +673,7 @@ public class AuthenticationService implements UserDetailsService {
         emailDetail.setReceiver(account);//set receiver
         emailDetail.setSubject("Reset password");
         emailDetail.setLink("https://www.google.com/?token="+token);
-        emailService.sendEmail(emailDetail);
+        emailService.sendEmailResetPassword(emailDetail);
 
     }
 

@@ -43,6 +43,28 @@ public class EmailService {
 
     }
 
+    public void sendEmailResetPassword(EmailDetail emailDetail) {
+        try{
+            Context context = new Context();
+            context.setVariable("name", emailDetail.getReceiver().getName());
+            context.setVariable("button", "Go to our Hairsalon website");
+            context.setVariable("link", emailDetail.getLink());
+            String template = templateEngine.process("reset-password", context);
+            // Creating a simple mail message
+            MimeMessage mimeMessage = javaMailSender.createMimeMessage();
+            MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
+            // Setting up necessary details
+            mimeMessageHelper.setFrom("hairsalon459@gmail.com");
+            mimeMessageHelper.setTo(emailDetail.getReceiver().getEmail());
+            mimeMessageHelper.setText(template, true);
+            mimeMessageHelper.setSubject(emailDetail.getSubject());
+            javaMailSender.send(mimeMessage);
+        }catch (Exception e) {
+            System.out.println("error sent email");
+        }
+
+    }
+
     public void sendEmailCreateAppointment(EmailDetailCreateAppointment emailDetail) {
         try{
             Context context = new Context();
@@ -99,7 +121,7 @@ public class EmailService {
             context.setVariable("name", emailDetail.getReceiver().getName());
             context.setVariable("button", "Go to our Hairsalon website");
             context.setVariable("link", emailDetail.getLink());
-            String template = templateEngine.process("welcome-hairsalon", context);
+            String template = templateEngine.process("reset-password", context);
             // Creating a simple mail message
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);
@@ -122,7 +144,7 @@ public class EmailService {
             context.setVariable("button", "Go to our Hairsalon website");
             context.setVariable("link", emailDetail.getLink());
             context.setVariable("sumsalary", emailDetail.getSumSalary());
-            String template = templateEngine.process("welcome-hairsalon", context);
+            String template = templateEngine.process("Salary", context);
             // Creating a simple mail message
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage);

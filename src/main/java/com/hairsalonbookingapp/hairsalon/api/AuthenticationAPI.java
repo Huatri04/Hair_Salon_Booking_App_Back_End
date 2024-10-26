@@ -134,7 +134,7 @@ public class AuthenticationAPI {
     }
     @PostMapping("/resetPassword/employee")
     public ResponseEntity resetPasswordEmployee(@Valid @RequestBody ResetPasswordRequest resetPasswordRequest) {
-        authenticationService.resetPassword(resetPasswordRequest);
+        authenticationService.resetPasswordEmployee(resetPasswordRequest);
         return ResponseEntity.ok("Password reset successfully");
     }
 }

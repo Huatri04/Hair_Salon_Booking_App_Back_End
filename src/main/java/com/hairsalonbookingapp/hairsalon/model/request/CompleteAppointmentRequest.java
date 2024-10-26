@@ -8,7 +8,7 @@ public class CompleteAppointmentRequest {
     String stylistId;
     String startSlot;
     String date;
-    private long appointmentId;
+//    private long appointmentId;
     @NotNull
     private String paymentType; // "VNPay" hoặc "Cash"
 }

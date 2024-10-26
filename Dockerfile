@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 openjdk:17-jdk-slim-buster
+FROM openjdk:17-jdk-slim-buster
 
 WORKDIR /app
 
