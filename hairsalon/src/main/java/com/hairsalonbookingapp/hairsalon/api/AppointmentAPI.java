@@ -77,11 +77,11 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointments);
     }
 
-    @PutMapping("/complete")
+    /*@PutMapping("/complete")
     public ResponseEntity completeAppointment(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
         String message = appointmentService.completeAppointment(completeAppointmentRequest);
         return ResponseEntity.ok(message);
-    }
+    }*/
 
     @GetMapping("/KPI")
     public ResponseEntity viewKPI(){
@@ -99,6 +99,18 @@ public class AppointmentAPI {
     public ResponseEntity viewFun(){
         long a = appointmentService.forFun();
         return ResponseEntity.ok(a);
+    }
+
+    @GetMapping("/{date}/{phone}")
+    public ResponseEntity getAllAppointmentsByDateAndPhone(@PathVariable String date, @PathVariable String phone){
+        List<AppointmentResponseInfo> appointmentResponseInfoList = appointmentService.getAppointmentBySĐT(phone, date);
+        return ResponseEntity.ok(appointmentResponseInfoList);
+    }
+
+    @PutMapping("/complete/{appointmentId}")
+    public ResponseEntity completeAppointment(@PathVariable long appointmentId){
+        String message = appointmentService.completeAppointmentById(appointmentId);
+        return ResponseEntity.ok(message);
     }
 
 }

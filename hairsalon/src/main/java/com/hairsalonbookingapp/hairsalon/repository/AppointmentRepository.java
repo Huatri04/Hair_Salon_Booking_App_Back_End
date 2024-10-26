@@ -3,6 +3,8 @@ package com.hairsalonbookingapp.hairsalon.repository;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
 import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.Appointment;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -18,4 +20,7 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     Appointment findAppointmentByIdAndAccountForCustomerAndIsDeletedFalse(long id, AccountForCustomer accountForCustomer);
     List<Appointment> findAppointmentsByAccountForCustomer(AccountForCustomer accountForCustomer);
     Appointment findAppointmentById(long id);
+    Page<Appointment> findAppointmentsByDateAndIsDeletedFalse(String date, Pageable pageable);
+    Page<Appointment> findAppointmentsByDateAndIsCompletedFalseAndIsDeletedFalse(String date, Pageable pageable);
+    List<Appointment> findAppointmentsByDateAndAccountForCustomer_PhoneNumberAndIsDeletedFalse(String date, String phone);
 }

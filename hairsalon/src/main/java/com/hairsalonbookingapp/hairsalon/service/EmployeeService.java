@@ -201,7 +201,8 @@ public class EmployeeService {
         }
         for(AccountForEmployee accountForEmployee : allStylists){
             if(accountForEmployee.getDays() == null){
-                foundStylists.add(accountForEmployee.getId());
+                String foundStylist = "Id: " + accountForEmployee.getId() + ", Name: " + accountForEmployee.getName();
+                foundStylists.add(foundStylist);
             }
         }
         return foundStylists;

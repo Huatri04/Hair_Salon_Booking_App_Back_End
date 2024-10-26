@@ -7,6 +7,8 @@ import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.DayOfWeek;
@@ -771,7 +773,7 @@ public class AppointmentService {
     }
 
 
-    //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT
+    //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT(NHẬP FORM)
     public String completeAppointment(CompleteAppointmentRequest completeAppointmentRequest){
         Slot slot = slotRepository
                 .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_IdAndDate(
@@ -812,6 +814,33 @@ public class AppointmentService {
         }
     }
 
+    //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT(NHẬP APPOINTMENT ID)
+    public String completeAppointmentById(long appointmentId){
+        Appointment appointment = appointmentRepository.findAppointmentById(appointmentId);
+        if(appointment == null){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+
+        appointment.setCompleted(true);
+        Appointment newAppontment = appointmentRepository.save(appointment);
+
+        AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
+        if(accountForCustomer != null){  // ĐÂY LÀ CUSTOMER KHÔNG PHẢI GUEST
+            long point = accountForCustomer.getPoint();
+            long newPoint = point + 1;
+            accountForCustomer.setPoint(newPoint);
+            customerRepository.save(accountForCustomer);
+        }
+        // TRƯỜNG HỢP GUEST(KO CÓ ACC) MUỐN THANH TOÁN THÌ CHỈ CẦN CỘNG THÊM SLOT HOÀN THÀNH CHO STYLIST LÀ ĐỦ
+
+        AccountForEmployee account = newAppontment.getSlot().getShiftEmployee().getAccountForEmployee();
+        account.setCompletedSlot(account.getCompletedSlot() + 1);
+        employeeRepository.save(account);
+
+        String message = "Complete successfully!!!";
+        return message;
+    }
+
     // DANH SÁCH CÁC STYLIST KHẢ DỤNG -> HỖ TRỢ HÀM DƯỚI
     public List<AccountForEmployee> getAllStylistList(){
         String role = "Stylist";
@@ -845,6 +874,154 @@ public class AppointmentService {
         Slot slot = slotRepository.findSlotById(1);
         return slot.getAppointments().getId();
     }
+
+    //HÀM LẤY TOÀN BỘ APPOINTMENT TRONG NGÀY -> STAFF LÀM
+    public AppointmentResponsePage getAllAppontmentsInDay(String date, int page, int size){
+        Page<Appointment> appointmentPage = appointmentRepository.findAppointmentsByDateAndIsDeletedFalse(date, PageRequest.of(page, size));
+        if(appointmentPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+        List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
+        for(Appointment appointment : appointmentPage.getContent()){
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDate(appointment.getDate());
+            appointmentResponse.setStartHour(appointment.getStartHour());
+
+            if(appointment.getAccountForCustomer() == null){
+                appointmentResponse.setCustomer("Guest");
+            } else {
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getCustomerName());
+            }
+
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            List<String> serviceNameList = new ArrayList<>();
+            List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
+            for(HairSalonService service : hairSalonServiceList) {
+                String serviceName = service.getName();
+                serviceNameList.add(serviceName);
+            }
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(appointment.getStylist());
+
+            appointmentResponseInfoList.add(appointmentResponse);
+        }
+
+        // SẮP XẾP DANH SÁCH APPONTMENT TỪ 1H -> 23H
+        List<AppointmentResponseInfo> newAppointmentResponseList = new ArrayList<>();
+        for(int i = 1; i <= 24; i++){
+            for(AppointmentResponseInfo appointmentResponseInfo : appointmentResponseInfoList){
+                int time = Integer.parseInt(appointmentResponseInfo.getStartHour().substring(0, 2));
+                if(time == i){
+                    newAppointmentResponseList.add(appointmentResponseInfo);
+                }
+            }
+        }
+        //TẠO RESPONSE
+        AppointmentResponsePage appointmentResponsePage = new AppointmentResponsePage();
+        appointmentResponsePage.setContent(newAppointmentResponseList);
+        appointmentResponsePage.setPageNumber(appointmentPage.getNumber());
+        appointmentResponsePage.setTotalElements(appointmentPage.getTotalElements());
+        appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
+
+        return appointmentResponsePage;
+    }
+
+    //HÀM LẤY TOÀN BỘ APPOINTMENT CHƯA HOÀN THÀNH TRONG NGÀY -> STAFF LÀM
+    public AppointmentResponsePage getAllUnCompletedAppontmentsInDay(String date, int page, int size){
+        Page<Appointment> appointmentPage = appointmentRepository
+                .findAppointmentsByDateAndIsCompletedFalseAndIsDeletedFalse(date, PageRequest.of(page, size));
+        if(appointmentPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+        List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
+        for(Appointment appointment : appointmentPage.getContent()){
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDate(appointment.getDate());
+            appointmentResponse.setStartHour(appointment.getStartHour());
+
+            if(appointment.getAccountForCustomer() == null){
+                appointmentResponse.setCustomer("Guest");
+            } else {
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getCustomerName());
+            }
+
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            List<String> serviceNameList = new ArrayList<>();
+            List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
+            for(HairSalonService service : hairSalonServiceList) {
+                String serviceName = service.getName();
+                serviceNameList.add(serviceName);
+            }
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(appointment.getStylist());
+
+            appointmentResponseInfoList.add(appointmentResponse);
+        }
+
+        // SẮP XẾP DANH SÁCH APPONTMENT TỪ 1H -> 23H
+        List<AppointmentResponseInfo> newAppointmentResponseList = new ArrayList<>();
+        for(int i = 1; i <= 24; i++){
+            for(AppointmentResponseInfo appointmentResponseInfo : appointmentResponseInfoList){
+                int time = Integer.parseInt(appointmentResponseInfo.getStartHour().substring(0, 2));
+                if(time == i){
+                    newAppointmentResponseList.add(appointmentResponseInfo);
+                }
+            }
+        }
+        //TẠO RESPONSE
+        AppointmentResponsePage appointmentResponsePage = new AppointmentResponsePage();
+        appointmentResponsePage.setContent(newAppointmentResponseList);
+        appointmentResponsePage.setPageNumber(appointmentPage.getNumber());
+        appointmentResponsePage.setTotalElements(appointmentPage.getTotalElements());
+        appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
+
+        return appointmentResponsePage;
+    }
+
+    //HÀM TÌM KIẾM THÔNG TIN APPOINTMENT -> STAFF LÀM
+    public List<AppointmentResponseInfo> getAppointmentBySĐT(String phoneNumber, String date){
+        List<Appointment> appointmentList = appointmentRepository
+                .findAppointmentsByDateAndAccountForCustomer_PhoneNumberAndIsDeletedFalse(date, phoneNumber);
+        if(appointmentList.isEmpty()){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+        List<AppointmentResponseInfo> appointmentResponseList = new ArrayList<>();
+        for(Appointment appointment : appointmentList) {
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDate(appointment.getDate());
+            appointmentResponse.setStartHour(appointment.getStartHour());
+            appointmentResponse.setCustomer(appointment.getAccountForCustomer().getCustomerName());
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            List<String> serviceNameList = new ArrayList<>();
+            List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
+            for (HairSalonService service : hairSalonServiceList) {
+                String serviceName = service.getName();
+                serviceNameList.add(serviceName);
+            }
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(appointment.getStylist());
+
+            appointmentResponseList.add(appointmentResponse);
+        }
+        return appointmentResponseList;
+    }
+
+
 
 
 }
