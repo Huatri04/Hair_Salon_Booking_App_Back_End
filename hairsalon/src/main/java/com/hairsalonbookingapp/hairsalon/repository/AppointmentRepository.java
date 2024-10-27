@@ -21,6 +21,6 @@ public interface AppointmentRepository extends JpaRepository<Appointment, Long> 
     List<Appointment> findAppointmentsByAccountForCustomer(AccountForCustomer accountForCustomer);
     Appointment findAppointmentById(long id);
     Page<Appointment> findAppointmentsByDateAndIsDeletedFalse(String date, Pageable pageable);
-    Page<Appointment> findAppointmentsByDateAndIsCompletedFalseAndIsDeletedFalse(String date, Pageable pageable);
+    Page<Appointment> findAppointmentsByDateAndStartHourAndIsCompletedFalseAndIsDeletedFalse(String date, String hour, Pageable pageable);
     List<Appointment> findAppointmentsByDateAndAccountForCustomer_PhoneNumberAndIsDeletedFalse(String date, String phone);
 }

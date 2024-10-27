@@ -113,4 +113,10 @@ public class AppointmentAPI {
         return ResponseEntity.ok(message);
     }
 
+    @GetMapping("/uncompleted/{date}/{hour}")
+    public ResponseEntity getAllUnCompletedAppointmentsByDateAndHour(@PathVariable String date, @PathVariable String hour, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        AppointmentResponsePage appointmentResponsePage = appointmentService.getAllUnCompletedAppontmentsInDay(date, hour, page, size);
+        return ResponseEntity.ok(appointmentResponsePage);
+    }
+
 }

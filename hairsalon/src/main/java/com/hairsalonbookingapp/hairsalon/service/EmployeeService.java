@@ -69,7 +69,7 @@ public class EmployeeService {
                         stylistLevel,
                         status,
                         PageRequest.of(page, size));
-        if(accountForEmployeePage.isEmpty()){
+        if(accountForEmployeePage.getContent().isEmpty()){
             throw new EntityNotFoundException("Employee not found!");
         }
         List<EmployeeInfo> employeeInfoList = new ArrayList<>();

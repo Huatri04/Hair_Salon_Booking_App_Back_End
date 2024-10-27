@@ -932,9 +932,9 @@ public class AppointmentService {
     }
 
     //HÀM LẤY TOÀN BỘ APPOINTMENT CHƯA HOÀN THÀNH TRONG NGÀY -> STAFF LÀM
-    public AppointmentResponsePage getAllUnCompletedAppontmentsInDay(String date, int page, int size){
+    public AppointmentResponsePage getAllUnCompletedAppontmentsInDay(String date, String hour, int page, int size){
         Page<Appointment> appointmentPage = appointmentRepository
-                .findAppointmentsByDateAndIsCompletedFalseAndIsDeletedFalse(date, PageRequest.of(page, size));
+                .findAppointmentsByDateAndStartHourAndIsCompletedFalseAndIsDeletedFalse(date, hour, PageRequest.of(page, size));
         if(appointmentPage.getContent().isEmpty()){
             throw new EntityNotFoundException("Appointment not found!");
         }
@@ -963,24 +963,14 @@ public class AppointmentService {
                 serviceNameList.add(serviceName);
             }
             appointmentResponse.setService(serviceNameList);
-            appointmentResponse.setStylist(appointment.getStylist());
+            appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getId());
 
             appointmentResponseInfoList.add(appointmentResponse);
         }
 
-        // SẮP XẾP DANH SÁCH APPONTMENT TỪ 1H -> 23H
-        List<AppointmentResponseInfo> newAppointmentResponseList = new ArrayList<>();
-        for(int i = 1; i <= 24; i++){
-            for(AppointmentResponseInfo appointmentResponseInfo : appointmentResponseInfoList){
-                int time = Integer.parseInt(appointmentResponseInfo.getStartHour().substring(0, 2));
-                if(time == i){
-                    newAppointmentResponseList.add(appointmentResponseInfo);
-                }
-            }
-        }
         //TẠO RESPONSE
         AppointmentResponsePage appointmentResponsePage = new AppointmentResponsePage();
-        appointmentResponsePage.setContent(newAppointmentResponseList);
+        appointmentResponsePage.setContent(appointmentResponseInfoList);
         appointmentResponsePage.setPageNumber(appointmentPage.getNumber());
         appointmentResponsePage.setTotalElements(appointmentPage.getTotalElements());
         appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
