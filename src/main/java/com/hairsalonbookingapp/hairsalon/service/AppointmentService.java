@@ -196,14 +196,6 @@ public class AppointmentService {
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
 
-            //SLOT
-            Slot slot = oldAppointment.getSlot();
-            slot.setAppointments(null);
-            slot.setAvailable(false);
-            slotRepository.save(slot);
-
-            oldAppointment.setSlot(null);
-
             if(oldAppointment.getAccountForCustomer() != null){
                 EmailDetailDeleteAppointment emailDetail = new EmailDetailDeleteAppointment();
                 emailDetail.setReceiver(oldAppointment.getAccountForCustomer());
@@ -215,6 +207,16 @@ public class AppointmentService {
                 emailDetail.setStartHour(oldAppointment.getSlot().getStartSlot());
                 emailService.sendEmailChangedAppointment(emailDetail);
             }
+
+            //SLOT
+            Slot slot = oldAppointment.getSlot();
+            slot.setAppointments(null);
+            slot.setAvailable(false);
+            slotRepository.save(slot);
+
+            oldAppointment.setSlot(null);
+
+
 
             //DISCOUNT CODE
             DiscountCode discountCode = oldAppointment.getDiscountCode();
