@@ -619,16 +619,16 @@ public class AppointmentService {
     public String deleteAppointmentByStaff(long slotId){
         Appointment oldAppointment = appointmentRepository
                 .findAppointmentBySlot_IdAndIsDeletedFalse(slotId);  //TÌM LẠI APPOINTMENT CŨ
-        if(oldAppointment != null){
-            oldAppointment.setDeleted(true);
+        if(oldAppointment != null){    //TÌM RA SLOT ĐÓ CÓ APPOINTMENT
+            oldAppointment.setDeleted(true);    // CHUYỂN TRẠNG THÁI APPOINTMENT VỀ TRUE
 
             //SLOT
-            Slot slot = oldAppointment.getSlot();
-            slot.setAppointments(null);
-            slot.setAvailable(false);
-            slotRepository.save(slot);
+            Slot slot = oldAppointment.getSlot();   // LẤY OBJ SLOT
+            slot.setAppointments(null);             // GỠ APPOINTMENT TRONG SLOT ĐÓ
+            slot.setAvailable(false);               // SLOT ĐÓ BỊ GÁN LÀ NOT AVAILABLE
+            slotRepository.save(slot);              // LƯU LẠI THÔNG TIN SLOT
 
-            oldAppointment.setSlot(null);
+            oldAppointment.setSlot(null);           // GỠ SLOT ĐÓ TRONG APPOINTMENT ( TRONG ENTITY APPOINTMENT CHỨA OBJ SLOT )
 
             //DISCOUNT CODE
             DiscountCode discountCode = oldAppointment.getDiscountCode();
@@ -637,7 +637,7 @@ public class AppointmentService {
                 discountCodeRepository.save(discountCode);
             }
 
-            oldAppointment.setDiscountCode(null);
+            oldAppointment.setDiscountCode(null);        // APPOINTMENT GỠ DISCOUNT CODE
 
             Appointment newAppointment = appointmentRepository.save(oldAppointment);     // LƯU LẠI LÊN DB
 
@@ -870,9 +870,12 @@ public class AppointmentService {
     }
 
 
-    public long forFun(){
-        Slot slot = slotRepository.findSlotById(1);
-        return slot.getAppointments().getId();
+    public boolean forFun(long id){
+        Slot slot = slotRepository.findSlotById(id);
+        if(slot.getAppointments() != null){
+            return true;
+        }
+        return false;
     }
 
     //HÀM LẤY TOÀN BỘ APPOINTMENT TRONG NGÀY -> STAFF LÀM

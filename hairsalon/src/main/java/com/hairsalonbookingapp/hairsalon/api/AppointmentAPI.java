@@ -95,9 +95,9 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointmentResponse);
     }
 
-    @GetMapping("/fun")
-    public ResponseEntity viewFun(){
-        long a = appointmentService.forFun();
+    @GetMapping("/fun/{id}")
+    public ResponseEntity viewFun(@PathVariable long id){
+        boolean a = appointmentService.forFun(id);
         return ResponseEntity.ok(a);
     }
 
