@@ -42,9 +42,9 @@ public class TransactionService {
     @Autowired
     ModelMapper modelMapper;
     // create Transaction
-    public TransactionResponse createTransactionInCast(CompleteAppointmentRequest orderRequest) {
+    public TransactionResponse createTransactionInCast(long appointmentId) {
         // Lấy thông tin appointment và nhân viên
-        Appointment appointment = appointmentService.completeAppointment(orderRequest);
+        Appointment appointment = appointmentService.completeAppointmentById(appointmentId);
         AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
 
         if (appointment == null || accountForEmployee == null) {

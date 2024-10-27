@@ -42,13 +42,13 @@ public class PayService {
     @Autowired
     PaymentRepository paymentRepository;
 
-    public String createUrl(CompleteAppointmentRequest orderRequest) throws  Exception {
+    public String createUrl(long orderRequest) throws  Exception {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
         LocalDateTime createDate = LocalDateTime.now();
         String formattedCreateDate = createDate.format(formatter);
 
         // code cua minh
-        Appointment appointment = appointmentService.completeAppointment(orderRequest);
+        Appointment appointment = appointmentService.completeAppointmentById(orderRequest);
         double money = appointment.getCost() * 100;
         String amount = String.valueOf((int) money);
 
@@ -113,19 +113,11 @@ public class PayService {
         return result.toString();
     }
 
-    public void createTransaction(CompleteAppointmentRequest completeAppointmentRequest) {
+    public void createTransaction(long appointmentId) {
         // Tìm appointment
-        Slot slot = slotRepository
-                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
-                        completeAppointmentRequest.getStartSlot(),
-                        completeAppointmentRequest.getStylistId(),
-                        completeAppointmentRequest.getDate()
-                );
-        if (slot != null) {
-            Appointment appointment = slot.getAppointments();
-            if (appointment == null) {
-                throw new EntityNotFoundException("Appointment not found!");
-            }
+        // Tìm appointment
+        Appointment appointment = appointmentRepository.findById(appointmentId)
+                .orElseThrow(() -> new EntityNotFoundException("Appointment not found!"));
 
             // Tạo payment
             Payment payment = new Payment();
@@ -143,17 +135,6 @@ public class PayService {
             AccountForCustomer accountForCustomer = appointment.getAccountForCustomer();
             // Tạo giao dịch cho thanh toán của khách hàng
             Transaction transaction = new Transaction();
-//        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
-
-//        transaction.setDate(new Date());
-//        transaction.setEmployee(employee);
-//        transaction.setMoney(appointment.getCost());
-//        transaction.setCustomer(accountForCustomer);
-//        transaction.setTransactionType("Banking");
-//        transaction.setStatus("Success");
-//        transaction.setPayment(payment);
-//        transaction.setDescription("Nạp tiền VNPay khách hàng");
-//        transactions.add(transaction);
 
             // Tạo giao dịch cho admin
             Transaction transaction1 = new Transaction();
@@ -178,4 +159,5 @@ public class PayService {
             // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
         }
     }
-}
+
+

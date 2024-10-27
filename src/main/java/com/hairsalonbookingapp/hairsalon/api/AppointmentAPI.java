@@ -4,6 +4,7 @@ import com.hairsalonbookingapp.hairsalon.entity.Appointment;
 import com.hairsalonbookingapp.hairsalon.model.request.*;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponseInfo;
+import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponsePage;
 import com.hairsalonbookingapp.hairsalon.model.response.KPITotal;
 import com.hairsalonbookingapp.hairsalon.service.AppointmentService;
 import com.hairsalonbookingapp.hairsalon.service.PayService;
@@ -74,19 +75,17 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointments);
     }
 
-    @PutMapping("/complete")
-    public ResponseEntity completeAppointment(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest) throws Exception {
+    @PutMapping("/complete/{appointmentId}")
+    public ResponseEntity completeAppointment(@Valid @RequestBody PaymentTypeRequest paymentType, @PathVariable long appointmentId) throws Exception {
         try {
-            String paymentType = completeAppointmentRequest.getPaymentType();
-
-            if ("Banking".equalsIgnoreCase(paymentType)) {
-                String urlVNPay = payService.createUrl(completeAppointmentRequest);
+            if ("Banking".equalsIgnoreCase(paymentType.getPaymentType())) {
+                String urlVNPay = payService.createUrl(appointmentId);
                 // Tạo giao dịch VNPay
-                payService.createTransaction(completeAppointmentRequest);
+                payService.createTransaction(appointmentId);
                 return ResponseEntity.ok(urlVNPay);
-            } else if ("Cash".equalsIgnoreCase(paymentType)) {
+            } else if ("Cash".equalsIgnoreCase(paymentType.getPaymentType())) {
                 // Xử lý thanh toán tiền mặt
-                transactionService.createTransactionInCast(completeAppointmentRequest);
+                transactionService.createTransactionInCast(appointmentId);
                 return ResponseEntity.ok("Thanh toán tiền mặt thành công.");
             } else {
                 return ResponseEntity.badRequest().body("Loại thanh toán không hợp lệ.");
@@ -124,5 +123,11 @@ public class AppointmentAPI {
     public ResponseEntity getAllAppointmentsByDateAndPhone(@PathVariable String date, @PathVariable String phone){
         List<AppointmentResponseInfo> appointmentResponseInfoList = appointmentService.getAppointmentBySĐT(phone, date);
         return ResponseEntity.ok(appointmentResponseInfoList);
+    }
+
+    @GetMapping("/uncompleted/{date}/{hour}")
+    public ResponseEntity getAllUnCompletedAppointmentsByDateAndHour(@PathVariable String date, @PathVariable String hour, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        AppointmentResponsePage appointmentResponsePage = appointmentService.getAllUnCompletedAppontmentsInDay(date, hour, page, size);
+        return ResponseEntity.ok(appointmentResponsePage);
     }
 }

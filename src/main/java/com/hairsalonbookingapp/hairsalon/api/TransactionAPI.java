@@ -19,12 +19,12 @@ public class TransactionAPI {
     @Autowired
     TransactionService transactionService;
 
-    @PostMapping
-//    @PreAuthorize("hasAuthority('customer')")
-    public ResponseEntity createTransaction(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
-        TransactionResponse transactionResponse = transactionService.createTransactionInCast(completeAppointmentRequest);
-        return ResponseEntity.ok(transactionResponse);
-    }
+//    @PostMapping
+////    @PreAuthorize("hasAuthority('customer')")
+//    public ResponseEntity createTransaction(@Valid @RequestBody CompleteAppointmentRequest completeAppointmentRequest){
+//        TransactionResponse transactionResponse = transactionService.createTransactionInCast(completeAppointmentRequest);
+//        return ResponseEntity.ok(transactionResponse);
+//    }
 
     @DeleteMapping("{id}")
     public ResponseEntity deleteTransaction(@PathVariable int id){

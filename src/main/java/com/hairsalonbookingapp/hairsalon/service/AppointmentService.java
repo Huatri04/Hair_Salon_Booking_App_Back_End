@@ -9,6 +9,8 @@ import com.hairsalonbookingapp.hairsalon.model.response.*;
 import com.hairsalonbookingapp.hairsalon.repository.*;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -323,46 +325,30 @@ public class AppointmentService {
     }
 
 
-
-
     //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT
-
-    //CUSTOMER TÍNH TIỀN, STAFF CHECK CHO APPOINTMENT
-    public Appointment completeAppointment(CompleteAppointmentRequest completeAppointmentRequest){
-        Slot slot = slotRepository
-                .findSlotByStartSlotAndShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
-                        completeAppointmentRequest.getStartSlot(),
-                        completeAppointmentRequest.getStylistId(),
-                        completeAppointmentRequest.getDate()
-                );
-        if(slot != null){
-            Appointment appointment = slot.getAppointments();
-            if(appointment == null){
-                throw new EntityNotFoundException("Appointment not found!");
-            }
-
-            appointment.setCompleted(true);
-            Appointment newAppontment = appointmentRepository.save(appointment);
-
-            AccountForCustomer accountForCustomer = newAppontment.getAccountForCustomer();
-            if(accountForCustomer != null){  // ĐÂY LÀ CUSTOMER KHÔNG PHẢI GUEST
-                long point = accountForCustomer.getPoint();
-                long newPoint = point + 1;
-                accountForCustomer.setPoint(newPoint);
-                accountForCustomerRepository.save(accountForCustomer);
-            }
-            // TRƯỜNG HỢP GUEST(KO CÓ ACC) MUỐN THANH TOÁN THÌ CHỈ CẦN CỘNG THÊM SLOT HOÀN THÀNH CHO STYLIST LÀ ĐỦ
-
-            AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
-            account.setKPI(account.getKPI() + 1);
-            employeeRepository.save(account);
-
-
-            String message = "Complete successfully!!!";
-            return appointment;
-        } else {
-            throw new EntityNotFoundException("Slot not found!");
+    public Appointment completeAppointmentById(long appointmentId) {
+        Appointment appointment = appointmentRepository.findAppointmentByAppointmentId(appointmentId);
+        if (appointment == null) {
+            throw new EntityNotFoundException("Appointment not found!");
         }
+
+        appointment.setCompleted(true);
+        Appointment newAppointment = appointmentRepository.save(appointment);
+
+        AccountForCustomer accountForCustomer = newAppointment.getAccountForCustomer();
+        if (accountForCustomer != null) {  // CUSTOMER (Không phải GUEST)
+            long point = accountForCustomer.getPoint();
+            long newPoint = point + 1;
+            accountForCustomer.setPoint(newPoint);
+            accountForCustomerRepository.save(accountForCustomer);
+        }
+
+        // GUEST không có tài khoản -> Chỉ cần cộng slot hoàn thành cho stylist
+        AccountForEmployee account = newAppointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        account.setKPI(account.getKPI() + 1);
+        employeeRepository.save(account);
+
+        return newAppointment;
     }
 
 
@@ -830,5 +816,51 @@ public class AppointmentService {
         return appointmentResponseList;
     }
 
+    //HÀM LẤY TOÀN BỘ APPOINTMENT CHƯA HOÀN THÀNH TRONG NGÀY -> STAFF LÀM
+    public AppointmentResponsePage getAllUnCompletedAppontmentsInDay(String date, String hour, int page, int size){
+        Page<Appointment> appointmentPage = appointmentRepository
+                .findAppointmentsByDateAndStartHourAndIsCompletedFalseAndIsDeletedFalse(date, hour, PageRequest.of(page, size));
+        if(appointmentPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+        List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
+        for(Appointment appointment : appointmentPage.getContent()){
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getAppointmentId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDate(appointment.getDate());
+            appointmentResponse.setStartHour(appointment.getStartHour());
+
+            if(appointment.getAccountForCustomer() == null){
+                appointmentResponse.setCustomer("Guest");
+            } else {
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getName());
+            }
+
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            List<String> serviceNameList = new ArrayList<>();
+            List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
+            for(HairSalonService service : hairSalonServiceList) {
+                String serviceName = service.getName();
+                serviceNameList.add(serviceName);
+            }
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getEmployeeId());
+
+            appointmentResponseInfoList.add(appointmentResponse);
+        }
+
+        //TẠO RESPONSE
+        AppointmentResponsePage appointmentResponsePage = new AppointmentResponsePage();
+        appointmentResponsePage.setContent(appointmentResponseInfoList);
+        appointmentResponsePage.setPageNumber(appointmentPage.getNumber());
+        appointmentResponsePage.setTotalElements(appointmentPage.getTotalElements());
+        appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
+
+        return appointmentResponsePage;
+    }
 
 }
