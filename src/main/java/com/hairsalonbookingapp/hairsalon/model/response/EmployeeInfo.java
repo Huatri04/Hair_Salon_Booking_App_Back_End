@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.model.response;
 
+import jakarta.validation.constraints.Min;
 import lombok.Data;
 
 import java.util.Date;
@@ -22,5 +23,10 @@ public class EmployeeInfo {
     int KPI; // KPI của stylist // [Stylist]
     String status;
     boolean isDeleted;
+
+    private Double CommessionOverratedFromKPI;
+
+
+    private Double FineUnderatedFromKPI;
     String days;
 }
