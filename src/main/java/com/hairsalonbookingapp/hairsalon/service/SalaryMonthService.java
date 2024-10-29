@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.*;
+import com.hairsalonbookingapp.hairsalon.exception.CreateException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
 import com.hairsalonbookingapp.hairsalon.exception.NoContentException;
 import com.hairsalonbookingapp.hairsalon.model.EmailDetail;
@@ -58,18 +59,38 @@ public class SalaryMonthService {
             salaryMonth.setMonth(currentMonth);
 
             double commessionOverratedFromKPI = 1;
-            if(employee.getCommessionOverratedFromKPI() != null){
-                commessionOverratedFromKPI = employee.getCommessionOverratedFromKPI();
+            if (employee.getCommessionOverratedFromKPI() != null) {
+                if(employee.getCommessionOverratedFromKPI() > 0){
+                    commessionOverratedFromKPI = employee.getCommessionOverratedFromKPI();
+                    salaryMonth.setCommessionOveratedFromKPI(commessionOverratedFromKPI);
+                }else{
+                    throw new CreateException("Commession Overrated From KPI must be greater than 0");
+                }
             }
 
             double fineUnderatedFromKPI = 1;
-            if(employee.getFineUnderatedFromKPI() != null){
-                fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
+            if (employee.getFineUnderatedFromKPI() != null) {
+                if(employee.getFineUnderatedFromKPI() > 0){
+                    fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
+                    salaryMonth.setFineUnderatedFromKPI(fineUnderatedFromKPI);
+                }else{
+                    throw new CreateException("Fine Underated From KPI must be greater than 0");
+                }
             }
 
-            salaryMonth.setCommessionOveratedFromKPI(employee.getKPI() * commessionOverratedFromKPI);
-            salaryMonth.setFineUnderatedFromKPI(employee.getKPI() * fineUnderatedFromKPI);
-            salaryMonth.setSumSalary(employee.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
+            double kpiRatio = (double)employee.getKPI() / employee.getTargetKPI(); // Tỷ lệ KPI đạt được
+
+            if (kpiRatio < 1.0) {  // KPI dưới mục tiêu
+                double fine = (1.0 - kpiRatio) * fineUnderatedFromKPI; // Phạt dựa trên phần thiếu
+                salaryMonth.setSumSalary(employee.getBasicSalary() - (employee.getBasicSalary() * fine));
+
+            } else if (kpiRatio > 1.0) { // KPI vượt mục tiêu
+                double bonus = (kpiRatio - 1.0) * commessionOverratedFromKPI; // Thưởng dựa trên phần vượt
+                salaryMonth.setSumSalary(employee.getBasicSalary() + (employee.getBasicSalary() * bonus));
+
+            } else { // KPI bằng mục tiêu
+                salaryMonth.setSumSalary(employee.getBasicSalary());
+            }
 
             EmailDetailForEmployeeSalary emailDetail = new EmailDetailForEmployeeSalary();
             emailDetail.setReceiver(employee);
@@ -121,17 +142,37 @@ public class SalaryMonthService {
 
                 double commessionOverratedFromKPI = 1;
                 if (employee.getCommessionOverratedFromKPI() != null) {
-                    commessionOverratedFromKPI = employee.getCommessionOverratedFromKPI();
+                    if(employee.getCommessionOverratedFromKPI() > 0){
+                        commessionOverratedFromKPI = employee.getCommessionOverratedFromKPI();
+                        salaryMonth.setCommessionOveratedFromKPI(commessionOverratedFromKPI);
+                    }else{
+                        throw new CreateException("Commession Overrated From KPI must be greater than 0");
+                    }
                 }
 
                 double fineUnderatedFromKPI = 1;
                 if (employee.getFineUnderatedFromKPI() != null) {
-                    fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
+                    if(employee.getFineUnderatedFromKPI() > 0){
+                        fineUnderatedFromKPI = employee.getFineUnderatedFromKPI();
+                        salaryMonth.setFineUnderatedFromKPI(fineUnderatedFromKPI);
+                    }else{
+                        throw new CreateException("Fine Underated From KPI must be greater than 0");
+                    }
                 }
 
-                salaryMonth.setCommessionOveratedFromKPI((employee.getKPI() - employee.getTargetKPI()) * commessionOverratedFromKPI);
-                salaryMonth.setFineUnderatedFromKPI((employee.getKPI() - employee.getTargetKPI())  * fineUnderatedFromKPI);
-                salaryMonth.setSumSalary(employee.getBasicSalary() + salaryMonth.getCommessionOveratedFromKPI() - salaryMonth.getFineUnderatedFromKPI());
+                double kpiRatio = (double)employee.getKPI() / employee.getTargetKPI(); // Tỷ lệ KPI đạt được
+
+                if (kpiRatio < 1.0) {  // KPI dưới mục tiêu
+                    double fine = (1.0 - kpiRatio) * fineUnderatedFromKPI; // Phạt dựa trên phần thiếu
+                    salaryMonth.setSumSalary(employee.getBasicSalary() - (employee.getBasicSalary() * fine));
+
+                } else if (kpiRatio > 1.0) { // KPI vượt mục tiêu
+                    double bonus = (kpiRatio - 1.0) * commessionOverratedFromKPI; // Thưởng dựa trên phần vượt
+                    salaryMonth.setSumSalary(employee.getBasicSalary() + (employee.getBasicSalary() * bonus));
+
+                } else { // KPI bằng mục tiêu
+                    salaryMonth.setSumSalary(employee.getBasicSalary());
+                }
 
                 // Lưu SalaryMonth vào cơ sở dữ liệu
                 SalaryMonth newSalaryMonth = salaryMonthRepository.save(salaryMonth);
