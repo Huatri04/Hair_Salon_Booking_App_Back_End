@@ -123,10 +123,10 @@ public class AppointmentService {
 
             AccountForEmployee accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
             if (accountForEmployee.getExpertStylistBonus() != 0) {
-                bonusEmployee += (accountForEmployee.getExpertStylistBonus()) / 100;
+                bonusEmployee += (accountForEmployee.getExpertStylistBonus());
             }
 
-            double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee * serviceFee);
+            double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee);
             appointment.setCost(totalCost);
 
             appointment.setDate(slot.getDate());
@@ -325,10 +325,10 @@ public class AppointmentService {
 
             AccountForEmployee accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
             if (accountForEmployee.getExpertStylistBonus() != 0) {
-                bonusEmployee += (accountForEmployee.getExpertStylistBonus()) / 100;
+                bonusEmployee += (accountForEmployee.getExpertStylistBonus());
             }
 
-            double totalCost = serviceFee + (bonusEmployee * serviceFee);
+            double totalCost = serviceFee + (bonusEmployee);
             appointment.setCost(totalCost);
 
             appointment.setDate(slot.getDate());
