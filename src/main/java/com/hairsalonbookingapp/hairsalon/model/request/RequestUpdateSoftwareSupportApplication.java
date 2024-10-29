@@ -12,6 +12,4 @@ public class RequestUpdateSoftwareSupportApplication {
     private String description;
 
     private String img;
-
-    private boolean isDeleted = false;
 }

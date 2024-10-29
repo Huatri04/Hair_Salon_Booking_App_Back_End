@@ -1,5 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.entity;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
@@ -27,14 +29,17 @@ public class Transaction {
 
     @ManyToOne
     @JoinColumn(name = "employeeId", nullable = false) // day la foreign key
+    @JsonIgnore // Bỏ qua thông tin nhân viên nếu không cần thiết
     private AccountForEmployee employee;
 
     @ManyToOne
     @JoinColumn(name = "phoneNumber", nullable = true) // day la foreign key
+    @JsonIgnore // Bỏ qua thông tin nhân viên nếu không cần thiết
     private AccountForCustomer customer;
 
     @ManyToOne
     @JoinColumn(name = "paymentId")
+    @JsonBackReference // Giải quyết vấn đề vòng lặp tuần hoàn
     private Payment payment;
 
 
