@@ -66,7 +66,7 @@ public class ShiftWeekService {
 
     //get all shift -> MANAGER LÀM
     public List<ShiftWeekResponse> getAllShift(){
-        List<ShiftInWeek> list = shiftWeekRepository.findAll();
+        List<ShiftInWeek> list = shiftWeekRepository.findShiftInWeeksByIsAvailableTrue();
         if(list != null){
             List<ShiftWeekResponse> shiftWeekResponseList = new ArrayList<>();
             for(ShiftInWeek shiftInWeek : list){
