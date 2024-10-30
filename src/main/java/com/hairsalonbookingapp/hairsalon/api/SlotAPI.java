@@ -2,6 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.model.response.SlotResponse;
 import com.hairsalonbookingapp.hairsalon.model.request.ViewAppointmentRequest;
+import com.hairsalonbookingapp.hairsalon.model.response.SlotResponsePage;
 import com.hairsalonbookingapp.hairsalon.service.SlotService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -35,6 +36,24 @@ public class SlotAPI {
     public ResponseEntity viewStartHoursAvailable(@PathVariable String date){
         List<String> stringList = slotService.getStartHoursAvailable(date);
         return ResponseEntity.ok(stringList);
+    }
+
+    @GetMapping("/stylist/{date}")
+    public ResponseEntity viewSlotsByStylist(@PathVariable String date, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        SlotResponsePage slotResponsePage = slotService.getSlotsInDayForStylist(date, page, size);
+        return ResponseEntity.ok(slotResponsePage);
+    }
+
+    @GetMapping("/staff/{date}")
+    public ResponseEntity viewSlotsInDateByStaff(@PathVariable String date, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        SlotResponsePage slotResponsePage = slotService.getSlotsInDayForAllStylist(date, page, size);
+        return ResponseEntity.ok(slotResponsePage);
+    }
+
+    @GetMapping("/staff/{date}/hour")
+    public ResponseEntity viewSlotsInDateAndHourByStaff(@PathVariable String date, @RequestParam String startHour, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        SlotResponsePage slotResponsePage = slotService.getSlotsByDateAndHourForAllStylist(date, startHour, page, size);
+        return ResponseEntity.ok(slotResponsePage);
     }
 
     /*@PostMapping("/slot")

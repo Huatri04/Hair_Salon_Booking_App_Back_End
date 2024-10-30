@@ -61,6 +61,9 @@ public class AppointmentService {
     @Autowired
     DiscountCodeRepository discountCodeRepository;
 
+    @Autowired
+    ShiftEmployeeRepository shiftEmployeeRepository;
+
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
     //- CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
 
@@ -315,9 +318,14 @@ public class AppointmentService {
                 .findSlotsByShiftEmployee_AccountForEmployee_EmployeeIdAndDate(
                         deleteAllAppointmentsRequest.getStylistId(),
                         deleteAllAppointmentsRequest.getDate());
-        if(slotList == null){
+        if(slotList.isEmpty()){
             throw new EntityNotFoundException("Slot not found!");
         }
+
+        ShiftEmployee shiftEmployee = slotList.get(0).getShiftEmployee();
+        shiftEmployee.setAvailable(false);
+        shiftEmployeeRepository.save(shiftEmployee);
+
         List<String> messages = new ArrayList<>();
         for(Slot slot : slotList){
             String message = deleteAppointmentByStaff(slot.getSlotId());

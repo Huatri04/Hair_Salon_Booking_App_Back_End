@@ -5,6 +5,7 @@ import com.hairsalonbookingapp.hairsalon.model.response.AvailableSlot;
 import com.hairsalonbookingapp.hairsalon.model.response.ShiftEmployeeResponse;
 import com.hairsalonbookingapp.hairsalon.model.request.StylistShiftRequest;
 import com.hairsalonbookingapp.hairsalon.model.response.AccountForEmployeeResponse;
+import com.hairsalonbookingapp.hairsalon.model.response.ShiftEmployeeResponsePage;
 import com.hairsalonbookingapp.hairsalon.service.ShiftEmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -82,11 +83,6 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(shiftEmployeeList);
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity getShift(@PathVariable long id){
-        String shiftEmployeeList = shiftEmployeeService.getShift(id);
-        return ResponseEntity.ok(shiftEmployeeList);
-    }
 
     @GetMapping("/available/{date}")
     public ResponseEntity getAvailableShifts(@PathVariable String date){
@@ -100,5 +96,16 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(availableSlotList);
     }
 
+    @GetMapping("/{startDate}")
+    public ResponseEntity getAllShiftsInWeek(@PathVariable String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeek(startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
+    }
+
+    @PostMapping("/tempShift")
+    public ResponseEntity createTempShift(@RequestParam String stylistId, @RequestParam String date){
+        ShiftEmployeeResponse shiftEmployeeResponse = shiftEmployeeService.createTempShift(stylistId, date);
+        return ResponseEntity.ok(shiftEmployeeResponse);
+    }
 
 }

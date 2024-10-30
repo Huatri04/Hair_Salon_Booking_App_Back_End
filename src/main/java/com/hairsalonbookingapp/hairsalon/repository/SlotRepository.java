@@ -1,6 +1,9 @@
 package com.hairsalonbookingapp.hairsalon.repository;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
@@ -20,4 +23,7 @@ public interface SlotRepository extends JpaRepository<Slot, Long> {
     List<Slot> findSlotsByDateAndStartSlotAndIsAvailableTrue(String date, String time);
     Slot findSlotByStartSlotAndDateAndShiftEmployee_AccountForEmployee_EmployeeIdAndIsAvailableTrue(String starthour, String date, String employeeId);
     List<Slot> findSlotsByDateAndIsAvailableTrue(String date);
+    Page<Slot> findSlotsByShiftEmployee_AccountForEmployeeAndDate(AccountForEmployee accountForEmployee, String date, Pageable pageable);
+    Page<Slot> findSlotsByDate(String date, Pageable pageable);
+    Page<Slot> findSlotsByDateAndStartSlot(String date, String startSlot, Pageable pageable);
 }
