@@ -81,7 +81,7 @@ public class AppointmentAPI {
             if ("Banking".equalsIgnoreCase(paymentType.getPaymentType())) {
                 String urlVNPay = payService.createUrl(appointmentId);
                 // Tạo giao dịch VNPay
-                payService.createTransaction(appointmentId);
+//                payService.createTransaction(appointmentId);
                 return ResponseEntity.ok(urlVNPay);
             } else if ("Cash".equalsIgnoreCase(paymentType.getPaymentType())) {
                 // Xử lý thanh toán tiền mặt
@@ -92,6 +92,23 @@ public class AppointmentAPI {
             }
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/vnpay/result")
+    public ResponseEntity<String> handleVNPayResult(
+            @RequestParam("vnp_ResponseCode") String responseCode,
+            @RequestParam("appointmentId") long appointmentId) {
+
+        if ("00".equals(responseCode)) {
+            // Cập nhật trạng thái giao dịch thành công
+            payService.createTransactionSuccess(appointmentId);
+            return ResponseEntity.ok("Thanh toán thành công.");
+        } else {
+            // Cập nhật trạng thái giao dịch thất bại
+            payService.createTransactionFail(appointmentId);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Thanh toán thất bại với mã lỗi: " + responseCode);
         }
     }
 
