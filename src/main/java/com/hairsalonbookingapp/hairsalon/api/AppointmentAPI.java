@@ -99,6 +99,7 @@ public class AppointmentAPI {
     @PostMapping("/vnpay/result")
     public ResponseEntity handleVNPayResult(@RequestParam("appointmentId") long appointmentId) {
         Transaction transaction = payService.createTransactionSuccess(appointmentId);
+        appointmentService.completeAppointmentById(appointmentId);
         return ResponseEntity.ok(transaction);
     }
 

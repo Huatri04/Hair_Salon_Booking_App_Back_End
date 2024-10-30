@@ -3,6 +3,7 @@ package com.hairsalonbookingapp.hairsalon.service;
 import com.hairsalonbookingapp.hairsalon.entity.*;
 import com.hairsalonbookingapp.hairsalon.exception.CreateException;
 import com.hairsalonbookingapp.hairsalon.exception.Duplicate;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.exception.NoContentException;
 import com.hairsalonbookingapp.hairsalon.model.EmailDetail;
 import com.hairsalonbookingapp.hairsalon.model.EmailDetailForEmployee;
@@ -236,6 +237,25 @@ public class SalaryMonthService {
 //        List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
 //        return salaryMonths;
         Page salaryMonthPage = salaryMonthRepository.findSalaryMonthsByIsDeletedFalseOrderByCreatedAtDesc(PageRequest.of(page, size));
+        SalaryMonthListResponse salaryMonthListResponse = new SalaryMonthListResponse();
+        salaryMonthListResponse.setTotalPage(salaryMonthPage.getTotalPages());
+        salaryMonthListResponse.setContent(salaryMonthPage.getContent());
+        salaryMonthListResponse.setPageNumber(salaryMonthPage.getNumber());
+        salaryMonthListResponse.setTotalElement(salaryMonthPage.getTotalElements());
+        return salaryMonthListResponse;
+    }
+
+    public SalaryMonthListResponse getAllSalaryMonthOfAnEmployee(int page, int size){
+//        List<SalaryMonth> salaryMonths = salaryMonthRepository.findSalaryMonthsByIsDeletedFalse();
+//        return salaryMonths;
+        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
+        if(employee == null){
+            throw new EntityNotFoundException("Không tìm thấy nhân viên");
+        }
+        Page<SalaryMonth> salaryMonthPage = salaryMonthRepository
+                .findByEmployee_EmployeeIdAndIsDeletedFalseOrderByCreatedAtDesc(
+                        employee.getEmployeeId(), PageRequest.of(page, size)
+                );
         SalaryMonthListResponse salaryMonthListResponse = new SalaryMonthListResponse();
         salaryMonthListResponse.setTotalPage(salaryMonthPage.getTotalPages());
         salaryMonthListResponse.setContent(salaryMonthPage.getContent());

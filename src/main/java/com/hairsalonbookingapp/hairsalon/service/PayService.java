@@ -48,7 +48,8 @@ public class PayService {
         String formattedCreateDate = createDate.format(formatter);
 
         // code cua minh
-        Appointment appointment = appointmentService.completeAppointmentById(orderRequest);
+//        Appointment appointment = appointmentService.completeAppointmentById(orderRequest);
+        Appointment appointment = appointmentRepository.findAppointmentByAppointmentId(orderRequest);
         double money = appointment.getCost() * 100;
         String amount = String.valueOf((int) money);
 

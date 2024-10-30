@@ -48,6 +48,12 @@ public class SalaryMonthAPI {
         return ResponseEntity.ok(salaryMonths);
     }
 
+    @GetMapping("/employee")
+    public ResponseEntity getAllSalaryMonthOfAnEmployee(@RequestParam int page, @RequestParam(defaultValue = "10") int size){
+        SalaryMonthListResponse salaryMonths = salaryMonthService.getAllSalaryMonthOfAnEmployee(page, size);
+        return ResponseEntity.ok(salaryMonths);
+    }
+
     @GetMapping("/employee/{id}")
     public ResponseEntity getAllSalaryMonthOfAnEmployee(@PathVariable String id){
         List<SalaryMonth> salaryMonths = salaryMonthService.getAllSalaryMonthOfAnEmployee(id);
