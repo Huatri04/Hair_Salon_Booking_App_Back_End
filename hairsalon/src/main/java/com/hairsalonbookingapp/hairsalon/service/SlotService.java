@@ -10,6 +10,8 @@ import com.hairsalonbookingapp.hairsalon.repository.ShiftEmployeeRepository;
 import com.hairsalonbookingapp.hairsalon.repository.SlotRepository;
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -353,6 +355,93 @@ public class SlotService {
         return availableHours;
 
     }
+
+
+    //HÀM LẤY SLOT TRONG NGÀY CỦA STYLIST -> STYLIST LÀM
+    public SlotResponsePage getSlotsInDayForStylist(String date, int page, int size){
+        AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+        Page<Slot> slotPage = slotRepository
+                .findSlotsByShiftEmployee_AccountForEmployeeAndDate(accountForEmployee, date, PageRequest.of(page, size));
+        if(slotPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+        List<SlotResponse> slotResponseList = new ArrayList<>();
+        for(Slot slot : slotPage.getContent()){
+            SlotResponse slotResponse = new SlotResponse();
+            slotResponse.setId(slot.getId());
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setDate(slot.getDate());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setAvailable(slot.isAvailable());
+
+            slotResponseList.add(slotResponse);
+        }
+
+        SlotResponsePage slotResponsePage = new SlotResponsePage();
+        slotResponsePage.setContent(slotResponseList);
+        slotResponsePage.setPageNumber(slotPage.getNumber());
+        slotResponsePage.setTotalElements(slotPage.getTotalElements());
+        slotResponsePage.setTotalPages(slotPage.getTotalPages());
+
+        return slotResponsePage;
+    }
+
+    //HÀM LẤY TOÀN BỘ SLOT CỦA MỌI STYLIST TRONG NGÀY -> STAFF LÀM
+    public SlotResponsePage getSlotsInDayForAllStylist(String date, int page, int size){
+        Page<Slot> slotPage = slotRepository
+                .findSlotsByDate(date, PageRequest.of(page, size));
+        if(slotPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+        List<SlotResponse> slotResponseList = new ArrayList<>();
+        for(Slot slot : slotPage.getContent()){
+            SlotResponse slotResponse = new SlotResponse();
+            slotResponse.setId(slot.getId());
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setDate(slot.getDate());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setAvailable(slot.isAvailable());
+
+            slotResponseList.add(slotResponse);
+        }
+
+        SlotResponsePage slotResponsePage = new SlotResponsePage();
+        slotResponsePage.setContent(slotResponseList);
+        slotResponsePage.setPageNumber(slotPage.getNumber());
+        slotResponsePage.setTotalElements(slotPage.getTotalElements());
+        slotResponsePage.setTotalPages(slotPage.getTotalPages());
+
+        return slotResponsePage;
+    }
+
+    //HÀM LẤY SLOT CỦA MỌI STYLIST THEO NGÀY VÀ GIỜ -> STAFF LÀM
+    public SlotResponsePage getSlotsByDateAndHourForAllStylist(String date, String startHour, int page, int size){
+        Page<Slot> slotPage = slotRepository
+                .findSlotsByDateAndStartSlot(date, startHour, PageRequest.of(page, size));
+        if(slotPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Slot not found!");
+        }
+        List<SlotResponse> slotResponseList = new ArrayList<>();
+        for(Slot slot : slotPage.getContent()){
+            SlotResponse slotResponse = new SlotResponse();
+            slotResponse.setId(slot.getId());
+            slotResponse.setShiftEmployeeId(slot.getShiftEmployee().getId());
+            slotResponse.setDate(slot.getDate());
+            slotResponse.setStartSlot(slot.getStartSlot());
+            slotResponse.setAvailable(slot.isAvailable());
+
+            slotResponseList.add(slotResponse);
+        }
+
+        SlotResponsePage slotResponsePage = new SlotResponsePage();
+        slotResponsePage.setContent(slotResponseList);
+        slotResponsePage.setPageNumber(slotPage.getNumber());
+        slotResponsePage.setTotalElements(slotPage.getTotalElements());
+        slotResponsePage.setTotalPages(slotPage.getTotalPages());
+
+        return slotResponsePage;
+    }
+
 
 
 

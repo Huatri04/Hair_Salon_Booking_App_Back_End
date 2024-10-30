@@ -242,6 +242,39 @@ public class ShiftEmployeeService {
         return availableSlotListByHour;
     }
 
+    //HÀM GIÚP PHÂN TRANG -> HỖ TRỢ HÀM DƯỚI
+
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE TRONG TUẦN -> STAFF/MANAGER LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeek(String startDate, String endDate){
+        LocalDate startWeek = LocalDate.of(
+                Integer.parseInt(startDate.substring(0,4)),
+                Integer.parseInt(startDate.substring(5,7)),
+                Integer.parseInt(startDate.substring(8))
+        );
+
+        LocalDate endWeek = LocalDate.of(
+                Integer.parseInt(endDate.substring(0,4)),
+                Integer.parseInt(endDate.substring(5,7)),
+                Integer.parseInt(endDate.substring(8))
+        );
+
+        List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            LocalDate date = startWeek.plusDays(i);
+            List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository
+                    .findShiftEmployeesByDateAndIsAvailableTrue(date.toString());
+            if(!shiftEmployeeList.isEmpty()){
+                allShiftEmployeeList.addAll(shiftEmployeeList);
+            }
+        }
+
+
+    }
+
+
+
+
 
 /* => COMMENT TẠM THỜI
 
@@ -339,64 +372,6 @@ public class ShiftEmployeeService {
 
         return shiftEmployeeResponses;
     }
-
-    // get shift -> CUSTOMER LÀM -> DÙNG BÊN APPOINTMENT SERVICE
-    public List<ShiftEmployee> getShiftsOfEmployee(String stylistId){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByAccountForEmployee_IdAndIsAvailableTrue(stylistId);
-        if(shiftEmployeeList != null){
-            return shiftEmployeeList;
-        } else {
-            throw new EntityNotFoundException("Shift not found!");
-        }
-    }
-
-
-    // HÀM LẤY SỐ SLOT STYLIST LÀM ĐỂ SO SÁNH KPI -> HỖ TRỢ HÀM DƯỚI
-    public String compareToKPI(String stylistID){
-        AccountForEmployee account = employeeRepository.findAccountForEmployeeByIdAndStatusAndIsDeletedFalse(stylistID, "Workday");
-        if(account != null){
-            int completedSlot = account.getCompletedSlot();
-            int KPI = account.getKPI();
-            String message = "STYLIST = " + account.getName() + ", ID = " + account.getId() + ", KPI = " + KPI + ", SLOT COMPLETE = " + completedSlot;
-            return message;
-        } else {
-            throw new AccountNotFoundException("Stylist not found!");
-        }
-    }
-
-
-    // XÁC NHẬN HOÀN THÀNH TOÀN BỘ SHIFT CỦA MỌI STYLIST TRONG NGÀY -> MANAGER LÀM MỖI NGÀY
-    public List<String> completeAllShiftEmployeeInDay(String day){
-        List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findShiftEmployeesByShiftInWeek_DayOfWeekAndIsAvailableTrue(day);
-        List<String> StylistGetSalary = new ArrayList<>();  // DANH SÁCH STYLIST NHẬN LƯƠNG
-        String notification = "Complete all shift in " + day;
-        if(shiftEmployeeList != null){
-            StylistGetSalary.add(notification);
-            for(ShiftEmployee shiftEmployee : shiftEmployeeList){
-                shiftEmployee.setCompleted(true);
-                ShiftEmployee newShift = shiftEmployeeRepository.save(shiftEmployee);
-                AccountForEmployee account = newShift.getAccountForEmployee();
-
-                account.setCompletedShift(account.getCompletedShift() + 1);
-
-                if(account.getCompletedShift() == MAXSHIFT){        // CÓ NGƯỜI ĐẠT ĐỦ 15 CA
-                    String message = compareToKPI(account.getId());
-                    StylistGetSalary.add(message);
-                    account.setCompletedShift(0);   // RESET VỀ 0
-                    account.setCompletedSlot(0);    // RESET VỀ 0
-                }
-
-                AccountForEmployee newAccount = employeeRepository.save(account);
-            }
-
-            return StylistGetSalary;
-
-        } else {
-            throw new EntityNotFoundException("Can not complete shift!");
-        }
-    }
-
-
     //*//*/HÀM NÀY TRẢ VỀ DANH SÁCH CÁC THỨ TRONG TUẦN
     public List<String> getAllDaysInWeek(){
         List<String> days = new ArrayList<>();

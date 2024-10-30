@@ -13,4 +13,5 @@ public interface ShiftEmployeeRepository extends JpaRepository<ShiftEmployee, Lo
     ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndNameAndIsAvailableTrue(String dayOfWeek, String name);
     ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndName(String dayOfWeek, String name);*/
     List<ShiftEmployee> findShiftEmployeesByDateAndIsAvailableTrue(String date);
+
 }
