@@ -113,8 +113,7 @@ public class PayService {
         return result.toString();
     }
 
-    public void createTransactionSuccess(long appointmentId) {
-        // Tìm appointment
+    public Transaction createTransactionSuccess(long appointmentId) {
         // Tìm appointment
         Appointment appointment = appointmentRepository.findById(appointmentId)
                 .orElseThrow(() -> new EntityNotFoundException("Appointment not found!"));
@@ -157,53 +156,10 @@ public class PayService {
 
             // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
             // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
+        return transaction1;
         }
 
-    public void createTransactionFail(long appointmentId) {
-        // Tìm appointment
-        // Tìm appointment
-        Appointment appointment = appointmentRepository.findById(appointmentId)
-                .orElseThrow(() -> new EntityNotFoundException("Appointment not found!"));
 
-        // Tạo payment
-        Payment payment = new Payment();
-        payment.setAppointment(appointment);
-        payment.setCreateAt(new Date());
-        payment.setTypePayment("Banking");
-
-        List<Transaction> transactions = new ArrayList<>();
-
-        AccountForEmployee employee = authenticationService.getCurrentAccountForEmployee();
-        if (employee == null) {
-            throw new IllegalStateException("Không tìm thấy nhân viên thực hiện giao dịch.");
-        }
-
-        AccountForCustomer accountForCustomer = appointment.getAccountForCustomer();
-        // Tạo giao dịch cho thanh toán của khách hàng
-        Transaction transaction = new Transaction();
-
-        // Tạo giao dịch cho admin
-        Transaction transaction1 = new Transaction();
-//        AccountForEmployee employee = appointment.getSlot().getShiftEmployee().getAccountForEmployee();
-        transaction1.setDate(new Date());
-        transaction1.setEmployee(employee);
-        transaction1.setMoney(appointment.getCost());
-        transaction1.setCustomer(accountForCustomer);
-        transaction1.setTransactionType("Banking");
-        transaction1.setPayment(payment);
-        transaction1.setStatus("failed");
-        transaction1.setDescription("Chuyển từ khách hàng tới salon");
-        transactions.add(transaction1);
-
-        // Thiết lập giao dịch trong payment
-        payment.setTransactions(transactions);
-
-        // Lưu payment trước
-        paymentRepository.save(payment);
-
-        // Không cần lưu giao dịch riêng biệt nếu đã sử dụng CascadeType.ALL
-        // transactionRepository.saveAll(transactions); // Không cần thiết nếu CascadeType.ALL đã được sử dụng
-    }
     }
 
 

@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.Appointment;
+import com.hairsalonbookingapp.hairsalon.entity.Transaction;
 import com.hairsalonbookingapp.hairsalon.model.request.*;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponse;
 import com.hairsalonbookingapp.hairsalon.model.response.AppointmentResponseInfo;
@@ -95,21 +96,10 @@ public class AppointmentAPI {
         }
     }
 
-    @GetMapping("/vnpay/result")
-    public ResponseEntity<String> handleVNPayResult(
-            @RequestParam("vnp_ResponseCode") String responseCode,
-            @RequestParam("appointmentId") long appointmentId) {
-
-        if ("00".equals(responseCode)) {
-            // Cập nhật trạng thái giao dịch thành công
-            payService.createTransactionSuccess(appointmentId);
-            return ResponseEntity.ok("Thanh toán thành công.");
-        } else {
-            // Cập nhật trạng thái giao dịch thất bại
-            payService.createTransactionFail(appointmentId);
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                    .body("Thanh toán thất bại với mã lỗi: " + responseCode);
-        }
+    @PostMapping("/vnpay/result")
+    public ResponseEntity handleVNPayResult(@RequestParam("appointmentId") long appointmentId) {
+        Transaction transaction = payService.createTransactionSuccess(appointmentId);
+        return ResponseEntity.ok(transaction);
     }
 
     @GetMapping("/KPI")
