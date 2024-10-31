@@ -193,6 +193,52 @@ public class ShiftEmployeeService {
         }
     }
 
+    //TẠO THÊM NGÀY LÀM BÙ CHO STYLIST (VÍ DỤ TRƯỜNG HỢP STYLIST BẬN THỨ 3 VÀ MUỐN BÙ THỨ 4) -> MANAGER LÀM
+    //LƯU Ý : CHỈ TẠO TRONG TUẦN
+    public ShiftEmployeeResponse createTempShift(String stylistId, String date){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(stylistId);
+        if(accountForEmployee == null){
+            throw new EntityNotFoundException("Invalid id!!!");
+        }
+
+        //TẠO SHIFT EMPLOYEE
+        ShiftEmployee shiftEmployee = new ShiftEmployee();
+
+        String day = timeService.getDay(date); // TÌM RA THỨ
+
+        ShiftInWeek shiftInWeek = shiftWeekRepository
+                .findShiftInWeekByDayOfWeekAndIsAvailableTrue(day);
+        shiftEmployee.setShiftInWeek(shiftInWeek);
+        shiftEmployee.setAccountForEmployee(accountForEmployee);
+        shiftEmployee.setDate(date);
+
+        //SAVE VÀO DB
+        ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
+
+        // TẠO CÁC SLOT
+        SlotRequest slotRequest = new SlotRequest();
+        slotRequest.setDate(newShiftEmployee.getDate());
+        slotRequest.setShiftEmployeeId(newShiftEmployee.getId());
+        slotRequest.setStartHour(timeService.setStartHour(day));
+        slotRequest.setEndHour(timeService.setEndHour(day));
+        slotRequest.setDuration(timeService.duration);
+        List<Slot> slotList = slotService.generateSlots(slotRequest);
+        newShiftEmployee.setSlots(slotList);
+        // SAVE LẠI VÀO DB
+        ShiftEmployee savedShift = shiftEmployeeRepository.save(newShiftEmployee);
+
+        // GENERATE RESPONSE
+        ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+        shiftEmployeeResponse.setId(savedShift.getId());
+        shiftEmployeeResponse.setAvailable(savedShift.isAvailable());
+        shiftEmployeeResponse.setEmployeeId(savedShift.getAccountForEmployee().getId());
+        shiftEmployeeResponse.setName(savedShift.getAccountForEmployee().getName());
+        shiftEmployeeResponse.setDayInWeek(savedShift.getShiftInWeek().getDayOfWeek());
+        shiftEmployeeResponse.setDate(savedShift.getDate());
+
+        return shiftEmployeeResponse;
+    }
+
     // 2 HÀM DƯỚI TEST CHO VUI
     public List<ShiftEmployee> getAllShift(){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll();
@@ -243,20 +289,115 @@ public class ShiftEmployeeService {
     }
 
     //HÀM GIÚP PHÂN TRANG -> HỖ TRỢ HÀM DƯỚI
+    public List<ShiftEmployeeResponse> paginate(List<ShiftEmployeeResponse> items, int page, int pageSize) {
+        // Xác định vị trí bắt đầu và kết thúc của trang
+        int fromIndex = (page - 1) * pageSize;
+        int toIndex = Math.min(fromIndex + pageSize, items.size());
 
+        // Kiểm tra xem trang có hợp lệ không
+        if (fromIndex > items.size()) {
+            throw new IllegalArgumentException("No result found!");
+        }
 
-    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE TRONG TUẦN -> STAFF/MANAGER LÀM
-    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeek(String startDate, String endDate){
+        // Trả về sublist từ vị trí fromIndex đến toIndex
+        return items.subList(fromIndex, toIndex);
+    }
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE CỦA STYLIST TRONG TUẦN -> STYLIST LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeekByStylist(String startDate, int page, int pageSize){
+        AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+
         LocalDate startWeek = LocalDate.of(
                 Integer.parseInt(startDate.substring(0,4)),
                 Integer.parseInt(startDate.substring(5,7)),
                 Integer.parseInt(startDate.substring(8))
         );
 
-        LocalDate endWeek = LocalDate.of(
-                Integer.parseInt(endDate.substring(0,4)),
-                Integer.parseInt(endDate.substring(5,7)),
-                Integer.parseInt(endDate.substring(8))
+        List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            LocalDate date = startWeek.plusDays(i);
+            ShiftEmployee shiftEmployee = shiftEmployeeRepository
+                    .findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(accountForEmployee, date.toString());
+            if(shiftEmployee != null){
+                allShiftEmployeeList.add(shiftEmployee);
+            }
+        }
+
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : allShiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(shiftEmployee.getId());
+            shiftEmployeeResponse.setAvailable(shiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = new ShiftEmployeeResponsePage();
+        shiftEmployeeResponsePage.setContent(paginate(shiftEmployeeResponseList, page, pageSize));
+        shiftEmployeeResponsePage.setPageNumber(page);
+        shiftEmployeeResponsePage.setTotalElements(shiftEmployeeResponseList.size());
+        int totalPages = (shiftEmployeeResponseList.size() + pageSize - 1)/(pageSize);
+        shiftEmployeeResponsePage.setTotalPages(totalPages);
+
+        return shiftEmployeeResponsePage;
+    }
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE CỦA STYLIST TRONG TUẦN -> STAFF LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeekByStaff(String stylistId, String startDate, int page, int pageSize){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(stylistId);
+        if(accountForEmployee == null){
+            throw new EntityNotFoundException("Invalid id!");
+        }
+
+        LocalDate startWeek = LocalDate.of(
+                Integer.parseInt(startDate.substring(0,4)),
+                Integer.parseInt(startDate.substring(5,7)),
+                Integer.parseInt(startDate.substring(8))
+        );
+
+        List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            LocalDate date = startWeek.plusDays(i);
+            ShiftEmployee shiftEmployee = shiftEmployeeRepository
+                    .findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(accountForEmployee, date.toString());
+            if(shiftEmployee != null){
+                allShiftEmployeeList.add(shiftEmployee);
+            }
+        }
+
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : allShiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(shiftEmployee.getId());
+            shiftEmployeeResponse.setAvailable(shiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = new ShiftEmployeeResponsePage();
+        shiftEmployeeResponsePage.setContent(paginate(shiftEmployeeResponseList, page, pageSize));
+        shiftEmployeeResponsePage.setPageNumber(page);
+        shiftEmployeeResponsePage.setTotalElements(shiftEmployeeResponseList.size());
+        int totalPages = (shiftEmployeeResponseList.size() + pageSize - 1)/(pageSize);
+        shiftEmployeeResponsePage.setTotalPages(totalPages);
+
+        return shiftEmployeeResponsePage;
+    }
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE TRONG TUẦN -> STAFF/MANAGER LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeek(String startDate, int page, int pageSize){
+        LocalDate startWeek = LocalDate.of(
+                Integer.parseInt(startDate.substring(0,4)),
+                Integer.parseInt(startDate.substring(5,7)),
+                Integer.parseInt(startDate.substring(8))
         );
 
         List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
@@ -269,11 +410,28 @@ public class ShiftEmployeeService {
             }
         }
 
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : allShiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(shiftEmployee.getId());
+            shiftEmployeeResponse.setAvailable(shiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(shiftEmployee.getDate());
 
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = new ShiftEmployeeResponsePage();
+        shiftEmployeeResponsePage.setContent(paginate(shiftEmployeeResponseList, page, pageSize));
+        shiftEmployeeResponsePage.setPageNumber(page);
+        shiftEmployeeResponsePage.setTotalElements(shiftEmployeeResponseList.size());
+        int totalPages = (shiftEmployeeResponseList.size() + pageSize - 1)/(pageSize);
+        shiftEmployeeResponsePage.setTotalPages(totalPages);
+
+        return shiftEmployeeResponsePage;
     }
-
-
-
 
 
 /* => COMMENT TẠM THỜI

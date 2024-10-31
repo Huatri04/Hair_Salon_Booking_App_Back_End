@@ -52,8 +52,8 @@ public class SlotAPI {
         return ResponseEntity.ok(slotResponsePage);
     }
 
-    @GetMapping("/staff/{date}/{hour}")
-    public ResponseEntity viewSlotsInDateAndHourByStaff(@PathVariable String date, @PathVariable String startHour, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+    @GetMapping("/staff/{date}/hour")
+    public ResponseEntity viewSlotsInDateAndHourByStaff(@PathVariable String date, @RequestParam String startHour, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
         SlotResponsePage slotResponsePage = slotService.getSlotsByDateAndHourForAllStylist(date, startHour, page, size);
         return ResponseEntity.ok(slotResponsePage);
     }

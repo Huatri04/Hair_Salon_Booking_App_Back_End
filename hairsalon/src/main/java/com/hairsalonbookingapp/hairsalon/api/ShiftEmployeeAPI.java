@@ -2,10 +2,7 @@ package com.hairsalonbookingapp.hairsalon.api;
 
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.Slot;
-import com.hairsalonbookingapp.hairsalon.model.AccountResponseForEmployee;
-import com.hairsalonbookingapp.hairsalon.model.AvailableSlot;
-import com.hairsalonbookingapp.hairsalon.model.ShiftEmployeeResponse;
-import com.hairsalonbookingapp.hairsalon.model.StylistShiftRequest;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.ShiftEmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -77,6 +74,12 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(shiftEmployeeResponseList);
     }
 
+    @PostMapping("/tempShift")
+    public ResponseEntity createTempShift(@RequestParam String stylistId, @RequestParam String date){
+        ShiftEmployeeResponse shiftEmployeeResponse = shiftEmployeeService.createTempShift(stylistId, date);
+        return ResponseEntity.ok(shiftEmployeeResponse);
+    }
+
     @GetMapping
     public ResponseEntity getAllShifts(){
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeService.getAllShift();
@@ -99,6 +102,24 @@ public class ShiftEmployeeAPI {
     public ResponseEntity getAvailableShiftsByHour(@PathVariable String date, @PathVariable String hour){
         List<AvailableSlot> availableSlotList = shiftEmployeeService.getAllAvailableSlotsByHour(hour, date);
         return ResponseEntity.ok(availableSlotList);
+    }
+
+    @GetMapping("/staff/{startDate}")
+    public ResponseEntity getAllShiftsInWeek(@PathVariable String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeek(startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
+    }
+
+    @GetMapping("/stylist/{startDate}")
+    public ResponseEntity getAllShiftsInWeekByStylist(@PathVariable String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeekByStylist(startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
+    }
+
+    @GetMapping("/staff/stylistId")
+    public ResponseEntity getAllShiftsInWeekOfStylistByStaff(@RequestParam String stylistId, @RequestParam String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeekByStaff(stylistId, startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
     }
 
 

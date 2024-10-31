@@ -1,5 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.repository;
 
+import com.hairsalonbookingapp.hairsalon.entity.AccountForEmployee;
 import com.hairsalonbookingapp.hairsalon.entity.ShiftEmployee;
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,5 +14,5 @@ public interface ShiftEmployeeRepository extends JpaRepository<ShiftEmployee, Lo
     ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndNameAndIsAvailableTrue(String dayOfWeek, String name);
     ShiftEmployee findShiftEmployeeByShiftInWeek_DayOfWeekAndName(String dayOfWeek, String name);*/
     List<ShiftEmployee> findShiftEmployeesByDateAndIsAvailableTrue(String date);
-
+    ShiftEmployee findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(AccountForEmployee accountForEmployee, String date);
 }
