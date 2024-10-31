@@ -348,6 +348,96 @@ public class ShiftEmployeeService {
         return shiftEmployeeResponse;
     }
 
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE CỦA STYLIST TRONG TUẦN -> STAFF LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeekByStaff(String stylistId, String startDate, int page, int pageSize){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(stylistId);
+        if(accountForEmployee == null){
+            throw new EntityNotFoundException("Invalid id!");
+        }
+
+        LocalDate startWeek = LocalDate.of(
+                Integer.parseInt(startDate.substring(0,4)),
+                Integer.parseInt(startDate.substring(5,7)),
+                Integer.parseInt(startDate.substring(8))
+        );
+
+        List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            LocalDate date = startWeek.plusDays(i);
+            ShiftEmployee shiftEmployee = shiftEmployeeRepository
+                    .findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(accountForEmployee, date.toString());
+            if(shiftEmployee != null){
+                allShiftEmployeeList.add(shiftEmployee);
+            }
+        }
+
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : allShiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(shiftEmployee.getShiftEmployeeId());
+            shiftEmployeeResponse.setAvailable(shiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getEmployeeId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = new ShiftEmployeeResponsePage();
+        shiftEmployeeResponsePage.setContent(paginate(shiftEmployeeResponseList, page, pageSize));
+        shiftEmployeeResponsePage.setPageNumber(page);
+        shiftEmployeeResponsePage.setTotalElements(shiftEmployeeResponseList.size());
+        int totalPages = (shiftEmployeeResponseList.size() + pageSize - 1)/(pageSize);
+        shiftEmployeeResponsePage.setTotalPages(totalPages);
+
+        return shiftEmployeeResponsePage;
+    }
+
+    //HÀM NÀY LẤY TOÀN BỘ SHIFT EMPLOYEE CỦA STYLIST TRONG TUẦN -> STYLIST LÀM
+    public ShiftEmployeeResponsePage getAllShiftEmployeesInWeekByStylist(String startDate, int page, int pageSize){
+        AccountForEmployee accountForEmployee = authenticationService.getCurrentAccountForEmployee();
+
+        LocalDate startWeek = LocalDate.of(
+                Integer.parseInt(startDate.substring(0,4)),
+                Integer.parseInt(startDate.substring(5,7)),
+                Integer.parseInt(startDate.substring(8))
+        );
+
+        List<ShiftEmployee> allShiftEmployeeList = new ArrayList<>();
+        for(int i = 0; i < 7; i++){
+            LocalDate date = startWeek.plusDays(i);
+            ShiftEmployee shiftEmployee = shiftEmployeeRepository
+                    .findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(accountForEmployee, date.toString());
+            if(shiftEmployee != null){
+                allShiftEmployeeList.add(shiftEmployee);
+            }
+        }
+
+        List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
+        for(ShiftEmployee shiftEmployee : allShiftEmployeeList){
+            ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
+            shiftEmployeeResponse.setId(shiftEmployee.getShiftEmployeeId());
+            shiftEmployeeResponse.setAvailable(shiftEmployee.isAvailable());
+            shiftEmployeeResponse.setEmployeeId(shiftEmployee.getAccountForEmployee().getEmployeeId());
+            shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
+            shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
+            shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+
+            shiftEmployeeResponseList.add(shiftEmployeeResponse);
+        }
+
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = new ShiftEmployeeResponsePage();
+        shiftEmployeeResponsePage.setContent(paginate(shiftEmployeeResponseList, page, pageSize));
+        shiftEmployeeResponsePage.setPageNumber(page);
+        shiftEmployeeResponsePage.setTotalElements(shiftEmployeeResponseList.size());
+        int totalPages = (shiftEmployeeResponseList.size() + pageSize - 1)/(pageSize);
+        shiftEmployeeResponsePage.setTotalPages(totalPages);
+
+        return shiftEmployeeResponsePage;
+    }
+
 /* => COMMENT TẠM THỜI
 
     //xóa shift -> STYLIST LÀM KHI NÓ MUỐN HỦY SHIFT, NHƯNG PHẢI THÔNG BÁO CHO MANAGER TRƯỚC

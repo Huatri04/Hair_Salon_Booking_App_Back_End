@@ -96,7 +96,7 @@ public class ShiftEmployeeAPI {
         return ResponseEntity.ok(availableSlotList);
     }
 
-    @GetMapping("/{startDate}")
+    @GetMapping("/staff/{startDate}")
     public ResponseEntity getAllShiftsInWeek(@PathVariable String startDate, @RequestParam int page, @RequestParam int pageSize){
         ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeek(startDate, page, pageSize);
         return ResponseEntity.ok(shiftEmployeeResponsePage);
@@ -106,6 +106,18 @@ public class ShiftEmployeeAPI {
     public ResponseEntity createTempShift(@RequestParam String stylistId, @RequestParam String date){
         ShiftEmployeeResponse shiftEmployeeResponse = shiftEmployeeService.createTempShift(stylistId, date);
         return ResponseEntity.ok(shiftEmployeeResponse);
+    }
+
+    @GetMapping("/stylist/{startDate}")
+    public ResponseEntity getAllShiftsInWeekByStylist(@PathVariable String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeekByStylist(startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
+    }
+
+    @GetMapping("/staff/stylistId")
+    public ResponseEntity getAllShiftsInWeekOfStylistByStaff(@RequestParam String stylistId, @RequestParam String startDate, @RequestParam int page, @RequestParam int pageSize){
+        ShiftEmployeeResponsePage shiftEmployeeResponsePage = shiftEmployeeService.getAllShiftEmployeesInWeekByStaff(stylistId, startDate, page, pageSize);
+        return ResponseEntity.ok(shiftEmployeeResponsePage);
     }
 
 }
