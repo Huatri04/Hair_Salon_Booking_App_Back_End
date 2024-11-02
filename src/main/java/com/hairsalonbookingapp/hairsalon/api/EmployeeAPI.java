@@ -55,4 +55,10 @@ public class EmployeeAPI {
         return ResponseEntity.ok(employeeResponsePage);
     }
 
+    @PutMapping("/employee/restart/{id}")
+    public ResponseEntity restartAccountEmployee(@PathVariable String id){
+        EmployeeInfo employeeInfo = employeeService.restartEmployee(id);
+        return ResponseEntity.ok(employeeInfo);
+    }
+
 }

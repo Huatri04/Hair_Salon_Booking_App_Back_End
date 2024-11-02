@@ -245,4 +245,16 @@ public class EmployeeService {
         return employeeResponsePage;
     }
 
+    //HÀM RESTART ACCOUNT EMPLOYEE
+    public EmployeeInfo restartEmployee(String id){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(id);
+        if(accountForEmployee == null){
+            throw new EntityNotFoundException("Employee not found!");
+        }
+
+        accountForEmployee.setDeleted(false);
+        AccountForEmployee restartedAccount = employeeRepository.save(accountForEmployee);
+        EmployeeInfo employeeInfo = modelMapper.map(restartedAccount, EmployeeInfo.class);
+        return employeeInfo;
+    }
 }

@@ -1,6 +1,7 @@
 package com.hairsalonbookingapp.hairsalon.service;
 
 import com.hairsalonbookingapp.hairsalon.entity.AccountForCustomer;
+import com.hairsalonbookingapp.hairsalon.exception.EntityNotFoundException;
 import com.hairsalonbookingapp.hairsalon.model.response.CustomerAccountInfo;
 import com.hairsalonbookingapp.hairsalon.model.response.CustomerResponsePage;
 import com.hairsalonbookingapp.hairsalon.repository.AccountForCustomerRepository;
@@ -51,6 +52,19 @@ public class CustomerService {
         customerResponsePage.setTotalElements(accountForCustomerPage.getTotalElements());
         customerResponsePage.setPageNumber(accountForCustomerPage.getNumber());
         return customerResponsePage;
+    }
+
+    //HÀM RESTART TÀI KHOẢN CUSTOMER
+    public CustomerAccountInfo restartCustomer(String phoneNumber){
+        AccountForCustomer accountForCustomer = customerRepository.findByPhoneNumber(phoneNumber);
+        if(accountForCustomer == null){
+            throw new EntityNotFoundException("Customer not found!");
+        }
+
+        accountForCustomer.setDeleted(false);
+        AccountForCustomer restartedAccount = customerRepository.save(accountForCustomer);
+        CustomerAccountInfo customerAccountInfo = modelMapper.map(restartedAccount, CustomerAccountInfo.class);
+        return customerAccountInfo;
     }
 
 }
