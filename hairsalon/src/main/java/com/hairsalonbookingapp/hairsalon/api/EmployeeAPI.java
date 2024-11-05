@@ -1,9 +1,6 @@
 package com.hairsalonbookingapp.hairsalon.api;
 
-import com.hairsalonbookingapp.hairsalon.model.EmployeeInfo;
-import com.hairsalonbookingapp.hairsalon.model.EmployeeResponsePage;
-import com.hairsalonbookingapp.hairsalon.model.FindEmployeeRequest;
-import com.hairsalonbookingapp.hairsalon.model.StylistInfo;
+import com.hairsalonbookingapp.hairsalon.model.*;
 import com.hairsalonbookingapp.hairsalon.service.EmployeeService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import jakarta.validation.Valid;
@@ -49,6 +46,12 @@ public class EmployeeAPI {
     public ResponseEntity getAllBanedEmployees(@RequestParam int page, @RequestParam(defaultValue = "2") int size){
         EmployeeResponsePage employeeResponsePage = employeeService.getAllBanedEmployees(page, size);
         return ResponseEntity.ok(employeeResponsePage);
+    }
+
+    @PutMapping("/employee/restart/{id}")
+    public ResponseEntity restartAccountEmployee(@PathVariable String id){
+        EmployeeInfo employeeInfo = employeeService.restartEmployee(id);
+        return ResponseEntity.ok(employeeInfo);
     }
 
 

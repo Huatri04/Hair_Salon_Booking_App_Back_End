@@ -187,8 +187,6 @@ public class EmployeeService {
 
 
 
-
-
     //HÀM CHECK DANH SÁCH CÁC STYLIST COI CÓ AI CHƯA SET NGÀY LÀM VIỆC KHÔNG
     public List<String> getStylistsThatWorkDaysNull(){
         String role = "Stylist";
@@ -209,7 +207,18 @@ public class EmployeeService {
     }
 
 
+    //HÀM RESTART ACCOUNT EMPLOYEE
+    public EmployeeInfo restartEmployee(String id){
+        AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeById(id);
+        if(accountForEmployee == null){
+            throw new EntityNotFoundException("Employee not found!");
+        }
 
+        accountForEmployee.setDeleted(false);
+        AccountForEmployee restartedAccount = employeeRepository.save(accountForEmployee);
+        EmployeeInfo employeeInfo = modelMapper.map(restartedAccount, EmployeeInfo.class);
+        return employeeInfo;
+    }
 
 
 
