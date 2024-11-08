@@ -56,11 +56,11 @@ public class PayService {
         String tmnCode = "OAXJYXKZ";
         String secretKey = "4MKK3NOKE1SOCD9YNKN9BOKKV3BQJBFU";
         String vnpUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-        String returnUrl = "http://localhost:5173/staff_page/paymentSuccessful";
+        String returnUrl = "http://localhost:5173/staff_page/paymentSuccessful?orderID=" + appointment.getAppointmentId();
         String currCode = "VND";
 
         Map<String, String> vnpParams = new TreeMap<>();
-        vnpParams.put("orderID", appointment.getAppointmentId() + "");
+
         vnpParams.put("vnp_Version", "2.1.0");
         vnpParams.put("vnp_Command", "pay");
         vnpParams.put("vnp_TmnCode", tmnCode);
