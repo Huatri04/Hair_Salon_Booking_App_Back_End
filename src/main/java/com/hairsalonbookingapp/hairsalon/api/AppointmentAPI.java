@@ -47,7 +47,7 @@ public class AppointmentAPI {
     }
 
     @PutMapping("/{appointmentId}")
-    public ResponseEntity completeAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long appointmentId){
+    public ResponseEntity updateAppointment(@Valid @RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long appointmentId){
         AppointmentResponse appointmentResponse = appointmentService.updateAppointment(appointmentUpdate, appointmentId);
         return ResponseEntity.ok(appointmentResponse);
     }

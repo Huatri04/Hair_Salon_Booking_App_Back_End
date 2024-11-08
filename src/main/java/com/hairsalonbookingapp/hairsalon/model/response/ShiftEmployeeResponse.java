@@ -10,4 +10,6 @@ public class ShiftEmployeeResponse {
     private String name; // AI LÀM
     private boolean isAvailable;  // CÒN KHẢ DỤNG KHÔNG
     private String date; // NGÀY NÀO
+    private String startHour;
+    private String endHour;
 }
