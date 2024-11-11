@@ -332,6 +332,9 @@ public class ShiftEmployeeService {
             shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+            shiftEmployeeResponse.setStartHour(shiftEmployee.getShiftInWeek().getStartHour());
+            shiftEmployeeResponse.setEndHour(shiftEmployee.getShiftInWeek().getEndHour());
+
 
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
@@ -378,6 +381,8 @@ public class ShiftEmployeeService {
             shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+            shiftEmployeeResponse.setStartHour(shiftEmployee.getShiftInWeek().getStartHour());
+            shiftEmployeeResponse.setEndHour(shiftEmployee.getShiftInWeek().getEndHour());
 
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
@@ -419,6 +424,8 @@ public class ShiftEmployeeService {
             shiftEmployeeResponse.setName(shiftEmployee.getAccountForEmployee().getName());
             shiftEmployeeResponse.setDayInWeek(shiftEmployee.getShiftInWeek().getDayOfWeek());
             shiftEmployeeResponse.setDate(shiftEmployee.getDate());
+            shiftEmployeeResponse.setStartHour(shiftEmployee.getShiftInWeek().getStartHour());
+            shiftEmployeeResponse.setEndHour(shiftEmployee.getShiftInWeek().getEndHour());
 
             shiftEmployeeResponseList.add(shiftEmployeeResponse);
         }
