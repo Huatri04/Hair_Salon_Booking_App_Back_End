@@ -119,4 +119,24 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointmentResponsePage);
     }
 
+    @GetMapping("/detail/{appointmentId}")
+    public ResponseEntity getAppontmentDetail(@PathVariable long appointmentId){
+        AppointmentDetail appointmentDetail = appointmentService.getAppontmentDetail(appointmentId);
+        return ResponseEntity.ok(appointmentDetail);
+    }
+
+    @PutMapping("/accept/{appointmentId}")
+    public ResponseEntity acceptAppointment(@PathVariable long appointmentId){
+        AppointmentDetail appointmentDetail = appointmentService.acceptAppointment(appointmentId);
+        return ResponseEntity.ok(appointmentDetail);
+    }
+
+    @GetMapping("/uncompleted/{date}")
+    public ResponseEntity getAllUnCompletedAppointmentsByDate(@PathVariable String date, @RequestParam int page, @RequestParam(defaultValue = "2") int size){
+        AppointmentResponsePage appointmentResponsePage = appointmentService.getAllUnCompletedAppontments(date, page, size);
+        return ResponseEntity.ok(appointmentResponsePage);
+    }
+
+
+
 }

@@ -30,7 +30,7 @@ public class TimeService {
     }
 
     // GIẢ ĐỊNH NGÀY HIỆN TẠI
-    public final LocalDate today = LocalDate.of(2024, 12, 19);
+    public final LocalDate today = LocalDate.of(2024, 12, 26);
     //public final LocalDate today = getToday();
     // THỜI GIAN BẮT ĐÂÙ VÀ KẾT THÚC CA LÀM VIỆC
     //public int startHour = 7;
@@ -152,5 +152,14 @@ public class TimeService {
         return dayOfWeek;
     }
 
+    //HÀM TRẢ VỀ DANH SÁCH CÁC NGÀY TỪ HÔM NAY ĐẾN CN
+    public List<LocalDate> getDaysUntilWeekend(String date){
+        LocalDate day = LocalDate.parse(date);
+        List<LocalDate> days = new ArrayList<>();
+        for(int i = 0; i <= 7 - day.getDayOfWeek().getValue(); i++){
+            days.add(day.plusDays(i));
+        }
+        return days;
+    }
 
 }

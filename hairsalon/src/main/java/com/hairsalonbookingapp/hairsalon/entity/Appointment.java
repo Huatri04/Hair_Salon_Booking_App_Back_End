@@ -25,6 +25,8 @@ public class Appointment {
 
     private boolean isCompleted = false;  // ĐƠN CHƯA HOÀN THÀNH
 
+    private String status = "Chưa phục vụ";// Đang phục vụ, Đã thanh toán
+
     private String date;
     private String startHour;
     private String stylist;
