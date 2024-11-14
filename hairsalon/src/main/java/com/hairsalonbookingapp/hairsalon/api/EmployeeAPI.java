@@ -54,5 +54,10 @@ public class EmployeeAPI {
         return ResponseEntity.ok(employeeInfo);
     }
 
+    @GetMapping("/stylist/workDayNotNull")
+    public ResponseEntity checkStylistHasNotNull(){
+        List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNotNull();
+        return ResponseEntity.ok(stylistIdList);
+    }
 
 }

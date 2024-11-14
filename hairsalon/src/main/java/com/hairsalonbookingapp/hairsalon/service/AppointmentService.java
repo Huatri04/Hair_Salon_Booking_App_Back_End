@@ -354,11 +354,14 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
-            /*for(Slot slot : slotList){
-                accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
-                break;
-            }*/
+            //AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
+            List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
+            for(Slot slot : slotList){
+                AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+                accountForEmployeeList.add(account);
+            }
+
+            AccountForEmployee accountForEmployee = getStylistWithLeastKPI(accountForEmployeeList);
 
 
             //LOGIC Y CHANG HÀM TẠO, KHÁC Ở CHỖ STYLIST EXPERT KHÔNG CỘNG BONUS THÊM
@@ -1363,6 +1366,21 @@ public class AppointmentService {
         appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
 
         return appointmentResponsePage;
+    }
+
+    //HÀM CHỌN STYLIST CÓ SỐ KPI ÍT NHẤT HIỆN TẠI
+    public AccountForEmployee getStylistWithLeastKPI(List<AccountForEmployee> accountForEmployeeList){
+        List<Integer> allKPI = new ArrayList<>();
+        for(AccountForEmployee account : accountForEmployeeList){
+            allKPI.add(account.getCompletedSlot());
+        }
+        int min = Collections.min(allKPI);
+        for(AccountForEmployee account : accountForEmployeeList){
+            if(account.getCompletedSlot() == min){
+                return account;
+            }
+        }
+        return null;
     }
 
 }

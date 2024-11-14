@@ -220,6 +220,23 @@ public class EmployeeService {
         return employeeInfo;
     }
 
-
+    //HÀM TRẢ VỀ DANH SÁCH CÁC STYLIST ĐÃ SET NGÀY LÀM VIỆC
+    public List<String> getStylistsThatWorkDaysNotNull(){
+        String role = "Stylist";
+        String status = "Workday";
+        List<String> foundStylists = new ArrayList<>(); // DANH SÁCH CÁC STYLIST BẮT ĐƯỢC
+        List<AccountForEmployee> allStylists = employeeRepository
+                .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
+        if(allStylists.isEmpty()){
+            throw new EntityNotFoundException("Stylist not found!");
+        }
+        for(AccountForEmployee accountForEmployee : allStylists){
+            if(accountForEmployee.getDays() != null){
+                String foundStylist = "Id: " + accountForEmployee.getId() + ", Name: " + accountForEmployee.getName();
+                foundStylists.add(foundStylist);
+            }
+        }
+        return foundStylists;
+    }
 
 }
