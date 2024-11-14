@@ -221,10 +221,10 @@ public class EmployeeService {
     }
 
     //HÀM TRẢ VỀ DANH SÁCH CÁC STYLIST ĐÃ SET NGÀY LÀM VIỆC
-    public List<String> getStylistsThatWorkDaysNotNull(){
+    public List<EmployeeInfo> getStylistsThatWorkDaysNotNull(){
         String role = "Stylist";
         String status = "Workday";
-        List<String> foundStylists = new ArrayList<>(); // DANH SÁCH CÁC STYLIST BẮT ĐƯỢC
+        List<EmployeeInfo> foundStylists = new ArrayList<>();
         List<AccountForEmployee> allStylists = employeeRepository
                 .findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(role, status);
         if(allStylists.isEmpty()){
@@ -232,8 +232,7 @@ public class EmployeeService {
         }
         for(AccountForEmployee accountForEmployee : allStylists){
             if(accountForEmployee.getDays() != null){
-                String foundStylist = "Id: " + accountForEmployee.getId() + ", Name: " + accountForEmployee.getName();
-                foundStylists.add(foundStylist);
+                foundStylists.add(modelMapper.map(accountForEmployee, EmployeeInfo.class));
             }
         }
         return foundStylists;

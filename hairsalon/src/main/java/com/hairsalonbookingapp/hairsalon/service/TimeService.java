@@ -152,7 +152,7 @@ public class TimeService {
         return dayOfWeek;
     }
 
-    //HÀM TRẢ VỀ DANH SÁCH CÁC NGÀY TỪ HÔM NAY ĐẾN CN
+    //HÀM TRẢ VỀ DANH SÁCH CÁC NGÀY TỪ NGÀY CHỌN ĐẾN CN
     public List<LocalDate> getDaysUntilWeekend(String date){
         LocalDate day = LocalDate.parse(date);
         List<LocalDate> days = new ArrayList<>();

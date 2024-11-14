@@ -56,7 +56,7 @@ public class EmployeeAPI {
 
     @GetMapping("/stylist/workDayNotNull")
     public ResponseEntity checkStylistHasNotNull(){
-        List<String> stylistIdList = employeeService.getStylistsThatWorkDaysNotNull();
+        List<EmployeeInfo> stylistIdList = employeeService.getStylistsThatWorkDaysNotNull();
         return ResponseEntity.ok(stylistIdList);
     }
 

@@ -137,6 +137,12 @@ public class AppointmentAPI {
         return ResponseEntity.ok(appointmentResponsePage);
     }
 
+    @PutMapping("/fun2")
+    public ResponseEntity fun2(){
+        String a = appointmentService.isCHoosr();
+        return ResponseEntity.ok(a);
+    }
+
 
 
 }

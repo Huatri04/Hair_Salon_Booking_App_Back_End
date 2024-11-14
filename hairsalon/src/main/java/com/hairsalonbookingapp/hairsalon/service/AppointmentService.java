@@ -317,7 +317,8 @@ public class AppointmentService {
         Appointment appointment = appointmentRepository.findAppointmentById(appointmentId);
         AppointmentDetail appointmentDetail = new AppointmentDetail();
         appointmentDetail.setId(appointmentId);
-        appointmentDetail.setStylist(appointment.getStylist());
+        AccountForEmployee accountForEmployee = appointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        appointmentDetail.setStylist(modelMapper.map(accountForEmployee, EmployeeInfo.class));
         appointmentDetail.setCustomer("Guest");
         if(appointment.getAccountForCustomer() != null){
             appointmentDetail.setCustomer(appointment.getAccountForCustomer().getCustomerName());
@@ -326,7 +327,7 @@ public class AppointmentService {
         appointmentDetail.setTotalCost(appointment.getCost());
         appointmentDetail.setDate(appointment.getDate());
         appointmentDetail.setStartHour(appointment.getStartHour());
-        appointmentDetail.setStylistFee(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getExpertStylistBonus());
+
         appointmentDetail.setStatus(appointment.getStatus());
         String discountCode = null;
         if(appointment.getDiscountCode() != null){
@@ -334,11 +335,17 @@ public class AppointmentService {
         }
 
         appointmentDetail.setDiscountCode(discountCode);
-        List<String> serviceName = new ArrayList<>();
+
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
         for(HairSalonService service : appointment.getHairSalonServices()){
-            serviceName.add(service.getName() + ": " + service.getCost() + " VND");
+            hairSalonServiceResponseList.add(modelMapper.map(service, HairSalonServiceResponse.class));
         }
-        appointmentDetail.setService(serviceName);
+        appointmentDetail.setService(hairSalonServiceResponseList);
+        appointmentDetail.setSystemChose(appointment.isSystemChose());
+        appointmentDetail.setStylistFee(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getExpertStylistBonus());
+        if(appointment.isSystemChose()){
+            appointmentDetail.setStylistFee(0);
+        }
         return appointmentDetail;
     }
 
@@ -354,7 +361,6 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            //AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
             List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
             for(Slot slot : slotList){
                 AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
@@ -380,6 +386,8 @@ public class AppointmentService {
                 }
                 //TẠO APPOINTMENT
                 Appointment appointment = new Appointment();
+
+                appointment.setSystemChose(true);
 
                 // SLOT
                 //Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
@@ -548,7 +556,13 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
+            List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
+            for(Slot slot : slotList){
+                AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+                accountForEmployeeList.add(account);
+            }
+
+            AccountForEmployee accountForEmployee = getStylistWithLeastKPI(accountForEmployeeList);
 
             //LOGIC Y CHANG HÀM TẠO, KHÁC Ở CHỖ STYLIST EXPERT KHÔNG CỘNG BONUS THÊM
             try {
@@ -565,6 +579,8 @@ public class AppointmentService {
                 }
                 //TẠO APPOINTMENT
                 Appointment appointment = new Appointment();
+
+                appointment.setSystemChose(true);
 
                 // SLOT
                 //Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
@@ -1296,7 +1312,8 @@ public class AppointmentService {
         Appointment newAppointment = appointmentRepository.save(appointment);
         AppointmentDetail appointmentDetail = new AppointmentDetail();
         appointmentDetail.setId(appointmentId);
-        appointmentDetail.setStylist(newAppointment.getStylist());
+        AccountForEmployee accountForEmployee = newAppointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        appointmentDetail.setStylist(modelMapper.map(accountForEmployee, EmployeeInfo.class));
         appointmentDetail.setCustomer("Guest");
         if(appointment.getAccountForCustomer() != null){
             appointmentDetail.setCustomer(appointment.getAccountForCustomer().getCustomerName());
@@ -1305,7 +1322,7 @@ public class AppointmentService {
         appointmentDetail.setTotalCost(newAppointment.getCost());
         appointmentDetail.setDate(newAppointment.getDate());
         appointmentDetail.setStartHour(newAppointment.getStartHour());
-        appointmentDetail.setStylistFee(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getExpertStylistBonus());
+
         appointmentDetail.setStatus(newAppointment.getStatus());
         String discountCode = null;
         if(newAppointment.getDiscountCode() != null){
@@ -1313,11 +1330,17 @@ public class AppointmentService {
         }
 
         appointmentDetail.setDiscountCode(discountCode);
-        List<String> serviceName = new ArrayList<>();
+
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
         for(HairSalonService service : newAppointment.getHairSalonServices()){
-            serviceName.add(service.getName() + ": " + service.getCost() + " VND");
+            hairSalonServiceResponseList.add(modelMapper.map(service, HairSalonServiceResponse.class));
         }
-        appointmentDetail.setService(serviceName);
+        appointmentDetail.setService(hairSalonServiceResponseList);
+        appointmentDetail.setSystemChose(newAppointment.isSystemChose());
+        appointmentDetail.setStylistFee(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getExpertStylistBonus());
+        if(newAppointment.isSystemChose()){
+            appointmentDetail.setStylistFee(0);
+        }
         return appointmentDetail;
     }
 
@@ -1381,6 +1404,14 @@ public class AppointmentService {
             }
         }
         return null;
+    }
+
+    public String isCHoosr(){
+        Appointment appointment = appointmentRepository.findAppointmentById(1);
+        appointment.setSystemChose(true);
+        appointmentRepository.save(appointment);
+        String a= "1";
+        return a;
     }
 
 }
