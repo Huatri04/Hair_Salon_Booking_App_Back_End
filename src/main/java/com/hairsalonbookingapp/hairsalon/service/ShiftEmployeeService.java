@@ -462,13 +462,14 @@ public class ShiftEmployeeService {
 
     public List<ShiftEmployeeResponse> generateShiftEmployeeByDate(String stylistId, String startDate){
         AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(stylistId);
+        ShiftEmployee checkExistedShift = null;
         if(accountForEmployee == null){
             throw new EntityNotFoundException("Stylist not found!");
         }
         String days = accountForEmployee.getDays(); // LẤY CÁC NGÀY STYLIST CHỌN
         String[] daysOfWeek = days.split(","); // TÁCH CHUỖI CÁC NGÀY THÀNH 1 DANH SÁCH DỰA TRÊN DẤU ,
         List<LocalDate> daysUntilWeekDays = timeService.getDaysUntilWeekend(startDate);
-        List<ShiftEmployee> shiftEmployeeList = new ArrayList<>();
+        //List<ShiftEmployee> shiftEmployeeList = new ArrayList<>();
         List<ShiftEmployeeResponse> shiftEmployeeResponseList = new ArrayList<>();
         for(String day : daysOfWeek){
             // TẠO MỚI SHIFT EMPLOYEE
@@ -481,11 +482,16 @@ public class ShiftEmployeeService {
             DayOfWeek dayOfWeek = DayOfWeek.valueOf(day);
             for(LocalDate date : daysUntilWeekDays){
                 if(date.getDayOfWeek() == dayOfWeek){
-                    shiftEmployee.setDate(date.toString());
-                    break;
+                    checkExistedShift = shiftEmployeeRepository
+                            .findShiftEmployeeByAccountForEmployeeAndDateAndIsAvailableTrue(accountForEmployee, date.toString());
+                    if(checkExistedShift == null){
+                        shiftEmployee.setDate(date.toString());
+                        break;
+                    }
+
                 }
             }
-            if(shiftEmployee.getDate() != null){
+            if(shiftEmployee.getDate() != null && checkExistedShift == null){
                 // SAVE VÀO DB
                 ShiftEmployee newShiftEmployee = shiftEmployeeRepository.save(shiftEmployee);
                 // TẠO CÁC SLOT
@@ -501,7 +507,7 @@ public class ShiftEmployeeService {
                 ShiftEmployee savedShift = shiftEmployeeRepository.save(newShiftEmployee);
 
                 //ADD TO ACCOUNT FOR EMPLOYEE => MỘT STYLIST CÓ NHIỀU SHIFTS
-                shiftEmployeeList.add(savedShift);
+                //shiftEmployeeList.add(savedShift);
 
                 // GENERATE RESPONSE
                 ShiftEmployeeResponse shiftEmployeeResponse = new ShiftEmployeeResponse();
@@ -517,9 +523,12 @@ public class ShiftEmployeeService {
 
         }
 
-        // LƯU LẠI ACCOUNT FOR EMPLOYEE
+        /*// LƯU LẠI ACCOUNT FOR EMPLOYEE
+        if(!shiftEmployeeList.isEmpty()){
+
+        }
         accountForEmployee.setShiftEmployees(shiftEmployeeList);
-        employeeRepository.save(accountForEmployee);
+        employeeRepository.save(accountForEmployee);*/
 
         return shiftEmployeeResponseList;
     }
@@ -532,7 +541,7 @@ public class ShiftEmployeeService {
 // HÀM NÀY CÓ THỂ TẠO CA LÀ VIỆC CHO TOÀN BỘ STYLIST VỚI LOGIC GIỐNG HÀM TRÊN HÀM TRÊN LÀ TẠO CA CHO 1 THẰNG, HÀM DƯỚI TẠO CHO NHIỀU ĐỨA, THỰC RA LOGIC 2 HÀM NÀY Y CHANG 2 HÀM CŨ
 
     public List<ShiftEmployeeResponse> generateAllShiftEmployeesByDate(String startDate){
-        //CHECK XEM MANAGER ĐÃ DÙNG CHỨC NĂNG NÀY CHƯA
+        /*//CHECK XEM MANAGER ĐÃ DÙNG CHỨC NĂNG NÀY CHƯA
         List<LocalDate> daysUntilWeekend = timeService.getDaysUntilWeekend(startDate);
         List<ShiftEmployee> shiftEmployeeList = shiftEmployeeRepository.findAll(); // LIST CÁC SHIFT EMPLOYEE TRONG DB
         for(LocalDate date : daysUntilWeekend){
@@ -542,7 +551,7 @@ public class ShiftEmployeeService {
                 }
             }
         }
-        // => MANAGER CHƯA DÙNG CHỨC NĂNG NÀY
+        // => MANAGER CHƯA DÙNG CHỨC NĂNG NÀY*/
         List<String> foundStylists = employeeService.getStylistsThatWorkDaysNull(); // CHECK XEM CÓ STYLIST NÀO CHƯA SET WORKDAY
         if(foundStylists.isEmpty()){ //TÌM KHÔNG THẤY
             String role = "Stylist";

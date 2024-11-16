@@ -1191,4 +1191,73 @@ public class AppointmentService {
         }
     }
 
+    // UPDATE DANH SACH DICH VU
+    public AppointmentResponse updateServiceList(List<Long> serviceIdList, long idAppointment){
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentByAppointmentId(idAppointment);
+        AccountForCustomer accountForCustomer = oldAppointment.getAccountForCustomer();
+        // LẤY THÔNG TIN CŨ
+        double total = oldAppointment.getCost();
+        DiscountCode oldCode = oldAppointment.getDiscountCode();
+        double discount = 0;
+        if(oldCode != null){
+            discount = (oldCode.getDiscountProgram().getPercentage())/100;
+        }
+
+        AccountForEmployee stylist = oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        double stylistFee = stylist.getStylistSelectionFee();
+        //LẤY LẠI LIST CŨ
+        double oldServicesCost = 0;
+        List<HairSalonService> oldHairSalonServiceList = oldAppointment.getHairSalonServices();
+        for(HairSalonService service : oldHairSalonServiceList){
+            oldServicesCost += service.getCost();
+        }
+        //double totalWithoutServices = total - servicesCost;
+        // GENERATE LIST MỚI TỪ INPUT
+        List<HairSalonService> newHairSalonServiceList = new ArrayList<>();
+
+        for(long id : serviceIdList){
+            HairSalonService hairSalonService = serviceRepository.findHairSalonServiceById(id);
+            newHairSalonServiceList.add(hairSalonService);
+        }
+
+        if(!serviceIdList.isEmpty() && !newHairSalonServiceList.equals(oldHairSalonServiceList)){
+            oldAppointment.setHairSalonServices(newHairSalonServiceList);
+            double newServiceCost = 0;
+            for(HairSalonService service : newHairSalonServiceList){
+                newServiceCost += service.getCost();
+            }
+            if(oldAppointment.isSystemChose()){
+                stylistFee = 0;
+            }
+            double newTotal = newServiceCost + stylistFee - newServiceCost * discount;
+            oldAppointment.setCost(newTotal);
+        }
+
+        List<String> serviceNameList = new ArrayList<>();
+        for(HairSalonService hairSalonService : oldAppointment.getHairSalonServices()){
+            String name = hairSalonService.getName();
+            serviceNameList.add(name);
+        }
+
+        Appointment appointment = appointmentRepository.save(oldAppointment);
+
+        AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+        appointmentResponse.setId(appointment.getAppointmentId());
+        appointmentResponse.setCost(appointment.getCost());
+        appointmentResponse.setDay(appointment.getSlot().getDate());
+        appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
+        if(accountForCustomer != null){
+            appointmentResponse.setCustomer(accountForCustomer.getName());
+        } else {
+            appointmentResponse.setCustomer("Guest");
+        }
+
+        appointmentResponse.setService(serviceNameList);
+        appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+
+        return appointmentResponse;
+    }
+
 }
