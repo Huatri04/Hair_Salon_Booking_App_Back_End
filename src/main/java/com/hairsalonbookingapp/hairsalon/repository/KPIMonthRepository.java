@@ -13,6 +13,8 @@ import java.util.Optional;
 public interface KPIMonthRepository extends JpaRepository<KPIMonth, Long> {
     Optional<KPIMonth> findByEmployeeAndMonthAndEmployeeRole(AccountForEmployee employee, String month, String role);
 
+    KPIMonth findKPIMonthByEmployeeAndMonthAndEmployeeRole(AccountForEmployee employee, String month, String role);
+
     Page<KPIMonth> findByMonthAndEmployeeRole(String month, String role, Pageable pageable);
 
     Page<KPIMonth> findByEmployeeRole(String role, Pageable pageable);

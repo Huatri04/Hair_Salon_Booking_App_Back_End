@@ -58,9 +58,10 @@ public class AuthenticationService implements UserDetailsService {
 
     @Autowired
     TokenService tokenService;
+
     @Validated(CreatedBy.class)// phan vao nhom created
     // logic dang ki tk cho guest
-    public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer){
+    public AccountForCustomerResponse register(RegisterRequestForCustomer registerRequestForCustomer) {
         AccountForCustomer account = modelMapper.map(registerRequestForCustomer, AccountForCustomer.class);
 
         // Kiểm tra định dạng email
@@ -102,7 +103,7 @@ public class AuthenticationService implements UserDetailsService {
 
             return modelMapper.map(newAccount, AccountForCustomerResponse.class);
         } catch (Exception e) {
-            if(e.getMessage().contains(account.getEmail())){
+            if (e.getMessage().contains(account.getEmail())) {
                 throw new Duplicate("duplicate email!");
             } else if (e.getMessage().contains(account.getPhoneNumber())) {
                 throw new Duplicate("duplicate phone!");
@@ -126,7 +127,7 @@ public class AuthenticationService implements UserDetailsService {
 
     // update profile cho customer
 
-    public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer){
+    public EditProfileCustomerResponse updatedAccount(RequestEditProfileCustomer requestEditProfileCustomer) {
 //        AccountForCustomer account = modelMapper.map(requestEditProfileCustomer, AccountForCustomer.class);
 //        AccountForCustomer oldAccount = accountForCustomerRepository.findByPhoneNumber(phone);
         AccountForCustomer oldAccount = getCurrentAccountForCustomer();
@@ -134,7 +135,7 @@ public class AuthenticationService implements UserDetailsService {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
 
-            try{
+            try {
 // vi model mapper ko nhan biet dc old vs new password nen lam ntn
                 // Cập nhật email
                 if (requestEditProfileCustomer.getEmail() != null && !requestEditProfileCustomer.getEmail().isEmpty()) {
@@ -171,7 +172,7 @@ public class AuthenticationService implements UserDetailsService {
                 AccountForCustomer updatedAccount = accountForCustomerRepository.save(oldAccount);
                 return modelMapper.map(updatedAccount, EditProfileCustomerResponse.class);
             } catch (DataIntegrityViolationException e) {
-                if(e.getMessage().contains(requestEditProfileCustomer.getEmail())){
+                if (e.getMessage().contains(requestEditProfileCustomer.getEmail())) {
                     throw new UpdatedException("duplicate email!");
                 } else if (e.getMessage().contains(requestEditProfileCustomer.getNewPassword())) {
                     throw new UpdatedException("duplicate password!");
@@ -182,78 +183,76 @@ public class AuthenticationService implements UserDetailsService {
     }
 
 
-
     // logic update profile cho employee
 
 
     public EditProfileEmployeeResponse updatedAccount(RequestEditProfileEmployee requestEditProfileEmployee) {
 //        AccountForEmployee account = modelMapper.map(requestEditProfileEmployee, AccountForEmployee.class);
-            AccountForEmployee oldAccount = getCurrentAccountForEmployee();
-            if (oldAccount == null) {
-                throw new Duplicate("Account not found!");// cho dung luon
-            } else {
-                try{
-                    // phai lam nhu thu cong ntn vi modelMapper ko nhan biet dc new vs old password
-                    // Cập nhật email
-                    if (requestEditProfileEmployee.getEmail() != null && !requestEditProfileEmployee.getEmail().isEmpty()) {
-                        oldAccount.setEmail(requestEditProfileEmployee.getEmail());
+        AccountForEmployee oldAccount = getCurrentAccountForEmployee();
+        if (oldAccount == null) {
+            throw new Duplicate("Account not found!");// cho dung luon
+        } else {
+            try {
+                // phai lam nhu thu cong ntn vi modelMapper ko nhan biet dc new vs old password
+                // Cập nhật email
+                if (requestEditProfileEmployee.getEmail() != null && !requestEditProfileEmployee.getEmail().isEmpty()) {
+                    oldAccount.setEmail(requestEditProfileEmployee.getEmail());
+                }
+
+                // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
+                if (requestEditProfileEmployee.getPhoneNumber() != null && !requestEditProfileEmployee.getPhoneNumber().isEmpty()) {
+                    oldAccount.setPhoneNumber(requestEditProfileEmployee.getPhoneNumber());
+                }
+
+                // Kiểm tra và cập nhật tên
+                if (requestEditProfileEmployee.getName() != null && !requestEditProfileEmployee.getName().isEmpty()) {
+                    oldAccount.setName(requestEditProfileEmployee.getName());
+                }
+
+                // Kiểm tra và cập nhật ảnh
+                if (requestEditProfileEmployee.getImg() != null && !requestEditProfileEmployee.getImg().isEmpty()) {
+                    oldAccount.setImg(requestEditProfileEmployee.getImg());
+                }
+
+                // Xử lý đổi mật khẩu
+                String oldPassword = requestEditProfileEmployee.getOldPassword();
+                String newPassword = requestEditProfileEmployee.getNewPassword();
+
+                if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
+                    // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
+                    if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
+                        throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
                     }
 
-                    // Kiểm tra số điện thoại hợp lệ (ví dụ: 10 chữ số)
-                    if (requestEditProfileEmployee.getPhoneNumber() != null && !requestEditProfileEmployee.getPhoneNumber().isEmpty()) {
-                        oldAccount.setPhoneNumber(requestEditProfileEmployee.getPhoneNumber());
+                    if (newPassword.length() < 6) {
+                        throw new UpdatedException("Mật khẩu mới phải có ít nhất 6 ký tự.");
                     }
 
-                    // Kiểm tra và cập nhật tên
-                    if (requestEditProfileEmployee.getName() != null && !requestEditProfileEmployee.getName().isEmpty()) {
-                        oldAccount.setName(requestEditProfileEmployee.getName());
+                    // Kiểm tra mật khẩu cũ
+                    if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
+                        throw new UpdatedException("Mật khẩu cũ không chính xác.");
                     }
 
-                    // Kiểm tra và cập nhật ảnh
-                    if (requestEditProfileEmployee.getImg() != null && !requestEditProfileEmployee.getImg().isEmpty()) {
-                        oldAccount.setImg(requestEditProfileEmployee.getImg());
-                    }
+                    // Mã hóa mật khẩu mới và cập nhật
+                    String encodedNewPassword = passwordEncoder.encode(newPassword);
+                    oldAccount.setPassword(encodedNewPassword);
+                }
 
-                    // Xử lý đổi mật khẩu
-                    String oldPassword = requestEditProfileEmployee.getOldPassword();
-                    String newPassword = requestEditProfileEmployee.getNewPassword();
-
-                    if (StringUtils.hasText(newPassword) || StringUtils.hasText(oldPassword)) {
-                        // Nếu muốn đổi mật khẩu, cả hai trường phải được điền
-                        if (!StringUtils.hasText(oldPassword) || !StringUtils.hasText(newPassword)) {
-                            throw new UpdatedException("Cần nhập cả mật khẩu cũ và mật khẩu mới để đổi mật khẩu.");
-                        }
-
-                        if (newPassword.length() < 6) {
-                            throw new UpdatedException("Mật khẩu mới phải có ít nhất 6 ký tự.");
-                        }
-
-                        // Kiểm tra mật khẩu cũ
-                        if (!passwordEncoder.matches(oldPassword, oldAccount.getPassword())) {
-                            throw new UpdatedException("Mật khẩu cũ không chính xác.");
-                        }
-
-                        // Mã hóa mật khẩu mới và cập nhật
-                        String encodedNewPassword = passwordEncoder.encode(newPassword);
-                        oldAccount.setPassword(encodedNewPassword);
-                    }
-
-                    // Lưu cập nhật vào cơ sở dữ liệu
-                    AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
-                    return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
-                } catch (Exception e) {
-                    if(e.getMessage().contains(requestEditProfileEmployee.getEmail())){
-                        throw new UpdatedException("duplicate email!");
-                    } else if (e.getMessage().contains(requestEditProfileEmployee.getPhoneNumber())) {
-                        throw new UpdatedException("duplicate phone!");
-                    } else if (e.getMessage().contains(requestEditProfileEmployee.getNewPassword())) {
-                        throw new UpdatedException("duplicate password!");
-                    }
+                // Lưu cập nhật vào cơ sở dữ liệu
+                AccountForEmployee updatedAccount = employeeRepository.save(oldAccount);
+                return modelMapper.map(updatedAccount, EditProfileEmployeeResponse.class);
+            } catch (Exception e) {
+                if (e.getMessage().contains(requestEditProfileEmployee.getEmail())) {
+                    throw new UpdatedException("duplicate email!");
+                } else if (e.getMessage().contains(requestEditProfileEmployee.getPhoneNumber())) {
+                    throw new UpdatedException("duplicate phone!");
+                } else if (e.getMessage().contains(requestEditProfileEmployee.getNewPassword())) {
+                    throw new UpdatedException("duplicate password!");
                 }
             }
-            return null;
+        }
+        return null;
     }
-
 
 
     public EditProfileEmployeeResponse updatedAccountByManager(RequestUpdateProfileEmployeeByManager requestUpdateProfileEmployeeByManager, String id) {
@@ -262,13 +261,13 @@ public class AuthenticationService implements UserDetailsService {
         if (oldAccount == null || !oldAccount.getRole().equalsIgnoreCase("Stylist")) {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
-            try{
+            try {
                 if (account.getStylistLevel() != null && !account.getStylistLevel().isEmpty()) {
                     oldAccount.setStylistLevel(account.getStylistLevel());
                 }
 
                 if (account.getTargetKPI() != null) {
-                    if(account.getTargetKPI() < 0 ){
+                    if (account.getTargetKPI() < 0) {
                         throw new UpdatedException("Target KPI must be at least 0");
                     }
                     oldAccount.setTargetKPI(account.getTargetKPI());
@@ -276,20 +275,42 @@ public class AuthenticationService implements UserDetailsService {
 
                 // Lưu KPI vào bảng KPI theo tháng
                 String currentMonth = LocalDate.now().getMonth().toString() + "-" + LocalDate.now().getYear();
-                KPIMonth kpiMonth = new KPIMonth();
-                kpiMonth.setKpi(oldAccount.getKPI());
-                kpiMonth.setTargetKPI(oldAccount.getTargetKPI());
-                kpiMonth.setMonth(currentMonth);
-                kpiMonth.setEmployee(oldAccount);
-                kpiMonthRepository.save(kpiMonth); // Lưu vào bảng KPI theo tháng
 
-                if(account.getStylistSelectionFee() != null){
-                    if(account.getStylistSelectionFee() < 0){
+
+                // Kiểm tra xem đã có bản ghi KPI cho stylist này trong tháng hiện tại chưa
+                KPIMonth existingKPIRecord = kpiMonthRepository.findKPIMonthByEmployeeAndMonthAndEmployeeRole(oldAccount, currentMonth, "Stylist");
+
+                System.out.println(existingKPIRecord);
+                if (existingKPIRecord != null) {
+                    // Nếu đã có
+                    existingKPIRecord.setTargetKPI(oldAccount.getTargetKPI());
+
+                    kpiMonthRepository.save(existingKPIRecord);
+                } else {
+                    // Nếu chưa có, tạo bản ghi KPI mới cho tháng hiện tại
+                    KPIMonth kpiMonth = new KPIMonth();
+                    kpiMonth.setKpi(0);
+                    kpiMonth.setTargetKPI(oldAccount.getTargetKPI());
+                    kpiMonth.setMonth(currentMonth);
+                    kpiMonth.setEmployee(oldAccount);
+                    System.out.println(kpiMonth);
+                    kpiMonthRepository.save(kpiMonth);
+                }
+
+
+//                KPIMonth kpiMonth = new KPIMonth();
+//                kpiMonth.setKpi(oldAccount.getKPI());
+//                kpiMonth.setTargetKPI(oldAccount.getTargetKPI());
+//                kpiMonth.setMonth(currentMonth);
+//                kpiMonth.setEmployee(oldAccount);
+//                kpiMonthRepository.save(kpiMonth); // Lưu vào bảng KPI theo tháng
+
+                if (account.getStylistSelectionFee() != null) {
+                    if (account.getStylistSelectionFee() < 0) {
                         throw new UpdatedException("Stylist Selection Fee must be at least 0");
                     }
                     oldAccount.setStylistSelectionFee(account.getStylistSelectionFee());
                 }
-
 
 
                 // Lưu cập nhật vào cơ sở dữ liệu
@@ -342,9 +363,9 @@ public class AuthenticationService implements UserDetailsService {
         if (oldAccount == null) {
             throw new Duplicate("Account not found!");// cho dung luon
         } else {
-            try{
+            try {
                 if (account.getBasicSalary() != null) {
-                    if(account.getBasicSalary() < 0 ){
+                    if (account.getBasicSalary() < 0) {
                         throw new UpdatedException("Basic Salary must be at least 0");
                     }
                     oldAccount.setBasicSalary(account.getBasicSalary());
@@ -365,32 +386,32 @@ public class AuthenticationService implements UserDetailsService {
         if (oldAccount == null) {
             throw new Duplicate("Account not found!");
         } else {
-            try{
+            try {
                 String role = oldAccount.getRole();
 
                 // Ánh xạ thủ công cho các thuộc tính có vấn đề
                 if (requestEditSsalaryEmployee.getBasicSalary() != null) {
-                    if(requestEditSsalaryEmployee.getBasicSalary() < 0){
+                    if (requestEditSsalaryEmployee.getBasicSalary() < 0) {
                         throw new UpdatedException("Basic Salary must be at least 0");
                     }
                     oldAccount.setBasicSalary(requestEditSsalaryEmployee.getBasicSalary());
                 }
 
-                if("Stylist".equalsIgnoreCase(role)){
+                if ("Stylist".equalsIgnoreCase(role)) {
                     if (requestEditSsalaryEmployee.getCommessionOverratedFromKPI() != null) {
-                        if(requestEditSsalaryEmployee.getCommessionOverratedFromKPI() < 0){
+                        if (requestEditSsalaryEmployee.getCommessionOverratedFromKPI() < 0) {
                             throw new UpdatedException("Commession Overrated From KPI must be at least 0");
                         }
                         oldAccount.setCommessionOverratedFromKPI(requestEditSsalaryEmployee.getCommessionOverratedFromKPI());
                     }
 
-                    if(requestEditSsalaryEmployee.getFineUnderatedFromKPI() != null){
-                        if(requestEditSsalaryEmployee.getFineUnderatedFromKPI() < 0){
+                    if (requestEditSsalaryEmployee.getFineUnderatedFromKPI() != null) {
+                        if (requestEditSsalaryEmployee.getFineUnderatedFromKPI() < 0) {
                             throw new UpdatedException("Fine Underated From KPI must be at least 0");
                         }
                         oldAccount.setFineUnderatedFromKPI(requestEditSsalaryEmployee.getFineUnderatedFromKPI());
                     }
-                }else{
+                } else {
                     oldAccount.setCommessionOverratedFromKPI(null);
                     oldAccount.setFineUnderatedFromKPI(null);
                 }
@@ -499,11 +520,9 @@ public class AuthenticationService implements UserDetailsService {
     }
 
 
-
-
     //LOGIN CUSTOMER
-    public AccountForCustomerResponse loginForCustomer(LoginRequestForCustomer loginRequestForCustomer){
-        try{
+    public AccountForCustomerResponse loginForCustomer(LoginRequestForCustomer loginRequestForCustomer) {
+        try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequestForCustomer.getPhoneNumber(),
                     loginRequestForCustomer.getPassword()
@@ -511,7 +530,7 @@ public class AuthenticationService implements UserDetailsService {
 
             //=> tài khoản có tồn tại
             AccountForCustomer account = (AccountForCustomer) authentication.getPrincipal();
-            if(account.isDeleted()){
+            if (account.isDeleted()) {
                 throw new Duplicate("Your account is blocked!");
             } else {
                 AccountForCustomerResponse accountResponseForCustomer = modelMapper.map(account, AccountForCustomerResponse.class);
@@ -525,8 +544,8 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     //LOGIN EMPLOYEE
-    public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee){
-        try{
+    public AccountForEmployeeResponse loginForEmployee(LoginRequestForEmployee loginRequestForEmployee) {
+        try {
             Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
                     loginRequestForEmployee.getUsername(),
                     loginRequestForEmployee.getPassword()
@@ -534,7 +553,7 @@ public class AuthenticationService implements UserDetailsService {
 
             //=> tài khoản có tồn tại
             AccountForEmployee account = (AccountForEmployee) authentication.getPrincipal();
-            if(account.isDeleted()){
+            if (account.isDeleted()) {
                 throw new AccountBlockedException("Your account is blocked!");
             } else {
                 AccountForEmployeeResponse accountResponseForEmployee = modelMapper.map(account, AccountForEmployeeResponse.class);
@@ -548,10 +567,10 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     //delete Acc customer
-    public AccountForCustomerResponse deleteAccountForCustomer(String phoneNumber){
+    public AccountForCustomerResponse deleteAccountForCustomer(String phoneNumber) {
         // tim toi id ma FE cung cap
         AccountForCustomer accountForCustomerNeedDelete = accountForCustomerRepository.findByPhoneNumber(phoneNumber);
-        if(accountForCustomerNeedDelete == null){
+        if (accountForCustomerNeedDelete == null) {
             throw new Duplicate("Account For Customer not found!"); // dung tai day
         }
 
@@ -561,10 +580,10 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     //delete Acc employee
-    public AccountForEmployeeResponse deleteAccountForEmployee(String emlpoyeeId){
+    public AccountForEmployeeResponse deleteAccountForEmployee(String emlpoyeeId) {
         // tim toi id ma FE cung cap
         AccountForEmployee accountForEmployeeNeedDelete = employeeRepository.findAccountForEmployeeByEmployeeId(emlpoyeeId);
-        if(accountForEmployeeNeedDelete == null){
+        if (accountForEmployeeNeedDelete == null) {
             throw new Duplicate("Account For Customer not found!"); // dung tai day
         }
 
@@ -574,24 +593,24 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     // show list of Account For Customer
-    public List<AccountForCustomer> getAllAccountForCustomer(){
+    public List<AccountForCustomer> getAllAccountForCustomer() {
         List<AccountForCustomer> accountForCustomers = accountForCustomerRepository.findAccountForCustomersByIsDeletedFalse();
         return accountForCustomers;
     }
 
     // show list of Account For Employee
-    public List<AccountForEmployee> getAllAccountForEmployee(){
+    public List<AccountForEmployee> getAllAccountForEmployee() {
         List<AccountForEmployee> accountForEmployees = employeeRepository.findAccountForEmployeesByIsDeletedFalse();
         return accountForEmployees;
     }
 
-    public List<EmployeeInfo> getEmployeeByRole(FindEmployeeRequest findEmployeeRequest){
+    public List<EmployeeInfo> getEmployeeByRole(FindEmployeeRequest findEmployeeRequest) {
         String status = "Workday";
         List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
-        if(findEmployeeRequest.getRole().equals("Stylist")){
-            if(findEmployeeRequest.getStylistLevel().equals("Normal")){
+        if (findEmployeeRequest.getRole().equals("Stylist")) {
+            if (findEmployeeRequest.getStylistLevel().equals("Normal")) {
                 accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Normal", status);
-            } else if(findEmployeeRequest.getStylistLevel().equals("Expert")){
+            } else if (findEmployeeRequest.getStylistLevel().equals("Expert")) {
                 accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStylistLevelAndStatusAndIsDeletedFalse("Stylist", "Expert", status);
             } else {
                 throw new EntityNotFoundException("Stylist not found!");
@@ -600,9 +619,9 @@ public class AuthenticationService implements UserDetailsService {
             accountForEmployeeList = employeeRepository.findAccountForEmployeesByRoleAndStatusAndIsDeletedFalse(findEmployeeRequest.getRole(), status);
         }
 
-        if(accountForEmployeeList != null){
+        if (accountForEmployeeList != null) {
             List<EmployeeInfo> employeeInfoList = new ArrayList<>();
-            for(AccountForEmployee accountForEmployee : accountForEmployeeList){
+            for (AccountForEmployee accountForEmployee : accountForEmployeeList) {
                 EmployeeInfo employeeInfo = modelMapper.map(accountForEmployee, EmployeeInfo.class);
                 employeeInfoList.add(employeeInfo);
             }
@@ -614,24 +633,21 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     //GET PROFILE CUSTOMER
-    public ProfileCustomer getProfileCustomer(){
+    public ProfileCustomer getProfileCustomer() {
         AccountForCustomer accountForCustomer = getCurrentAccountForCustomer();
         return modelMapper.map(accountForCustomer, ProfileCustomer.class);
     }
 
     //GET PROFILE EMPLOYEE
-    public ProfileEmployee getProfileEmployee(){
+    public ProfileEmployee getProfileEmployee() {
         AccountForEmployee accountForEmployee = getCurrentAccountForEmployee();
         return modelMapper.map(accountForEmployee, ProfileEmployee.class);
     }
 
 
-
-
-
     @Override
     public UserDetails loadUserByUsername(String input) throws UsernameNotFoundException {
-        if(isPhoneNumber(input)){
+        if (isPhoneNumber(input)) {
             return loadUserByPhoneNumber(input);
         } else {
             return loadUserByName(input);
@@ -639,7 +655,7 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public UserDetails loadUserByPhoneNumber(String phoneNumber) throws UsernameNotFoundException {
-        if(accountForCustomerRepository.findByPhoneNumber(phoneNumber)!=null){
+        if (accountForCustomerRepository.findByPhoneNumber(phoneNumber) != null) {
             return accountForCustomerRepository.findByPhoneNumber(phoneNumber);
         } else {
             throw new AccountNotFoundException("Phonenumber or password invalid!");
@@ -647,7 +663,7 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     public UserDetails loadUserByName(String username) throws UsernameNotFoundException {
-        if(employeeRepository.findAccountForEmployeeByUsername(username)!=null){
+        if (employeeRepository.findAccountForEmployeeByUsername(username) != null) {
             return employeeRepository.findAccountForEmployeeByUsername(username);
         } else {
             throw new AccountNotFoundException("Username or password invalid!");
@@ -695,17 +711,18 @@ public class AuthenticationService implements UserDetailsService {
     }
 
     //HÀM GET PROFILE CUSTOMER THEO PHONENUMBER
-    public ProfileCustomer getProfileCusById(String phone){
+    public ProfileCustomer getProfileCusById(String phone) {
         AccountForCustomer accountForCustomer = accountForCustomerRepository.findByPhoneNumber(phone);
-        if (accountForCustomer == null){
+        if (accountForCustomer == null) {
             throw new EntityNotFoundException("Customer not found!!!");
         }
         return modelMapper.map(accountForCustomer, ProfileCustomer.class);
     }
+
     //HÀM GET PROFILE EMPLOYEE THEO ID
-    public ProfileEmployee getProfileEmpById(String id){
+    public ProfileEmployee getProfileEmpById(String id) {
         AccountForEmployee accountForEmployee = employeeRepository.findAccountForEmployeeByEmployeeId(id);
-        if (accountForEmployee == null){
+        if (accountForEmployee == null) {
             throw new EntityNotFoundException("Employee not found!!!");
         }
         return modelMapper.map(accountForEmployee, ProfileEmployee.class);
@@ -713,14 +730,14 @@ public class AuthenticationService implements UserDetailsService {
 
     public void forgotPassword(String email) {
         AccountForCustomer account = accountForCustomerRepository.findAccountForCustomerByEmail(email);
-        if(account == null) {
+        if (account == null) {
             throw new EntityNotFoundException("Account not found");
         }
         String token = tokenService.generateTokenCustomer(account);
         EmailDetail emailDetail = new EmailDetail();
         emailDetail.setReceiver(account);//set receiver
         emailDetail.setSubject("Reset password");
-        emailDetail.setLink("https://www.google.com/?token="+token);
+        emailDetail.setLink("https://www.google.com/?token=" + token);
         emailService.sendEmailResetPassword(emailDetail);
 
     }
@@ -728,7 +745,7 @@ public class AuthenticationService implements UserDetailsService {
     public AccountForCustomer resetPassword(ResetPasswordRequest resetPasswordRequest) {
         AccountForCustomer account = getCurrentAccountForCustomer();
         account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
-        try{
+        try {
             accountForCustomerRepository.save(account);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
@@ -739,14 +756,14 @@ public class AuthenticationService implements UserDetailsService {
 
     public void forgotPasswordEmployee(String email) {
         AccountForEmployee account = employeeRepository.findByEmail(email);
-        if(account == null) {
+        if (account == null) {
             throw new EntityNotFoundException("Account not found");
         }
         String token = tokenService.generateTokenEmployee(account);
         EmailDetailForEmployee emailDetail = new EmailDetailForEmployee();
         emailDetail.setReceiver(account);//set receiver
         emailDetail.setSubject("Reset password");
-        emailDetail.setLink("https://www.google.com/?token="+token);
+        emailDetail.setLink("https://www.google.com/?token=" + token);
         emailService.sendEmailToEmployee(emailDetail);
 
     }
@@ -754,7 +771,7 @@ public class AuthenticationService implements UserDetailsService {
     public AccountForEmployee resetPasswordEmployee(ResetPasswordRequest resetPasswordRequest) {
         AccountForEmployee account = getCurrentAccountForEmployee();
         account.setPassword(passwordEncoder.encode(resetPasswordRequest.getPassword()));
-        try{
+        try {
             employeeRepository.save(account);
         } catch (RuntimeException e) {
             throw new RuntimeException(e);
