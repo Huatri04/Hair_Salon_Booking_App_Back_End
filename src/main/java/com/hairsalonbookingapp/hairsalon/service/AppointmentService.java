@@ -16,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class AppointmentService {
@@ -63,6 +64,9 @@ public class AppointmentService {
 
     @Autowired
     ShiftEmployeeRepository shiftEmployeeRepository;
+
+    @Autowired
+    KPIMonthRepository kpiMonthRepository;
 
     //CUSTOMER XEM VÀ CHỌN DỊCH VỤ
     //- CHỨC NĂNG getAllAvailableService(); BÊN HAIR SALON BOOKING APP SERVICE : CUSTOMER XEM CÁC DỊCH VỤ KHẢ DỤNG
@@ -257,9 +261,8 @@ public class AppointmentService {
 
     // XÓA APPOINTMENT -> CUSTOMER LÀM
     public String deleteAppointmentByCustomer(long idAppointment){
-        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
         Appointment oldAppointment = appointmentRepository
-                .findAppointmentByAppointmentIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);  //TÌM LẠI APPOINTMENT CŨ
+                .findAppointmentByAppointmentId(idAppointment);  //TÌM LẠI APPOINTMENT CŨ
         if(oldAppointment != null){
             oldAppointment.setDeleted(true);
 
@@ -343,6 +346,7 @@ public class AppointmentService {
         }
 
         appointment.setCompleted(true);
+        appointment.setStatus("Đã thanh toán");
         Appointment newAppointment = appointmentRepository.save(appointment);
 
         AccountForCustomer accountForCustomer = newAppointment.getAccountForCustomer();
@@ -410,32 +414,86 @@ public class AppointmentService {
         }
     }
 
-    // HÀM TRẢ VỀ DANH SÁCH CÁC STYLIST VÀ KPI
-    public List<KPITotal> getAllKPI(){
-        List<KPITotal> kpiTotalList = new ArrayList<>();
-        for(AccountForEmployee account : getAllStylistList()){
-            KPITotal kpiTotal = new KPITotal();
-            kpiTotal.setStylistId(account.getEmployeeId());
-            kpiTotal.setKPI(account.getKPI());
-            kpiTotal.setTargetKPI(account.getTargetKPI());
+//    // HÀM TRẢ VỀ DANH SÁCH CÁC STYLIST VÀ KPI
+//    public List<KPITotal> getAllKPI(){
+//        List<KPITotal> kpiTotalList = new ArrayList<>();
+//        for(AccountForEmployee account : getAllStylistList()){
+//            KPITotal kpiTotal = new KPITotal();
+//            kpiTotal.setStylistId(account.getEmployeeId());
+//            kpiTotal.setKPI(account.getKPI());
+//            kpiTotal.setTargetKPI(account.getTargetKPI());
+//
+//            kpiTotalList.add(kpiTotal);
+//            account.setKPI(0);
+//            employeeRepository.save(account);
+//        }
+//        return kpiTotalList;
+//    }
 
-            kpiTotalList.add(kpiTotal);
-            account.setKPI(0);
-            employeeRepository.save(account);
+    public KPIMonthListResponse getAllKPI(String month, int page, int size) {
+        // Lấy dữ liệu từ repository và phân trang
+        Page<KPIMonth> kpiMonthPage = kpiMonthRepository.findByMonthAndEmployeeRole(month,"Stylist", PageRequest.of(page, size));
+
+        // Chuyển đổi từng KPIMonth thành KPIMonthResponseDTO
+        List<KPIMonthResponseDTO> content = new ArrayList<>();
+        for (KPIMonth kpiMonth : kpiMonthPage.getContent()) {
+            KPIMonthResponseDTO dto = new KPIMonthResponseDTO();
+            dto.setId(kpiMonth.getId());
+            dto.setKpi(kpiMonth.getKpi());
+            dto.setTargetKPI(kpiMonth.getTargetKPI());
+            dto.setMonth(kpiMonth.getMonth());
+            dto.setEmployeeId(kpiMonth.getEmployee().getEmployeeId());
+            dto.setEmployeeName(kpiMonth.getEmployee().getName());
+            content.add(dto);
         }
-        return kpiTotalList;
+
+        // Tạo đối tượng phản hồi và thiết lập các thuộc tính
+        KPIMonthListResponse kpiMonthListResponse = new KPIMonthListResponse();
+        kpiMonthListResponse.setTotalPage(kpiMonthPage.getTotalPages());
+        kpiMonthListResponse.setContent(content);
+        kpiMonthListResponse.setPageNumber(kpiMonthPage.getNumber());
+        kpiMonthListResponse.setTotalElement(kpiMonthPage.getTotalElements());
+
+        return kpiMonthListResponse;
     }
 
-    // UPDATE APPOINTMENT ->  CUSTOMER LÀM
+    public KPIMonthListResponse getAllKPIAllMonth(int page, int size) {
+        // Lấy dữ liệu từ repository và phân trang
+        Page<KPIMonth> kpiMonthPage = kpiMonthRepository.findByEmployeeRole("Stylist", PageRequest.of(page, size));
 
-    public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long idAppointment){
-        AccountForCustomer accountForCustomer = authenticationService.getCurrentAccountForCustomer();
-        Appointment oldAppointment = appointmentRepository
-                .findAppointmentByAppointmentIdAndAccountForCustomerAndIsDeletedFalse(idAppointment, accountForCustomer);
-        if(oldAppointment == null){
-            throw new EntityNotFoundException("Appointment not found!!!");
+        // Chuyển đổi từng KPIMonth thành KPIMonthResponseDTO
+        List<KPIMonthResponseDTO> content = new ArrayList<>();
+        for (KPIMonth kpiMonth : kpiMonthPage.getContent()) {
+            KPIMonthResponseDTO dto = new KPIMonthResponseDTO();
+            dto.setId(kpiMonth.getId());
+            dto.setKpi(kpiMonth.getKpi());
+            dto.setTargetKPI(kpiMonth.getTargetKPI());
+            dto.setMonth(kpiMonth.getMonth());
+            dto.setEmployeeId(kpiMonth.getEmployee().getEmployeeId());
+            dto.setEmployeeName(kpiMonth.getEmployee().getName());
+            content.add(dto);
         }
 
+        // Tạo đối tượng phản hồi và thiết lập các thuộc tính
+        KPIMonthListResponse kpiMonthListResponse = new KPIMonthListResponse();
+        kpiMonthListResponse.setTotalPage(kpiMonthPage.getTotalPages());
+        kpiMonthListResponse.setContent(content);
+        kpiMonthListResponse.setPageNumber(kpiMonthPage.getNumber());
+        kpiMonthListResponse.setTotalElement(kpiMonthPage.getTotalElements());
+
+        return kpiMonthListResponse;
+    }
+
+
+    // UPDATE APPOINTMENT ->  CUSTOMER LÀM
+// UPDATE APPOINTMENT
+    public AppointmentResponse updateAppointment(AppointmentUpdate appointmentUpdate, long idAppointment){
+        boolean StylistChange = false;
+
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentByAppointmentId(idAppointment);
+        boolean isSystemChose = oldAppointment.isSystemChose();
+        AccountForCustomer accountForCustomer = oldAppointment.getAccountForCustomer();
         // LẤY LẠI APPOINTMENT REQUEST CŨ
         List<Long> oldServiceIdList = new ArrayList<>();
         List<HairSalonService> hairSalonServiceList = oldAppointment.getHairSalonServices();
@@ -457,7 +515,7 @@ public class AppointmentService {
         oldRequest.setServiceIdList(oldServiceIdList);
 
 
-        // TẠO APPOINTMENT MỚI
+        // TẠO APPOINTMENT REQUEST MỚI
         AppointmentRequest appointmentRequest = new AppointmentRequest();
 
         String newDate = appointmentUpdate.getDate();
@@ -479,6 +537,7 @@ public class AppointmentService {
 
         if (!newStylistId.isEmpty() && !newStylistId.equals(oldRequest.getStylistId())){
             appointmentRequest.setStylistId(newStylistId);
+            StylistChange = true;
         } else {
             appointmentRequest.setStylistId(oldRequest.getStylistId());
         }
@@ -495,17 +554,10 @@ public class AppointmentService {
             appointmentRequest.setDiscountCode(oldRequest.getDiscountCode());
         }
 
-        // Ghi log để kiểm tra giá trị trước khi xóa và tạo mới
-        System.out.println("Deleting appointment ID: " + oldAppointment.getAppointmentId());
-        System.out.println("Creating new appointment with request: " + appointmentRequest);
-
-
         //XÓA APPOINTMENT CŨ VÀ TẠO CÁI MỚI
         deleteAppointmentByCustomer(oldAppointment.getAppointmentId());
-
-        return createNewAppointment(appointmentRequest);
+        return createNewAppointmentByStaffWithCustomerAcc(appointmentRequest, accountForCustomer, StylistChange, isSystemChose);
     }
-
     //HỆ THỐNG TỰ TÌM STYLIST PHÙ HỢP VÀ ĐẶT LỊCH LUÔN CHO KHÁCH - LÀM BỞI CUSTOMER
     public  AppointmentResponse createNewAppointmentBySystem(AppointmentRequestSystem appointmentRequestSystem){
         List<Slot> slotList = slotRepository
@@ -514,11 +566,13 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
-            /*for(Slot slot : slotList){
-                accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
-                break;
-            }*/
+            List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
+            for(Slot slot : slotList){
+                AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+                accountForEmployeeList.add(account);
+            }
+
+            AccountForEmployee accountForEmployee = getStylistWithLeastKPI(accountForEmployeeList);
 
 
             //LOGIC Y CHANG HÀM TẠO, KHÁC Ở CHỖ STYLIST EXPERT KHÔNG CỘNG BONUS THÊM
@@ -537,6 +591,8 @@ public class AppointmentService {
                 }
                 //TẠO APPOINTMENT
                 Appointment appointment = new Appointment();
+
+                appointment.setSystemChose(true);
 
                 // SLOT
                 //Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
@@ -619,15 +675,17 @@ public class AppointmentService {
                 emailDetail.setStartHour(appointmentResponse.getStartHour());
                 emailService.sendEmailCreateAppointment(emailDetail);
 
+
                 return appointmentResponse;
             } catch (Exception e) {
                 throw new EntityNotFoundException("Can not create appointment: " + e.getMessage());
             }
-//-----------------------------------------------------------------------------------------------
+            //-----------------------------------------------------------------------------------------------
         } else {
             throw new EntityNotFoundException("Can not find slot!");
         }
     }
+
 
     //STAFF ĐẶT LỊCH HẸN CHO GUEST
     public AppointmentResponse createNewAppointmentByStaff(AppointmentRequest appointmentRequest){
@@ -715,7 +773,13 @@ public class AppointmentService {
                         appointmentRequestSystem.getStartHour()
                 );
         if(!slotList.isEmpty()){
-            AccountForEmployee accountForEmployee = slotList.get(0).getShiftEmployee().getAccountForEmployee();
+            List<AccountForEmployee> accountForEmployeeList = new ArrayList<>();
+            for(Slot slot : slotList){
+                AccountForEmployee account = slot.getShiftEmployee().getAccountForEmployee();
+                accountForEmployeeList.add(account);
+            }
+
+            AccountForEmployee accountForEmployee = getStylistWithLeastKPI(accountForEmployeeList);
 
             //LOGIC Y CHANG HÀM TẠO, KHÁC Ở CHỖ STYLIST EXPERT KHÔNG CỘNG BONUS THÊM
             try {
@@ -732,6 +796,8 @@ public class AppointmentService {
                 }
                 //TẠO APPOINTMENT
                 Appointment appointment = new Appointment();
+
+                appointment.setSystemChose(true);
 
                 // SLOT
                 //Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
@@ -765,6 +831,7 @@ public class AppointmentService {
                 slot.setAppointments(newAppointment);
                 slot.setAvailable(false);
                 slotRepository.save(slot);
+
                 for(HairSalonService hairSalonService : hairSalonServiceList){
                     List<Appointment> appointments = hairSalonService.getAppointments();
                     appointments.add(newAppointment);
@@ -791,6 +858,7 @@ public class AppointmentService {
             throw new EntityNotFoundException("Can not find slot!");
         }
     }
+
 
 
     //HÀM TÌM KIẾM THÔNG TIN APPOINTMENT -> STAFF LÀM
@@ -871,6 +939,325 @@ public class AppointmentService {
         appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
 
         return appointmentResponsePage;
+    }
+
+    //HÀM LẤY TOÀN BỘ APPOINTMENT CHƯA HOÀN THÀNH -> STAFF LÀM
+    public AppointmentResponsePage getAllUnCompletedAppontments(String date, int page, int size){
+        Page<Appointment> appointmentPage = appointmentRepository
+                .findAppointmentsByDateAndIsCompletedFalseAndIsDeletedFalse(date, PageRequest.of(page, size));
+        if(appointmentPage.getContent().isEmpty()){
+            throw new EntityNotFoundException("Appointment not found!");
+        }
+        List<AppointmentResponseInfo> appointmentResponseInfoList = new ArrayList<>();
+        for(Appointment appointment : appointmentPage.getContent()){
+            AppointmentResponseInfo appointmentResponse = new AppointmentResponseInfo();
+
+            appointmentResponse.setId(appointment.getAppointmentId());
+            appointmentResponse.setCost(appointment.getCost());
+            appointmentResponse.setDate(appointment.getDate());
+            appointmentResponse.setStartHour(appointment.getStartHour());
+
+            if(appointment.getAccountForCustomer() == null){
+                appointmentResponse.setCustomer("Guest");
+            } else {
+                appointmentResponse.setCustomer(appointment.getAccountForCustomer().getName());
+            }
+
+            appointmentResponse.setDeleted(appointment.isDeleted());
+            appointmentResponse.setCompleted(appointment.isCompleted());
+
+            List<String> serviceNameList = new ArrayList<>();
+            List<HairSalonService> hairSalonServiceList = appointment.getHairSalonServices();
+            for(HairSalonService service : hairSalonServiceList) {
+                String serviceName = service.getName();
+                serviceNameList.add(serviceName);
+            }
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getEmployeeId());
+
+            appointmentResponseInfoList.add(appointmentResponse);
+        }
+
+        //TẠO RESPONSE
+        AppointmentResponsePage appointmentResponsePage = new AppointmentResponsePage();
+        appointmentResponsePage.setContent(appointmentResponseInfoList);
+        appointmentResponsePage.setPageNumber(appointmentPage.getNumber());
+        appointmentResponsePage.setTotalElements(appointmentPage.getTotalElements());
+        appointmentResponsePage.setTotalPages(appointmentPage.getTotalPages());
+
+        return appointmentResponsePage;
+    }
+
+
+    //XEM CHI TIẾT LỊCH HẸN
+    public AppointmentDetail getAppontmentDetail(long appointmentId){
+        Appointment appointment = appointmentRepository.findAppointmentByAppointmentId(appointmentId);
+        AppointmentDetail appointmentDetail = new AppointmentDetail();
+        appointmentDetail.setId(appointmentId);
+        AccountForEmployee accountForEmployee = appointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        appointmentDetail.setStylist(modelMapper.map(accountForEmployee, EmployeeInfo.class));
+        appointmentDetail.setCustomer("Guest");
+        if(appointment.getAccountForCustomer() != null){
+            appointmentDetail.setCustomer(appointment.getAccountForCustomer().getName());
+        }
+        appointmentDetail.setCompleted(appointment.isCompleted());
+        appointmentDetail.setTotalCost(appointment.getCost());
+        appointmentDetail.setDate(appointment.getDate());
+        appointmentDetail.setStartHour(appointment.getStartHour());
+
+        appointmentDetail.setStatus(appointment.getStatus());
+        String discountCode = null;
+        if(appointment.getDiscountCode() != null){
+            discountCode = appointment.getDiscountCode().getDiscountCodeId() + "(" + appointment.getDiscountCode().getDiscountProgram().getPercentage() + "%" + ")";
+        }
+
+        appointmentDetail.setDiscountCode(discountCode);
+
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
+        for(HairSalonService service : appointment.getHairSalonServices()){
+            hairSalonServiceResponseList.add(modelMapper.map(service, HairSalonServiceResponse.class));
+        }
+        appointmentDetail.setService(hairSalonServiceResponseList);
+        appointmentDetail.setSystemChose(appointment.isSystemChose());
+        appointmentDetail.setStylistFee(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getStylistSelectionFee());
+        if(appointment.isSystemChose()){
+            appointmentDetail.setStylistFee(0);
+        }
+        return appointmentDetail;
+    }
+
+
+    //STAFF ACCEPT APPOINTMENT
+    public AppointmentDetail acceptAppointment(long appointmentId){
+        Appointment appointment = appointmentRepository.findAppointmentByAppointmentId(appointmentId);
+        appointment.setStatus("Đang phục vụ");
+        Appointment newAppointment = appointmentRepository.save(appointment);
+        AppointmentDetail appointmentDetail = new AppointmentDetail();
+        appointmentDetail.setId(appointmentId);
+        AccountForEmployee accountForEmployee = newAppointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        appointmentDetail.setStylist(modelMapper.map(accountForEmployee, EmployeeInfo.class));
+        appointmentDetail.setCustomer("Guest");
+        if(appointment.getAccountForCustomer() != null){
+            appointmentDetail.setCustomer(appointment.getAccountForCustomer().getName());
+        }
+        appointmentDetail.setCompleted(newAppointment.isCompleted());
+        appointmentDetail.setTotalCost(newAppointment.getCost());
+        appointmentDetail.setDate(newAppointment.getDate());
+        appointmentDetail.setStartHour(newAppointment.getStartHour());
+
+        appointmentDetail.setStatus(newAppointment.getStatus());
+        String discountCode = null;
+        if(newAppointment.getDiscountCode() != null){
+            discountCode = newAppointment.getDiscountCode().getDiscountCodeId() + "(" + newAppointment.getDiscountCode().getDiscountProgram().getPercentage() + "%" + ")";
+        }
+
+        appointmentDetail.setDiscountCode(discountCode);
+
+        List<HairSalonServiceResponse> hairSalonServiceResponseList = new ArrayList<>();
+        for(HairSalonService service : newAppointment.getHairSalonServices()){
+            hairSalonServiceResponseList.add(modelMapper.map(service, HairSalonServiceResponse.class));
+        }
+        appointmentDetail.setService(hairSalonServiceResponseList);
+        appointmentDetail.setSystemChose(newAppointment.isSystemChose());
+        appointmentDetail.setStylistFee(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getStylistSelectionFee());
+        if(newAppointment.isSystemChose()){
+            appointmentDetail.setStylistFee(0);
+        }
+        return appointmentDetail;
+    }
+
+    //HÀM CHỌN STYLIST CÓ SỐ KPI ÍT NHẤT HIỆN TẠI
+    public AccountForEmployee getStylistWithLeastKPI(List<AccountForEmployee> accountForEmployeeList){
+        List<Integer> allKPI = new ArrayList<>();
+        for(AccountForEmployee account : accountForEmployeeList){
+            allKPI.add(account.getKPI());
+        }
+        int min = Collections.min(allKPI);
+        for(AccountForEmployee account : accountForEmployeeList){
+            if(account.getKPI() == min){
+                return account;
+            }
+        }
+        return null;
+    }
+
+    //HỖ TRỢ HÀM UPDATE
+    public AppointmentResponse createNewAppointmentByStaffWithCustomerAcc(AppointmentRequest appointmentRequest, AccountForCustomer accountForCustomer, boolean Stylistchange, boolean isSystemChose) {
+        try {
+            List<String> serviceNameList = new ArrayList<>();  //TẠO LIST CHỨA TÊN CÁC DỊCH VỤ CUSTOMER CHỌN
+            List<Long> serviceIdList = appointmentRequest.getServiceIdList();  // LẤY DANH SÁCH ID DỊCH VỤ CUSTOMER CHỌN
+            List<HairSalonService> hairSalonServiceList = new ArrayList<>();   // TẠO LIST CHỨA OBJ DỊCH VỤ
+            double bonusDiscountCode = 0;
+            double bonusEmployee = 0;
+            double serviceFee = 0;
+            for(long serviceId : serviceIdList){  // VỚI MỖI ID DỊCH VỤ STYLIST CHỌN, CHUYỂN NÓ THÀNH OBJ VÀ GÁN VÀO LIST
+                HairSalonService service = serviceRepository.findHairSalonServiceById(serviceId);
+                hairSalonServiceList.add(service);  // GÁN VÀO DANH SÁCH OBJ DỊCH VỤ
+                serviceNameList.add(service.getName());  // GÁN VÀO DANH SÁCH TÊN DỊCH VỤ
+                serviceFee += service.getCost();  // PHÍ GỐC CỦA SERVICE
+            }
+            //TẠO APPOINTMENT
+            Appointment appointment = new Appointment();
+
+            // SLOT
+            //Slot slot = slotRepository.findSlotByIdAndIsAvailableTrue(appointmentRequest.getSlotId());
+            Slot slot = slotRepository
+                    .findSlotByStartSlotAndDateAndShiftEmployee_AccountForEmployee_EmployeeIdAndIsAvailableTrue(
+                            appointmentRequest.getStartHour(),
+                            appointmentRequest.getDate(),
+                            appointmentRequest.getStylistId()
+                    );
+            appointment.setSlot(slot);  // TÌM SLOT DỰA TRÊN THÔNG TIN REQUEST VÀ GÁN VÀO APPOINTMENT
+
+            //ACCOUNT FOR CUSTOMER
+            appointment.setAccountForCustomer(accountForCustomer);
+
+            //HAIR SALON SERVICE
+            appointment.setHairSalonServices(hairSalonServiceList);
+
+            //DISCOUNT CODE
+            if (!appointmentRequest.getDiscountCode().isEmpty()) {
+                DiscountCode discountCode = getDiscountCode(appointmentRequest.getDiscountCode());
+                appointment.setDiscountCode(discountCode);
+                bonusDiscountCode += (discountCode.getDiscountProgram().getPercentage()) / 100;
+            }
+
+
+            AccountForEmployee accountForEmployee = slot.getShiftEmployee().getAccountForEmployee();
+            if(Stylistchange){
+                appointment.setSystemChose(false);
+                if (accountForEmployee.getStylistSelectionFee() != 0) {
+                    bonusEmployee += (accountForEmployee.getStylistSelectionFee());
+                }
+
+            } else {  // NẾU KO CHỌN STYLIST MỚI -> CÓ 2 TH:
+                // 1. LỊCH CŨ DO HỆ THỐNG CHỌN STYLIST
+                // 2. LỊCH CŨ DO NGƯỜI DÙNG CHỌN
+                appointment.setSystemChose(isSystemChose);
+                if(!appointment.isSystemChose()){
+                    bonusEmployee += (accountForEmployee.getStylistSelectionFee());
+                }
+            }
+
+
+
+            double totalCost = serviceFee - (bonusDiscountCode * serviceFee) + (bonusEmployee);
+            appointment.setCost(totalCost);
+
+            appointment.setDate(slot.getDate());
+            appointment.setStartHour(slot.getStartSlot());
+            appointment.setStylist(slot.getShiftEmployee().getAccountForEmployee().getName());
+
+
+
+            Appointment newAppointment = appointmentRepository.save(appointment);
+
+            //SET OBJ APPOINTMENT VÀO CÁC OBJ KHÁC
+            slot.setAppointments(newAppointment);
+            slot.setAvailable(false);
+            slotRepository.save(slot);
+
+            List<Appointment> appointmentList = accountForCustomer.getAppointments();
+            appointmentList.add(newAppointment);
+            accountForCustomer.setAppointments(appointmentList);
+            accountForCustomerRepository.save(accountForCustomer);
+
+            for(HairSalonService hairSalonService : hairSalonServiceList){
+                List<Appointment> appointments = hairSalonService.getAppointments();
+                appointments.add(newAppointment);
+                hairSalonService.setAppointments(appointments);
+                serviceRepository.save(hairSalonService);
+            }
+
+            if (!appointmentRequest.getDiscountCode().isEmpty()) {
+                DiscountCode discountCode = getDiscountCode(appointmentRequest.getDiscountCode());
+                discountCode.setAppointment(newAppointment);
+                discountCodeRepository.save(discountCode);
+            }
+
+            AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+            appointmentResponse.setId(newAppointment.getAppointmentId());
+            appointmentResponse.setCost(newAppointment.getCost());
+            appointmentResponse.setDay(newAppointment.getSlot().getDate());
+            appointmentResponse.setStartHour(newAppointment.getSlot().getStartSlot());
+            appointmentResponse.setCustomer(accountForCustomer.getName());
+            appointmentResponse.setService(serviceNameList);
+            appointmentResponse.setStylist(newAppointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+
+            return appointmentResponse;
+        } catch (Exception e) {
+            throw new EntityNotFoundException("Can not create appointment: " + e.getMessage());
+        }
+    }
+
+    // UPDATE DANH SACH DICH VU
+    public AppointmentResponse updateServiceList(AppointmentUpdate appointmentUpdate, long idAppointment){
+        Appointment oldAppointment = appointmentRepository
+                .findAppointmentByAppointmentId(idAppointment);
+        AccountForCustomer accountForCustomer = oldAppointment.getAccountForCustomer();
+        // LẤY THÔNG TIN CŨ
+        double total = oldAppointment.getCost();
+        DiscountCode oldCode = oldAppointment.getDiscountCode();
+        double discount = 0;
+        if(oldCode != null){
+            discount = (oldCode.getDiscountProgram().getPercentage())/100;
+        }
+
+        AccountForEmployee stylist = oldAppointment.getSlot().getShiftEmployee().getAccountForEmployee();
+        double stylistFee = stylist.getStylistSelectionFee();
+        //LẤY LẠI LIST CŨ
+        double oldServicesCost = 0;
+        List<HairSalonService> oldHairSalonServiceList = oldAppointment.getHairSalonServices();
+        for(HairSalonService service : oldHairSalonServiceList){
+            oldServicesCost += service.getCost();
+        }
+        //double totalWithoutServices = total - servicesCost;
+        // GENERATE LIST MỚI TỪ INPUT
+        List<HairSalonService> newHairSalonServiceList = new ArrayList<>();
+
+        for(long id : appointmentUpdate.getServiceIdList()){
+            HairSalonService hairSalonService = serviceRepository.findHairSalonServiceById(id);
+            newHairSalonServiceList.add(hairSalonService);
+        }
+
+        if(!appointmentUpdate.getServiceIdList().isEmpty() && !newHairSalonServiceList.equals(oldHairSalonServiceList)){
+            oldAppointment.setHairSalonServices(newHairSalonServiceList);
+            double newServiceCost = 0;
+            for(HairSalonService service : newHairSalonServiceList){
+                newServiceCost += service.getCost();
+            }
+            if(oldAppointment.isSystemChose()){
+                stylistFee = 0;
+            }
+            double newTotal = newServiceCost + stylistFee - newServiceCost * discount;
+            oldAppointment.setCost(newTotal);
+        }
+
+        List<String> serviceNameList = new ArrayList<>();
+        for(HairSalonService hairSalonService : oldAppointment.getHairSalonServices()){
+            String name = hairSalonService.getName();
+            serviceNameList.add(name);
+        }
+
+        Appointment appointment = appointmentRepository.save(oldAppointment);
+
+        AppointmentResponse appointmentResponse = new AppointmentResponse();
+
+        appointmentResponse.setId(appointment.getAppointmentId());
+        appointmentResponse.setCost(appointment.getCost());
+        appointmentResponse.setDay(appointment.getSlot().getDate());
+        appointmentResponse.setStartHour(appointment.getSlot().getStartSlot());
+        if(accountForCustomer != null){
+            appointmentResponse.setCustomer(accountForCustomer.getName());
+        } else {
+            appointmentResponse.setCustomer("Guest");
+        }
+
+        appointmentResponse.setService(serviceNameList);
+        appointmentResponse.setStylist(appointment.getSlot().getShiftEmployee().getAccountForEmployee().getName());
+
+        return appointmentResponse;
     }
 
 }
