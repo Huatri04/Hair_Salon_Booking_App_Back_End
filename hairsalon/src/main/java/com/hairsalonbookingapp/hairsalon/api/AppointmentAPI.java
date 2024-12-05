@@ -144,8 +144,8 @@ public class AppointmentAPI {
     }
 
     @PutMapping("/service/{appointmentId}")
-    public ResponseEntity updateService(@RequestBody List<Long> serviceIdList, @PathVariable long appointmentId){
-        AppointmentResponse appointmentResponse = appointmentService.updateServiceList(serviceIdList, appointmentId);
+    public ResponseEntity updateService(@RequestBody AppointmentUpdate appointmentUpdate, @PathVariable long appointmentId){
+        AppointmentResponse appointmentResponse = appointmentService.updateServiceList(appointmentUpdate, appointmentId);
         return ResponseEntity.ok(appointmentResponse);
     }
 

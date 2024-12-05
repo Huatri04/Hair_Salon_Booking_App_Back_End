@@ -1531,7 +1531,7 @@ public class AppointmentService {
     }
 
     // UPDATE DANH SACH DICH VU
-    public AppointmentResponse updateServiceList(List<Long> serviceIdList, long idAppointment){
+    public AppointmentResponse updateServiceList(AppointmentUpdate appointmentUpdate, long idAppointment){
         Appointment oldAppointment = appointmentRepository
                 .findAppointmentById(idAppointment);
         AccountForCustomer accountForCustomer = oldAppointment.getAccountForCustomer();
@@ -1555,12 +1555,12 @@ public class AppointmentService {
         // GENERATE LIST MỚI TỪ INPUT
         List<HairSalonService> newHairSalonServiceList = new ArrayList<>();
 
-        for(long id : serviceIdList){
+        for(long id : appointmentUpdate.getServiceIdList()){
             HairSalonService hairSalonService = serviceRepository.findHairSalonServiceById(id);
             newHairSalonServiceList.add(hairSalonService);
         }
 
-        if(!serviceIdList.isEmpty() && !newHairSalonServiceList.equals(oldHairSalonServiceList)){
+        if(!appointmentUpdate.getServiceIdList().isEmpty() && !newHairSalonServiceList.equals(oldHairSalonServiceList)){
             oldAppointment.setHairSalonServices(newHairSalonServiceList);
             double newServiceCost = 0;
             for(HairSalonService service : newHairSalonServiceList){
